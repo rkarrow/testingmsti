@@ -43,7 +43,8 @@ const seedDB = async () => {
     }
 
     const courseCount = await Course.countDocuments();
-    if (courseCount === 0) {
+    if (courseCount < 4) {
+      await Course.deleteMany({});
       await Course.insertMany([
         {
           title: 'Officer & Rating Training',
@@ -90,6 +91,7 @@ const seedDB = async () => {
           image: '/course-ecdis.jpg',
         },
       ]);
+      console.log('✅ Default 4 Figma courses seeded successfully');
     }
   } catch (e) {
     console.log('Seed error:', e.message);
