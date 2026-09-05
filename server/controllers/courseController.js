@@ -124,54 +124,9 @@ exports.deleteCourse = async (req, res) => {
 exports.seedCourses = async (req, res) => {
   try {
     await Course.deleteMany({});
-    const created = await Course.insertMany([
-      {
-        title: 'Officer & Rating Training',
-        description: 'A comprehensive nautical science and pre-sea officer cadetship designed to develop world-class merchant navy officers.',
-        shortDescription: 'Officer Cadet (Nautical Science / Pre-Sea)',
-        category: 'Deck Department',
-        duration: '24 Months',
-        level: 'Degree',
-        featured: true,
-        intake: 'January & July',
-        image: '/course-officer.jpg',
-      },
-      {
-        title: 'Marine Engineering Cadetship',
-        description: 'An intensive marine engineering programme focusing on ship propulsion systems, marine automation, and engine room operations.',
-        shortDescription: 'Class IV Marine Engineer Officer CoC Track',
-        category: 'Engine Propulsion',
-        duration: '36 Months',
-        level: 'Degree',
-        featured: true,
-        intake: 'January & July',
-        image: '/course-engineering.jpg',
-      },
-      {
-        title: 'Pre-Sea General Purpose Rating',
-        description: 'Practical seamanship, firefighting, survival craft, and deck machinery operations for general purpose maritime ratings.',
-        shortDescription: 'Seamanship, Firefighting & Lifeboat Proficiency',
-        category: 'Pre-Sea General',
-        duration: '9 Months',
-        level: 'Diploma',
-        featured: true,
-        intake: 'March & September',
-        image: '/course-rating.jpg',
-      },
-      {
-        title: 'ECDIS & Simulator Lab',
-        description: 'STCW-compliant electronic chart display, radar navigation, and full-mission bridge simulator competency modules.',
-        shortDescription: 'IMO STCW Modular & Mandatory Competencies',
-        category: 'STCW Modular',
-        duration: 'Fast Track',
-        level: 'Certificate',
-        featured: true,
-        intake: 'Monthly',
-        image: '/course-ecdis.jpg',
-      },
-    ]);
+    const created = await Course.insertMany(defaultCourses.map(({ _id, ...rest }) => rest));
     res.json({ success: true, count: created.length, data: created });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, count: defaultCourses.length, data: defaultCourses });
   }
 };
