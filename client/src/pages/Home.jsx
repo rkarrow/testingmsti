@@ -4,7 +4,40 @@ import axios from 'axios'
 import { FiArrowRight, FiChevronLeft, FiChevronRight, FiMapPin, FiExternalLink, FiDownload, FiMonitor, FiTool, FiLifeBuoy, FiHome } from 'react-icons/fi'
 
 export default function Home() {
-  const [courses, setCourses] = useState([])
+  const [courses, setCourses] = useState([
+    {
+      _id: '1',
+      title: 'Officer & Rating Training',
+      shortDescription: 'Officer Cadet (Nautical Science / Pre-Sea)',
+      category: 'Deck Department',
+      duration: '24 Months',
+      image: '/course-officer.jpg',
+    },
+    {
+      _id: '2',
+      title: 'Marine Engineering Cadetship',
+      shortDescription: 'Class IV Marine Engineer Officer CoC Track',
+      category: 'Engine Propulsion',
+      duration: '36 Months',
+      image: '/course-engineering.jpg',
+    },
+    {
+      _id: '3',
+      title: 'Pre-Sea General Purpose Rating',
+      shortDescription: 'Seamanship, Firefighting & Lifeboat Proficiency',
+      category: 'Pre-Sea General',
+      duration: '9 Months',
+      image: '/course-rating.jpg',
+    },
+    {
+      _id: '4',
+      title: 'ECDIS & Simulator Lab',
+      shortDescription: 'IMO STCW Modular & Mandatory Competencies',
+      category: 'STCW Modular',
+      duration: 'Fast Track',
+      image: '/course-ecdis.jpg',
+    },
+  ])
   const [news, setNews] = useState([])
   const [settings, setSettings] = useState({
     heroBadge: "⚓ FOUNDING EXCELLENCE SINCE 2002 • SRI LANKA'S PREMIER CADET CORPS",
