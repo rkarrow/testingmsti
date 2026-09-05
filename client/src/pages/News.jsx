@@ -75,7 +75,7 @@ const bulletins = [
 const categories = ['All', 'News', 'Announcement', 'Event', 'Bulletin', 'Achievement']
 
 export default function News() {
-  const [news, setNews] = useState([])
+  const [news, setNews] = useState(staticNews)
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('All')
   const [search, setSearch] = useState('')
