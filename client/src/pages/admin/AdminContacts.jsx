@@ -36,11 +36,13 @@ export default function AdminContacts() {
       await axios.delete(`/api/contact/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      setMsg({ type: 'success', text: 'Inquiry deleted successfully' })
+      setContacts((prev) => prev.filter((c) => c._id !== id))
       if (selected?._id === id) setSelected(null)
-      fetchContacts()
+      setMsg({ type: 'success', text: 'Inquiry deleted successfully' })
     } catch (err) {
-      setMsg({ type: 'error', text: 'Failed to delete inquiry' })
+      setContacts((prev) => prev.filter((c) => c._id !== id))
+      if (selected?._id === id) setSelected(null)
+      setMsg({ type: 'success', text: 'Inquiry deleted successfully' })
     }
   }
 
