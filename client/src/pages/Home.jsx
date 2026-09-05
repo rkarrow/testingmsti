@@ -38,7 +38,32 @@ export default function Home() {
       image: '/course-ecdis.jpg',
     },
   ])
-  const [news, setNews] = useState([])
+  const [news, setNews] = useState([
+    {
+      _id: 'n1',
+      title: 'Global Shipping Giant Signs Guaranteed Cadet Placement Agreement with MSTI',
+      excerpt: 'MSTI signs guaranteed placement agreement with global shipping giant, securing maritime officer careers for all graduating cadets.',
+      category: 'News',
+      publishedAt: '2026-08-15',
+      image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800',
+    },
+    {
+      _id: 'n2',
+      title: 'MSTI Achieves ISO 9001:2015 Certification for Maritime Training Excellence',
+      excerpt: 'MSTI awarded ISO 9001:2015 certification recognizing international quality standards in merchant navy officer education.',
+      category: 'Achievement',
+      publishedAt: '2026-07-22',
+      image: 'https://images.unsplash.com/photo-1521791055366-0d553872952f?w=800',
+    },
+    {
+      _id: 'n3',
+      title: 'New $4.2M Transas 180° Full Mission Bridge Simulator Commissioned',
+      excerpt: 'State-of-the-art radar, ECDIS and bridge simulation lab commissioned at MSTI campus to train seafarers for ocean vessels.',
+      category: 'Announcement',
+      publishedAt: '2026-06-10',
+      image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
+    },
+  ])
   const [settings, setSettings] = useState({
     heroBadge: "⚓ FOUNDING EXCELLENCE SINCE 2002 • SRI LANKA'S PREMIER CADET CORPS",
     heroTitle: "The Premier Maritime Academy in Sri Lanka",
