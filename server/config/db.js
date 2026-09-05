@@ -102,17 +102,23 @@ const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
 
   try {
-    await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 10000 });
+    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/msti_maritime';
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
     console.log(`✅ MongoDB Connected to Atlas/Primary Database`);
     await seedDB();
   } catch (error) {
-    console.log(`⚠️ Primary Database Connection Failed: ${error.message}`);
-    console.log(`⚠️ Starting In-Memory Database fallback...`);
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
-    console.log(`✅ MongoDB Connected to In-Memory Database`);
-    await seedDB();
+    console.log(`⚠️ Primary Database Connection Error: ${error.message}`);
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        mongoServer = await MongoMemoryServer.create();
+        const memUri = mongoServer.getUri();
+        await mongoose.connect(memUri);
+        console.log(`✅ MongoDB Connected to In-Memory Database`);
+        await seedDB();
+      } catch (memErr) {
+        console.log('In-Memory DB error:', memErr.message);
+      }
+    }
   }
 };
 
