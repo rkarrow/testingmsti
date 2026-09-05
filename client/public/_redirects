@@ -1,1 +1,3 @@
-/*    /index.html   200
+/api/*        https://msti-backend-api.onrender.com/api/:splat    200
+/uploads/*    https://msti-backend-api.onrender.com/uploads/:splat200
+/*            /index.html                                          200
