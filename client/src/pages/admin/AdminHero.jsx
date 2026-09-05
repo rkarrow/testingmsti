@@ -2,24 +2,26 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { FiSave, FiUpload, FiImage, FiCheckCircle, FiAlertCircle, FiRefreshCw, FiEye } from 'react-icons/fi'
 
+const defaultHeroSettings = {
+  heroBadge: "⚓ FOUNDING EXCELLENCE SINCE 2002 • SRI LANKA'S PREMIER CADET CORPS",
+  heroTitle: "The Premier Maritime Academy in Sri Lanka",
+  heroSubtitle: "We aspire to become the premier training institute for maritime careers in Sri Lanka and overseas. Fully accredited merchant navy officer training under IMO STCW and DG Shipping.",
+  heroBgImage: "/hero-image.jpg",
+  heroPrimaryCtaText: "Explore Programs",
+  heroPrimaryCtaLink: "/courses",
+  heroSecondaryCtaText: "Book a Campus Visit",
+  heroSecondaryCtaLink: "/contact",
+  aboutBadge: "ABOUT US",
+  aboutTitle: "The Premier Maritime Academy in Sri Lanka",
+  aboutDesc1: "We aim to continuously contribute to the growth of individuals and organizations to ensure they are qualified to deliver results at the highest levels of performance.",
+  aboutDesc2: "Our goal at MSTI Maritime Academy is to be recognized worldwide as a top quality service provider to the international marine industry in maritime training.",
+  aboutLeaderName: "Capt. Ayesha Fernando",
+  aboutLeaderRole: "Valedictorian • Officer of the Watch (STCW II/1)",
+  aboutLeaderImage: "/captain.jpg",
+}
+
 export default function AdminHero() {
-  const [formData, setFormData] = useState({
-    heroBadge: '',
-    heroTitle: '',
-    heroSubtitle: '',
-    heroBgImage: '',
-    heroPrimaryCtaText: '',
-    heroPrimaryCtaLink: '',
-    heroSecondaryCtaText: '',
-    heroSecondaryCtaLink: '',
-    aboutBadge: '',
-    aboutTitle: '',
-    aboutDesc1: '',
-    aboutDesc2: '',
-    aboutLeaderName: '',
-    aboutLeaderRole: '',
-    aboutLeaderImage: '',
-  })
+  const [formData, setFormData] = useState(defaultHeroSettings)
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
