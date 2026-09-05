@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-navy-950 text-white font-sans antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-navy-950;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-navy-500 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-blue-400;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-600 hover:to-blue-800 text-white font-bold text-sm tracking-wider uppercase px-6 py-3.5 rounded-lg shadow-lg hover:shadow-blue-900/40 transition-all duration-300 cursor-pointer border border-blue-500/30;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 border-2 border-amber-400/80 hover:bg-amber-400 hover:text-navy-950 text-amber-400 font-bold text-sm tracking-wider uppercase px-6 py-3.5 rounded-lg transition-all duration-300 cursor-pointer shadow-md;
+  }
+
+  .btn-outline-blue {
+    @apply inline-flex items-center gap-2 border border-blue-500/50 hover:bg-blue-600/20 text-blue-400 hover:text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 cursor-pointer;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-navy-300 text-base md:text-lg max-w-2xl leading-relaxed;
+  }
+
+  .card {
+    @apply bg-navy-900/90 backdrop-blur-sm border border-navy-800 rounded-xl overflow-hidden hover:border-amber-400/50 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300;
+  }
+
+  .tag {
+    @apply inline-block text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-md;
+  }
+
+  .badge-blue {
+    @apply tag bg-blue-600/20 text-blue-400 border border-blue-500/30;
+  }
+
+  .badge-gold {
+    @apply tag bg-amber-400/20 text-amber-400 border border-amber-400/40;
+  }
+
+  .badge-navy {
+    @apply tag bg-navy-800 text-navy-300 border border-navy-700;
+  }
+
+  .input-field {
+    @apply w-full bg-navy-900/80 border border-navy-700 rounded-lg px-4 py-3 text-white placeholder-navy-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors;
+  }
+
+  .section-divider {
+    @apply border-t border-navy-800/80 my-16;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-white via-blue-100 to-amber-300 bg-clip-text text-transparent;
+  }
+
+  .text-gold {
+    @apply text-amber-400 font-semibold;
+  }
+
+  .bg-glass {
+    @apply bg-navy-950/80 backdrop-blur-md border border-white/10;
+  }
+
+  .hover-lift {
+    @apply hover:-translate-y-1.5 transition-transform duration-300;
+  }
+
+  .gold-stripe {
+    @apply relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-16 after:h-1 after:bg-amber-400 after:rounded-full;
+  }
+}
