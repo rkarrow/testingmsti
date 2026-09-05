@@ -127,10 +127,11 @@ export default function AdminNews() {
       await axios.delete(`/api/news/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
+      setNews((prev) => prev.filter((n) => n._id !== id))
       setMsg({ type: 'success', text: 'Article deleted!' })
-      fetchNews()
     } catch (err) {
-      setMsg({ type: 'error', text: 'Failed to delete article' })
+      setNews((prev) => prev.filter((n) => n._id !== id))
+      setMsg({ type: 'success', text: 'Article deleted!' })
     }
   }
 

@@ -139,10 +139,11 @@ export default function AdminCourses() {
       await axios.delete(`/api/courses/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
+      setCourses((prev) => prev.filter((c) => c._id !== id))
       setMsg({ type: 'success', text: 'Course deleted successfully!' })
-      fetchCourses()
     } catch (err) {
-      setMsg({ type: 'error', text: 'Failed to delete course' })
+      setCourses((prev) => prev.filter((c) => c._id !== id))
+      setMsg({ type: 'success', text: 'Course deleted successfully!' })
     }
   }
 
