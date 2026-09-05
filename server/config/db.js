@@ -99,6 +99,7 @@ const seedDB = async () => {
 };
 
 const connectDB = async () => {
+  mongoose.set('bufferCommands', false);
   if (mongoose.connection.readyState >= 1) return;
 
   try {
