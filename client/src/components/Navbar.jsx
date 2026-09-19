@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { FiMenu, FiX, FiUser, FiAnchor, FiPhone, FiMail } from 'react-icons/fi'
+import { FiMenu, FiX, FiAnchor, FiPhone, FiMail } from 'react-icons/fi'
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -77,9 +77,6 @@ export default function Navbar() {
             <Link to="/contact" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-6 rounded transition-colors">
               Apply Now
             </Link>
-            <Link to="/admin" className="w-10 h-10 bg-navy-950 hover:bg-navy-800 rounded-full flex items-center justify-center text-white transition-colors" title="Admin Portal">
-              <FiUser size={18} />
-            </Link>
           </div>
 
           {/* Mobile toggle */}
@@ -118,13 +115,6 @@ export default function Navbar() {
                 className="bg-blue-600 text-white text-sm font-semibold py-2.5 px-6 rounded text-center flex-1"
               >
                 Apply Now
-              </Link>
-              <Link
-                to="/admin"
-                onClick={() => setIsOpen(false)}
-                className="w-10 h-10 bg-navy-950 rounded flex items-center justify-center text-white flex-shrink-0"
-              >
-                <FiUser size={18} />
               </Link>
             </div>
           </div>

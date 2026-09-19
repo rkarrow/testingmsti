@@ -1,0 +1,85 @@
+====================================================================================================
+                        SE3071: DIGITAL IMAGE PROCESSING - 50% PROGRESS REVIEW
+                                 VIVA PREPARATION GUIDE & SYSTEM SPECS
+                                  DOMAIN: SECURITY / SURVEILLANCE
+====================================================================================================
+
+1. PROJECT OVERVIEW & METADATA
+----------------------------------------------------------------------------------------------------
+- Module: SE3071 - Digital Image Processing (Year 3 Semester 2 - 2026)
+- Allocated Domain: Security / Surveillance (Based on IT Number Last Digit: 6)
+- System Architecture: Single Integrated Python App (Streamlit + OpenCV + NumPy)
+
+2. PROBLEM STATEMENT
+----------------------------------------------------------------------------------------------------
+"Enhancing low-contrast surveillance images and detecting candidate vehicle, person, and license plate 
+regions using adaptive thresholding and morphological contour analysis."
+
+3. DATASET SUMMARY
+----------------------------------------------------------------------------------------------------
+- Total Images: 30 Images
+  * Self-Captured Images: 10 images (Roadway traffic, scooters, vehicles, and pedestrians)
+  * Downloaded Images: 10 images (CCTV surveillance frames, low-light traffic scenes)
+  * Unseen Test Dataset: 10 images (Held back exclusively for quantitative evaluation)
+- Documentation File: dataset_record.txt (Includes image names, resolution, format, and test purpose)
+
+4. CORE PROCESSING PIPELINE & VIVA JUSTIFICATIONS
+----------------------------------------------------------------------------------------------------
+
+Q1: What are the Colour Spaces used and why?
+Answer:
+- BGR to Grayscale: Essential for noise reduction, enhancement (CLAHE), and edge detection algorithms.
+- BGR to HSV: Preserves color intensity independent of brightness, useful for reflective region identification 
+  like vehicle license plates or tail lights.
+
+Q2: How did you perform Contrast Enhancement and Illumination Correction?
+Answer:
+- Contrast Enhancement: Applied CLAHE (Contrast Limited Adaptive Histogram Equalization). Unlike standard 
+  Histogram Equalization, CLAHE operates on localized regions (tiles) and clips high peaks to prevent noise 
+  over-amplification in surveillance scenes.
+- Illumination Correction: Implemented Gamma Correction via Look-Up Table (LUT). This brightens dark 
+  shadowed areas without saturating well-lit foreground zones.
+
+Q3: Which Noise Reduction filters did you compare, and which one did you select?
+Answer:
+- Comparison: Compared Gaussian Blur vs Median Blur.
+- Selection Justification: Selected MEDIAN BLUR. Median filtering is a non-linear method exceptionally 
+  effective at removing salt-and-pepper noise (typical in low-light CCTV sensor artifacts) while strictly 
+  preserving sharp edges necessary for object bounding box detection.
+
+Q4: Why did you choose Adaptive / Dynamic Thresholding over Otsu's Thresholding?
+Answer:
+- Justification: Surveillance images often suffer from uneven spatial illumination (e.g., street lights, 
+  headlight glare, tree shadows). Otsu's method calculates a single global threshold, which fails under 
+  non-uniform lighting. Adaptive Thresholding computes threshold values for smaller local regions, adapting 
+  better to real-world security scenes.
+
+5. DOMAIN ANALYSIS & OUTPUT RULE LOGIC
+----------------------------------------------------------------------------------------------------
+- Domain Techniques Implemented:
+  1. CLAHE & Gamma Illumination Enhancement
+  2. Median Noise Filtering
+  3. Canny Edge Detection
+  4. Morphological Closing (to connect fragmented edge components)
+  5. Contour Analysis & Geometric Feature Bounding Boxes
+
+- Output Decision Logic (Calculation):
+  "Contours are filtered based on bounding rectangle area (area > 300 pixels) and aspect ratio (0.2 < width/height < 6.0). 
+   Matching regions are rendered with green bounding boxes, and the system outputs the total count of candidate objects."
+
+6. EVALUATION METRICS & GROUND TRUTH
+----------------------------------------------------------------------------------------------------
+- Evaluation Metrics Selected:
+  1. Count Error: | Actual Manual Count - System Detected Count |
+  2. Processing Time per Frame (seconds)
+- Ground Truth Preparation: Manual object counting log established for the 10 unseen test set images.
+
+7. VIVA CHANGE PREDICTION DRILLS (IF EXAMINER ASKS TO CHANGE PARAMETERS)
+----------------------------------------------------------------------------------------------------
+- Scenario 1: "Increase Canny High Threshold"
+  -> Effect: Edge detection becomes stricter. Minor noise edges disappear, but faint object boundaries might be missed.
+- Scenario 2: "Decrease Gamma Value (below 1.0)"
+  -> Effect: Image gets darker, low-light CCTV regions become less visible, reducing contour detection yield.
+- Scenario 3: "Increase CLAHE Clip Limit"
+  -> Effect: Contrast increases in local tiles, making faint edges more prominent, but may introduce localized noise.
+====================================================================================================

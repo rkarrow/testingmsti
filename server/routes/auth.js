@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
 
     res.json({
       success: true,
@@ -55,7 +55,22 @@ router.post('/login', async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.log('Login DB error:', error.message);
+    // Fallback: if DB is down but credentials match default admin, issue token anyway
+    if (email === 'admin@msti.lk' && password === 'admin123') {
+      const token = jwt.sign({ id: 'admin_fallback', role: 'admin' }, JWT_SECRET, { expiresIn: '30d' });
+      return res.json({
+        success: true,
+        token,
+        user: {
+          id: 'admin_fallback',
+          name: 'MSTI Admin',
+          email: 'admin@msti.lk',
+          role: 'admin',
+        },
+      });
+    }
+    res.status(500).json({ success: false, message: 'Server error. Please try again in a moment.' });
   }
 });
 

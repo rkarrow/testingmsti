@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongoServer;
 
@@ -98,19 +97,25 @@ const seedDB = async () => {
   }
 };
 
-const connectDB = async () => {
-  mongoose.set('bufferCommands', false);
-  if (mongoose.connection.readyState >= 1) return;
+let isConnecting = false;
 
+const connectDB = async () => {
+  // Keep bufferCommands ON (default) so queries queue while connection establishes
+  mongoose.set('bufferTimeoutMS', 30000); // wait up to 30s for connection before failing
+  if (mongoose.connection.readyState >= 1) return;
+  if (isConnecting) return;
+
+  isConnecting = true;
   try {
     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/msti_maritime';
-    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 15000 });
     console.log(`✅ MongoDB Connected to Atlas/Primary Database`);
     await seedDB();
   } catch (error) {
     console.log(`⚠️ Primary Database Connection Error: ${error.message}`);
     if (process.env.NODE_ENV !== 'production') {
       try {
+        const { MongoMemoryServer } = require('mongodb-memory-server');
         mongoServer = await MongoMemoryServer.create();
         const memUri = mongoServer.getUri();
         await mongoose.connect(memUri);
@@ -120,7 +125,10 @@ const connectDB = async () => {
         console.log('In-Memory DB error:', memErr.message);
       }
     }
+  } finally {
+    isConnecting = false;
   }
 };
 
 module.exports = connectDB;
+

@@ -47,7 +47,6 @@ export default function Footer() {
                 { label: 'Maritime News & Commencements', to: '/news' },
                 { label: 'Simulators & Training Fleet', to: '/about' },
                 { label: 'Cadet Application Portal', to: '/contact' },
-                { label: 'Admin Portal Login', to: '/admin/login' },
               ].map((link, i) => (
                 <li key={i}>
                   <Link to={link.to} className="text-navy-400 text-xs hover:text-blue-400 transition-colors">
