@@ -25,32 +25,53 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Campus & Contact Details */}
+          {/* Column 2: Campus & Training Centers */}
           <div className="space-y-4">
-            <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-              MSTI Dehiwala - Main Branch
-            </h3>
-            
-            <div className="space-y-2.5 text-xs text-navy-300">
-              <div className="flex items-start gap-2.5">
-                <FiMapPin className="text-blue-400 shrink-0 mt-0.5" size={15} />
-                <span>No. 32, Station Road, Dehiwala 10350, Sri Lanka</span>
+            <div>
+              <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                MSTI Dehiwala - Main Branch
+              </h3>
+              <div className="space-y-1.5 text-xs text-navy-300">
+                <div className="flex items-start gap-2">
+                  <FiMapPin className="text-blue-400 shrink-0 mt-0.5" size={13} />
+                  <span>No. 32, Station Road, Dehiwala 10350, Sri Lanka</span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <a href="tel:+94117476100" className="hover:text-white transition-colors flex items-center gap-1">
+                    <FiPhone className="text-blue-400 shrink-0" size={12} /> +94 11 747 6100
+                  </a>
+                  <a href="mailto:helpdesk@msti.lk" className="hover:text-white transition-colors flex items-center gap-1">
+                    <FiMail className="text-blue-400 shrink-0" size={12} /> helpdesk@msti.lk
+                  </a>
+                </div>
               </div>
-              
-              <div className="flex items-center gap-2.5">
-                <FiPhone className="text-blue-400 shrink-0" size={14} />
-                <a href="tel:+94117476100" className="hover:text-white transition-colors font-medium">
-                  +94 11 747 6100
-                </a>
-              </div>
-              
-              <div className="flex items-center gap-2.5">
-                <FiMail className="text-blue-400 shrink-0" size={14} />
-                <a href="mailto:helpdesk@msti.lk" className="hover:text-white transition-colors">
-                  helpdesk@msti.lk
-                </a>
-              </div>
+            </div>
+
+            {/* Kalutara South Training Center */}
+            <div className="pt-3 border-t border-navy-900">
+              <h4 className="text-white text-xs font-semibold flex items-center gap-1.5 mb-1 text-blue-400">
+                <FiMapPin size={13} className="text-amber-400" /> Kalutara South Training Center
+              </h4>
+              <p className="text-navy-300 text-[11px] leading-relaxed">
+                No. 25, St. Sebastian Road, Kalutara South, Sri Lanka
+              </p>
+              <p className="text-navy-400 text-[10px] mt-0.5">
+                Practical Workshops, Basic Seamanship, Seafarer Physical Readiness.
+              </p>
+            </div>
+
+            {/* Kalutara North Training Center */}
+            <div className="pt-3 border-t border-navy-900">
+              <h4 className="text-white text-xs font-semibold flex items-center gap-1.5 mb-1 text-blue-400">
+                <FiMapPin size={13} className="text-amber-400" /> Kalutara North Training Center
+              </h4>
+              <p className="text-navy-300 text-[11px] leading-relaxed">
+                Mirishenawatta, Ethanamadala, Kalutara North, Sri Lanka
+              </p>
+              <p className="text-navy-400 text-[10px] mt-0.5">
+                Specialized Practical Grounds, Marine Safety Training, Outdoor Exercises.
+              </p>
             </div>
 
             {/* Certificate Verification CTA */}
