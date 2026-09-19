@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Contact = require('../models/Contact');
 
 // POST submit contact form
@@ -61,8 +62,6 @@ exports.getAllEnquiries = async (req, res) => {
     res.json({ success: true, count: defaultContacts.length, data: defaultContacts });
   }
 };
-
-const mongoose = require('mongoose');
 
 // DELETE enquiry
 exports.deleteEnquiry = async (req, res) => {

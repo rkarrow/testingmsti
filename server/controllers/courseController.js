@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+const Course = require('../models/Course');
+
 const defaultCourses = [
   {
     _id: '101',
