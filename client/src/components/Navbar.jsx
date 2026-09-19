@@ -20,17 +20,20 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-blue-400 font-medium">
-              <FiAnchor size={13} className="text-amber-400" /> IMO STCW & DG SHIPPING APPROVED ACADEMY
+              <FiAnchor size={13} className="text-amber-400" /> DGMS APPROVED & ISO 9001:2015 CERTIFIED ACADEMY
             </span>
             <span className="text-navy-700">|</span>
-            <span className="text-navy-300">Merchant Navy Officer Training & Nautical Science</span>
+            <span className="text-navy-300">📍 No. 32, Station Road, Dehiwala 10350, Sri Lanka</span>
           </div>
           <div className="flex items-center gap-6 text-xs text-navy-300">
-            <a href="tel:+94112428900" className="hover:text-white transition-colors flex items-center gap-1.5">
-              <FiPhone size={12} className="text-blue-400" /> +94 11 242 8900
+            <a href="tel:+94117476100" className="hover:text-white transition-colors flex items-center gap-1.5">
+              <FiPhone size={12} className="text-blue-400" /> +94 11 747 6100
             </a>
-            <a href="mailto:admissions@msti.edu.lk" className="hover:text-white transition-colors flex items-center gap-1.5">
-              <FiMail size={12} className="text-blue-400" /> admissions@msti.edu.lk
+            <a href="mailto:helpdesk@msti.lk" className="hover:text-white transition-colors flex items-center gap-1.5">
+              <FiMail size={12} className="text-blue-400" /> helpdesk@msti.lk
+            </a>
+            <a href="mailto:certificate@msti.lk?subject=Certificate%20Verification%20Request" className="text-amber-400 hover:text-amber-300 transition-colors font-medium border-l border-navy-700 pl-4">
+              Certificate Verification
             </a>
           </div>
         </div>
