@@ -66,6 +66,16 @@ app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 // Serve static uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Auto-connect DB middleware for serverless/express (must be BEFORE routes)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('DB connect error:', err.message);
+  }
+  next();
+});
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/settings', require('./routes/settings'));
@@ -105,16 +115,6 @@ app.get('/api/db-status', async (req, res) => {
     maskedUri: mongoUri.replace(/:([^:@]+)@/, ':****@'),
     connectError: connectError
   });
-});
-
-// Auto-connect DB middleware for serverless/express
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-  } catch (err) {
-    // continue
-  }
-  next();
 });
 
 // Centralized error handler (secure error reporting without stack trace leakage)
