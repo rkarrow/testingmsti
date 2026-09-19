@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiMapPin, FiPhone, FiMail, FiCheckCircle, FiShield, FiAward } from 'react-icons/fi'
+import CertificateModal from './CertificateModal'
 
 export default function Footer() {
+  const [certModalOpen, setCertModalOpen] = useState(false)
   return (
     <footer className="bg-navy-950 pt-16 pb-8 border-t border-navy-900 text-navy-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,13 +79,14 @@ export default function Footer() {
 
             {/* Certificate Verification CTA */}
             <div className="pt-2">
-              <a
-                href="mailto:certificate@msti.lk?subject=Certificate%20Verification%20Request"
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-semibold transition-all w-full justify-center group"
+              <button
+                type="button"
+                onClick={() => setCertModalOpen(true)}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-semibold transition-all w-full justify-center group cursor-pointer"
               >
                 <FiCheckCircle size={14} className="text-blue-400 group-hover:scale-110 transition-transform" />
                 Certificate Verification
-              </a>
+              </button>
             </div>
           </div>
 
@@ -143,11 +147,20 @@ export default function Footer() {
           <div className="flex gap-5 text-xs">
             <Link to="/about" className="hover:text-blue-400 transition-colors">DGMS Approval</Link>
             <Link to="/courses" className="hover:text-blue-400 transition-colors">STCW Programs</Link>
-            <a href="mailto:certificate@msti.lk" className="hover:text-blue-400 transition-colors">Certificate Verification</a>
+            <button 
+              type="button" 
+              onClick={() => setCertModalOpen(true)} 
+              className="hover:text-blue-400 transition-colors text-xs text-navy-400 cursor-pointer"
+            >
+              Certificate Verification
+            </button>
             <Link to="/contact" className="hover:text-blue-400 transition-colors">MSTI Dehiwala - Main Branch</Link>
           </div>
         </div>
       </div>
+
+      {/* Certificate Verification Modal */}
+      <CertificateModal isOpen={certModalOpen} onClose={() => setCertModalOpen(false)} />
     </footer>
   )
 }

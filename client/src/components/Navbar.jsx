@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { FiMenu, FiX, FiAnchor, FiPhone, FiMail } from 'react-icons/fi'
+import CertificateModal from './CertificateModal'
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -12,6 +13,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [certModalOpen, setCertModalOpen] = useState(false)
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 shadow-sm">
@@ -32,9 +34,13 @@ export default function Navbar() {
             <a href="mailto:helpdesk@msti.lk" className="hover:text-white transition-colors flex items-center gap-1.5">
               <FiMail size={12} className="text-blue-400" /> helpdesk@msti.lk
             </a>
-            <a href="mailto:certificate@msti.lk?subject=Certificate%20Verification%20Request" className="text-amber-400 hover:text-amber-300 transition-colors font-medium border-l border-navy-700 pl-4">
+            <button
+              type="button"
+              onClick={() => setCertModalOpen(true)}
+              className="text-amber-400 hover:text-amber-300 transition-colors font-medium border-l border-navy-700 pl-4 cursor-pointer"
+            >
               Certificate Verification
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -124,6 +130,9 @@ export default function Navbar() {
         </div>
       )}
       </nav>
+
+      {/* Certificate Verification Modal */}
+      <CertificateModal isOpen={certModalOpen} onClose={() => setCertModalOpen(false)} />
     </header>
   )
 }
