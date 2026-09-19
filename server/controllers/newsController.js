@@ -64,7 +64,7 @@ exports.getAllNews = async (req, res) => {
     if (limit) newsQuery = newsQuery.limit(parseInt(limit));
 
     let news = await newsQuery;
-    if (!news || news.length === 0) {
+    if (!news) {
       news = defaultNews;
     }
     res.json({ success: true, count: news.length, data: news });

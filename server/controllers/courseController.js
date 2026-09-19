@@ -68,7 +68,7 @@ exports.getAllCourses = async (req, res) => {
     if (limit) coursesQuery = coursesQuery.limit(parseInt(limit));
 
     let courses = await coursesQuery;
-    if (!courses || courses.length === 0) {
+    if (!courses) {
       courses = defaultCourses;
     }
     res.json({ success: true, count: courses.length, data: courses });

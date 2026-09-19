@@ -42,7 +42,8 @@ const seedDB = async () => {
     }
 
     const courseCount = await Course.countDocuments();
-    if (courseCount < 4) {
+    // Only seed courses on the very first run (when settings didn't exist) or if explicitly requested
+    if (!settingsExist && courseCount === 0) {
       await Course.deleteMany({});
       await Course.insertMany([
         {

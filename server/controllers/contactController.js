@@ -53,7 +53,7 @@ const defaultContacts = [
 exports.getAllEnquiries = async (req, res) => {
   try {
     let enquiries = await Contact.find().sort({ createdAt: -1 });
-    if (!enquiries || enquiries.length === 0) {
+    if (!enquiries) {
       enquiries = defaultContacts;
     }
     res.json({ success: true, count: enquiries.length, data: enquiries });
