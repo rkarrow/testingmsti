@@ -106,12 +106,22 @@ app.get('/api/db-status', async (req, res) => {
   });
 });
 
+// Auto-connect DB middleware for serverless/express
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+  } catch (err) {
+    // continue
+  }
+  next();
+});
+
 // Centralized error handler (secure error reporting without stack trace leakage)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-// Start server AFTER DB is connected
+// Start server when run directly
 const startServer = async () => {
   try {
     await connectDB();
@@ -125,5 +135,10 @@ const startServer = async () => {
   });
 };
 
-startServer();
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  startServer();
+}
+
+module.exports = app;
+
 
