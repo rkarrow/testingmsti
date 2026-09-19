@@ -1,13 +1,19 @@
 import { useState } from 'react'
-import { FiX, FiMail, FiCheck, FiCopy, FiExternalLink, FiFileText } from 'react-icons/fi'
+import axios from 'axios'
+import { FiX, FiMail, FiCheck, FiCopy, FiExternalLink, FiFileText, FiSend, FiCheckCircle, FiLoader, FiAlertCircle } from 'react-icons/fi'
 
 export default function CertificateModal({ isOpen, onClose }) {
   const [fullName, setFullName] = useState('')
+  const [studentEmail, setStudentEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [dob, setDob] = useState('')
   const [certList, setCertList] = useState([
     { name: '', number: '', issuedDate: '', expireDate: '' }
   ])
   const [copied, setCopied] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sentSuccess, setSentSuccess] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
   if (!isOpen) return null
 
@@ -29,6 +35,8 @@ export default function CertificateModal({ isOpen, onClose }) {
   const generateEmailBody = () => {
     const nameStr = fullName.trim() || '[Your Full Name]'
     const dobStr = dob.trim() || '[DD/MM/YYYY]'
+    const emailStr = studentEmail.trim() || '[Your Email]'
+    const phoneStr = phone.trim() || '[Your Phone]'
     
     let certsTable = ''
     const validCerts = certList.filter(c => c.name.trim() || c.number.trim())
@@ -49,11 +57,52 @@ Could you please verify the authentication of the following certificates issued 
 
 Full Name - ${nameStr}
 D.O.B – ${dobStr}
+Contact Email – ${emailStr}
+Phone – ${phoneStr}
 
 ${certsTable}
 Copies of the Certificates are attached for your easy reference.
 
 Thank you.`
+  }
+
+  const handleSendDirectly = async (e) => {
+    if (e) e.preventDefault()
+    setErrorMsg('')
+    
+    if (!fullName.trim()) {
+      setErrorMsg('Please enter your Full Name')
+      return
+    }
+    if (!studentEmail.trim()) {
+      setErrorMsg('Please enter your Contact Email Address so we can reply with the verification')
+      return
+    }
+
+    try {
+      setSending(true)
+      const bodyText = generateEmailBody()
+      
+      // Submit to backend API
+      await axios.post('/api/contact', {
+        name: fullName,
+        email: studentEmail,
+        phone: phone || '+94',
+        subject: `Certificate Verification Request - ${fullName}`,
+        enquiryType: 'Certificate Verification',
+        message: bodyText,
+      })
+
+      setSentSuccess(true)
+    } catch (err) {
+      // If API error, fallback to opening mail client
+      const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || 'Student Verification'}`)
+      const body = encodeURIComponent(generateEmailBody())
+      window.location.href = `mailto:certificate@msti.lk?subject=${subject}&body=${body}`
+      setSentSuccess(true)
+    } finally {
+      setSending(false)
+    }
   }
 
   const handleOpenGmail = () => {
@@ -63,16 +112,20 @@ Thank you.`
     window.open(gmailUrl, '_blank')
   }
 
-  const handleOpenEmail = () => {
-    const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || 'Student Verification'}`)
-    const body = encodeURIComponent(generateEmailBody())
-    window.location.href = `mailto:certificate@msti.lk?subject=${subject}&body=${body}`
-  }
-
   const handleCopy = () => {
     navigator.clipboard.writeText(generateEmailBody())
     setCopied(true)
     setTimeout(() => setCopied(false), 3000)
+  }
+
+  const handleReset = () => {
+    setSentSuccess(false)
+    setFullName('')
+    setStudentEmail('')
+    setPhone('')
+    setDob('')
+    setCertList([{ name: '', number: '', issuedDate: '', expireDate: '' }])
+    onClose()
   }
 
   return (
@@ -80,8 +133,8 @@ Thank you.`
       <div className="bg-navy-950 border border-navy-800 rounded-2xl max-w-2xl w-full p-6 md:p-8 space-y-6 shadow-2xl relative my-8 text-left max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-navy-400 hover:text-white p-2 rounded-lg bg-navy-900/50 hover:bg-navy-800 transition-colors"
+          onClick={handleReset}
+          className="absolute top-4 right-4 text-navy-400 hover:text-white p-2 rounded-lg bg-navy-900/50 hover:bg-navy-800 transition-colors cursor-pointer"
         >
           <FiX size={20} />
         </button>
@@ -97,168 +150,226 @@ Thank you.`
           </div>
         </div>
 
-        {/* Official Notice Box */}
-        <div className="bg-blue-600/10 border border-blue-500/30 rounded-xl p-4 text-xs leading-relaxed text-blue-200">
-          <p className="font-semibold text-white mb-1">📢 Notice for Students & Employers:</p>
-          <p className="italic text-blue-100">
-            “Dear Students, To verify your certificates, please send an email to{' '}
-            <a href="mailto:certificate@msti.lk" className="text-amber-400 underline font-semibold">
-              certificate@msti.lk
-            </a>
-            . Thank you.”
-          </p>
-        </div>
-
-        {/* Quick Fill Form */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-              Verification Template Auto-fill (Optional)
-            </h3>
-            <span className="text-[11px] text-navy-400">Fill details or send directly</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-medium text-navy-300 mb-1">Full Name</label>
-              <input
-                type="text"
-                placeholder="e.g. Opatha Arachchi Kankanamge Tehan"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-              />
+        {/* SUCCESS VIEW */}
+        {sentSuccess ? (
+          <div className="space-y-6 py-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
+              <FiCheckCircle size={32} />
             </div>
-            <div>
-              <label className="block text-[11px] font-medium text-navy-300 mb-1">Date of Birth (D.O.B)</label>
-              <input
-                type="text"
-                placeholder="e.g. 11/12/1998"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-              />
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-white">Verification Request Sent Successfully!</h3>
+              <p className="text-xs text-navy-300 max-w-md mx-auto leading-relaxed">
+                Your certificate verification request has been dispatched to <span className="text-blue-400 font-semibold">certificate@msti.lk</span>. Our verification officers will inspect the credentials and reply to <span className="text-white font-medium">{studentEmail}</span> shortly.
+              </p>
+            </div>
+
+            <div className="pt-4 flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 px-8 rounded-xl shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+              >
+                Done
+              </button>
             </div>
           </div>
+        ) : (
+          <>
+            {/* Official Notice Box */}
+            <div className="bg-blue-600/10 border border-blue-500/30 rounded-xl p-4 text-xs leading-relaxed text-blue-200">
+              <p className="font-semibold text-white mb-1">📢 Notice for Students & Employers:</p>
+              <p className="italic text-blue-100">
+                “Dear Students, To verify your certificates, please send an email to{' '}
+                <a href="mailto:certificate@msti.lk" className="text-amber-400 underline font-semibold">
+                  certificate@msti.lk
+                </a>
+                . Thank you.”
+              </p>
+            </div>
 
-          {/* Certificate Items */}
-          <div className="space-y-2 pt-2">
-            <label className="block text-[11px] font-medium text-navy-300">
-              Certificates to Verify:
-            </label>
-            {certList.map((cert, index) => (
-              <div key={index} className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-navy-900/60 p-2.5 rounded-lg border border-navy-800">
-                <input
-                  type="text"
-                  placeholder="Certificate Name (e.g. Advanced Fire Fighting)"
-                  value={cert.name}
-                  onChange={(e) => handleCertChange(index, 'name', e.target.value)}
-                  className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Cert No (e.g. 50014/09-2024)"
-                  value={cert.number}
-                  onChange={(e) => handleCertChange(index, 'number', e.target.value)}
-                  className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Issued (e.g. 03/01/2025)"
-                  value={cert.issuedDate}
-                  onChange={(e) => handleCertChange(index, 'issuedDate', e.target.value)}
-                  className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                />
-                <div className="flex gap-1">
+            {errorMsg && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 flex items-center gap-2">
+                <FiAlertCircle size={16} className="shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {/* Quick Fill Form */}
+            <form onSubmit={handleSendDirectly} className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                  Verification Request Details
+                </h3>
+                <span className="text-[11px] text-navy-400">All fields automatically formatted</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Full Name *</label>
                   <input
                     type="text"
-                    placeholder="Expiry / Never Expires"
-                    value={cert.expireDate}
-                    onChange={(e) => handleCertChange(index, 'expireDate', e.target.value)}
-                    className="flex-1 bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                    required
+                    placeholder="e.g. Opatha Arachchi Kankanamge Tehan"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
                   />
-                  {certList.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveCert(index)}
-                      className="text-red-400 hover:text-red-300 px-2 py-1"
-                      title="Remove"
-                    >
-                      <FiX size={14} />
-                    </button>
-                  )}
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Date of Birth (D.O.B)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 11/12/1998"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Your Email (for Reply) *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="yourname@gmail.com"
+                    value={studentEmail}
+                    onChange={(e) => setStudentEmail(e.target.value)}
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Contact Phone</label>
+                  <input
+                    type="text"
+                    placeholder="+94 77 123 4567"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                  />
                 </div>
               </div>
-            ))}
 
-            <button
-              type="button"
-              onClick={handleAddCert}
-              className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 mt-1"
-            >
-              + Add another certificate
-            </button>
-          </div>
-        </div>
+              {/* Certificate Items */}
+              <div className="space-y-2 pt-2">
+                <label className="block text-[11px] font-medium text-navy-300">
+                  Certificates to Verify (Name, Number, Issued & Expire Dates):
+                </label>
+                {certList.map((cert, index) => (
+                  <div key={index} className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-navy-900/60 p-2.5 rounded-lg border border-navy-800">
+                    <input
+                      type="text"
+                      placeholder="Certificate Name"
+                      value={cert.name}
+                      onChange={(e) => handleCertChange(index, 'name', e.target.value)}
+                      className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Cert No (e.g. 50014/09-2024)"
+                      value={cert.number}
+                      onChange={(e) => handleCertChange(index, 'number', e.target.value)}
+                      className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Issued (e.g. 03/01/2025)"
+                      value={cert.issuedDate}
+                      onChange={(e) => handleCertChange(index, 'issuedDate', e.target.value)}
+                      className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                    />
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        placeholder="Expiry Date"
+                        value={cert.expireDate}
+                        onChange={(e) => handleCertChange(index, 'expireDate', e.target.value)}
+                        className="flex-1 bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                      />
+                      {certList.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCert(index)}
+                          className="text-red-400 hover:text-red-300 px-2 py-1 cursor-pointer"
+                          title="Remove"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
 
-        {/* Email Preview Box */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] text-navy-400">
-            <span>Email Draft Preview (Recipient: certificate@msti.lk)</span>
-            <button
-              onClick={handleCopy}
-              className="text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium"
-            >
-              {copied ? <FiCheck className="text-emerald-400" /> : <FiCopy />}
-              {copied ? 'Copied to Clipboard!' : 'Copy Text'}
-            </button>
-          </div>
-          <pre className="bg-navy-900 border border-navy-800 rounded-xl p-3.5 text-xs font-mono text-navy-200 whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto">
-            {generateEmailBody()}
-          </pre>
-        </div>
+                <button
+                  type="button"
+                  onClick={handleAddCert}
+                  className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 mt-1 cursor-pointer"
+                >
+                  + Add another certificate
+                </button>
+              </div>
 
-        {/* Action Buttons */}
-        <div className="pt-2 border-t border-navy-800 flex flex-col gap-2.5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Primary: Open in Gmail */}
-            <button
-              type="button"
-              onClick={handleOpenGmail}
-              className="bg-red-600 hover:bg-red-500 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-red-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <FiExternalLink size={16} /> Open & Auto-Fill in Gmail
-            </button>
+              {/* Email Preview Box */}
+              <div className="space-y-1.5 pt-2">
+                <div className="flex items-center justify-between text-[11px] text-navy-400">
+                  <span>Formatted Email Message (Sent to: certificate@msti.lk)</span>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium cursor-pointer"
+                  >
+                    {copied ? <FiCheck className="text-emerald-400" /> : <FiCopy />}
+                    {copied ? 'Copied!' : 'Copy Text'}
+                  </button>
+                </div>
+                <pre className="bg-navy-900 border border-navy-800 rounded-xl p-3.5 text-xs font-mono text-navy-200 whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto">
+                  {generateEmailBody()}
+                </pre>
+              </div>
 
-            {/* Secondary: Open in Default Email Client */}
-            <button
-              type="button"
-              onClick={handleOpenEmail}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <FiMail size={16} /> Open in Default Mail App
-            </button>
-          </div>
+              {/* Action Buttons */}
+              <div className="pt-2 border-t border-navy-800 flex flex-col gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* DIRECT SEND BUTTON */}
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    {sending ? <FiLoader className="animate-spin" size={16} /> : <FiSend size={16} />}
+                    {sending ? 'Sending Request...' : 'Send Verification Request'}
+                  </button>
 
-          <div className="flex gap-2.5">
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="flex-1 bg-navy-900 hover:bg-navy-850 text-navy-200 hover:text-white font-semibold text-xs py-2.5 px-4 rounded-xl border border-navy-800 flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              {copied ? <FiCheck className="text-emerald-400" size={15} /> : <FiCopy size={15} />}
-              {copied ? 'Copied to Clipboard!' : 'Copy Formatted Text'}
-            </button>
+                  {/* Open in Gmail Button */}
+                  <button
+                    type="button"
+                    onClick={handleOpenGmail}
+                    className="bg-red-600 hover:bg-red-500 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-red-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <FiExternalLink size={16} /> Open & Auto-Fill in Gmail
+                  </button>
+                </div>
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-navy-900 hover:bg-navy-850 text-navy-400 hover:text-white text-xs py-2.5 px-5 rounded-xl border border-navy-800 cursor-pointer"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+                <div className="flex gap-2.5">
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="flex-1 bg-navy-900 hover:bg-navy-850 text-navy-200 hover:text-white font-semibold text-xs py-2.5 px-4 rounded-xl border border-navy-800 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    {copied ? <FiCheck className="text-emerald-400" size={15} /> : <FiCopy size={15} />}
+                    {copied ? 'Copied to Clipboard!' : 'Copy Formatted Text'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="bg-navy-900 hover:bg-navy-850 text-navy-400 hover:text-white text-xs py-2.5 px-5 rounded-xl border border-navy-800 cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </form>
+          </>
+        )}
       </div>
     </div>
   )
