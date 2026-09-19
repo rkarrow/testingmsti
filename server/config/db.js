@@ -100,8 +100,8 @@ const seedDB = async () => {
 let isConnecting = false;
 
 const connectDB = async () => {
-  // Keep bufferCommands ON (default) so queries queue while connection establishes
-  mongoose.set('bufferTimeoutMS', 30000); // wait up to 30s for connection before failing
+  // Disable bufferCommands so queries fail immediately if DB is disconnected (allows our fallback auth to work)
+  mongoose.set('bufferCommands', false);
   if (mongoose.connection.readyState >= 1) return;
   if (isConnecting) return;
 
