@@ -29,7 +29,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-              Dehiwala Main Campus
+              MSTI Dehiwala - Main Branch
             </h3>
             
             <div className="space-y-2.5 text-xs text-navy-300">
@@ -123,7 +123,7 @@ export default function Footer() {
             <Link to="/about" className="hover:text-blue-400 transition-colors">DGMS Approval</Link>
             <Link to="/courses" className="hover:text-blue-400 transition-colors">STCW Programs</Link>
             <a href="mailto:certificate@msti.lk" className="hover:text-blue-400 transition-colors">Certificate Verification</a>
-            <Link to="/contact" className="hover:text-blue-400 transition-colors">Dehiwala Main</Link>
+            <Link to="/contact" className="hover:text-blue-400 transition-colors">MSTI Dehiwala - Main Branch</Link>
           </div>
         </div>
       </div>
