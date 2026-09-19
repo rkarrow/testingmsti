@@ -85,7 +85,7 @@ app.get('/api/health', (req, res) => {
 
 // Diagnostic DB Status endpoint
 app.get('/api/db-status', async (req, res) => {
-  const mongoUri = process.env.MONGO_URI || 'mongodb+srv://rashmikak217_db_user:10Krashm%40@cluster0.qqvcriy.mongodb.net/msti_maritime?retryWrites=true&w=majority';
+  const mongoUri = process.env.MONGO_URI || 'mongodb+srv://rashmikak217_db_user:10Krashm%40@cluster0.qqvcriy.mongodb.net/msti_maritime?retryWrites=true&w=majority&appName=Cluster0';
   const state = mongoose.connection.readyState;
   const stateMap = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
   

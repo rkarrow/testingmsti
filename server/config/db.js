@@ -106,8 +106,8 @@ const connectDB = async () => {
 
   isConnecting = true;
   try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://rashmikak217_db_user:10Krashm%40@cluster0.qqvcriy.mongodb.net/msti_maritime?retryWrites=true&w=majority';
-    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 20000 });
+    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://rashmikak217_db_user:10Krashm%40@cluster0.qqvcriy.mongodb.net/msti_maritime?retryWrites=true&w=majority&appName=Cluster0';
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 15000 });
     console.log(`✅ MongoDB Connected to Atlas/Primary Database`);
     await seedDB();
   } catch (error) {
