@@ -71,12 +71,9 @@ exports.getAllCourses = async (req, res) => {
     if (limit) coursesQuery = coursesQuery.limit(parseInt(limit));
 
     let courses = await coursesQuery;
-    if (!courses) {
-      courses = defaultCourses;
-    }
     res.json({ success: true, count: courses.length, data: courses });
   } catch (error) {
-    res.json({ success: true, count: defaultCourses.length, data: defaultCourses });
+    res.status(500).json({ success: false, message: 'DB Error: ' + error.message });
   }
 };
 
