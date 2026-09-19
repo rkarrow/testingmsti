@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { FiSave, FiUpload, FiImage, FiCheckCircle, FiAlertCircle, FiRefreshCw, FiEye } from 'react-icons/fi'
+import { FiSave, FiUpload, FiImage, FiCheckCircle, FiAlertCircle, FiRefreshCw, FiSliders, FiInfo, FiPhone, FiHelpCircle, FiPlus, FiTrash2 } from 'react-icons/fi'
 
-const defaultHeroSettings = {
-  heroBadge: "⚓ FOUNDING EXCELLENCE SINCE 2002 • SRI LANKA'S PREMIER CADET CORPS",
+const defaultSettings = {
+  // Hero
+  heroBadge: "⚓ FOUNDING EXCELLENCE SINCE 1986 • SRI LANKA'S PREMIER CADET CORPS",
   heroTitle: "The Premier Maritime Academy in Sri Lanka",
   heroSubtitle: "We aspire to become the premier training institute for maritime careers in Sri Lanka and overseas. Fully accredited merchant navy officer training under IMO STCW and DG Shipping.",
   heroBgImage: "/hero-image.jpg",
@@ -11,17 +12,47 @@ const defaultHeroSettings = {
   heroPrimaryCtaLink: "/courses",
   heroSecondaryCtaText: "Book a Campus Visit",
   heroSecondaryCtaLink: "/contact",
+
+  // About Section & Page
   aboutBadge: "ABOUT US",
   aboutTitle: "The Premier Maritime Academy in Sri Lanka",
-  aboutDesc1: "We aim to continuously contribute to the growth of individuals and organizations to ensure they are qualified to deliver results at the highest levels of performance.",
-  aboutDesc2: "Our goal at MSTI Maritime Academy is to be recognized worldwide as a top quality service provider to the international marine industry in maritime training.",
+  aboutDesc1: "We aim to continuously contribute to the growth of individuals and organizations to ensure they are qualified to deliver results at the highest levels of performance. To do so, we engage in the most suitable solutions in training, assessment, and career development, delivering the best maritime courses Sri Lanka has to offer.",
+  aboutDesc2: "Our goal at MSTI Maritime Academy is to be recognized worldwide as a top quality service provider to the international marine industry in maritime training, adhering to strict IMO guidelines and global merchant fleets.",
+  aboutMission: "To continuously contribute to the growth of maritime professionals and organizations through world-class IMO-compliant training, cutting-edge bridge simulators, and rigorous seafarer development.",
+  aboutVision: "To be recognized globally as Sri Lanka's premier benchmark institution for maritime education, officer cadetship, and merchant marine engineering excellence.",
+  aboutHistory: "Founded in 1986, MSTI Maritime Academy is Sri Lanka's pioneer private maritime institute with a distinguished legacy spanning nearly four decades.",
   aboutLeaderName: "Capt. Ayesha Fernando",
   aboutLeaderRole: "Valedictorian • Officer of the Watch (STCW II/1)",
   aboutLeaderImage: "/captain.jpg",
+
+  // Contact Info & Campus Branches
+  contactAddress: "No. 32, Station Road, Dehiwala 10350, Sri Lanka",
+  contactPhone: "+94 11 747 6100",
+  contactEmail: "helpdesk@msti.lk",
+  contactHours: "Mon–Fri 8:30 AM – 5:30 PM",
+  kalutaraSouthAddress: "No. 25, St. Sebastian Road, Kalutara South, Sri Lanka",
+  kalutaraNorthAddress: "Mirishenawatta, Ethanamadala, Kalutara North, Sri Lanka",
+
+  // FAQs
+  faqs: [
+    {
+      q: 'What are the minimum academic requirements for the Officer Cadetship Programme?',
+      a: 'Applicants must have a minimum of GCE A/L qualification. While a science background is preferred, arts and commerce students are also eligible. English language proficiency is mandatory.',
+    },
+    {
+      q: 'Is there a maximum age limit for applying to MSTI?',
+      a: 'Yes. For the Officer Cadetship and Marine Engineering Cadetship programmes, applicants must be between 17 and 25 years of age at the time of application. Short courses and professional development programmes have no age restrictions.',
+    },
+    {
+      q: 'Does MSTI guarantee employment after graduation?',
+      a: 'MSTI has signed placement agreements with over 150 international shipping companies. All qualifying graduates from our flagship cadetship programmes are offered employment through our placement partners.',
+    },
+  ],
 }
 
 export default function AdminHero() {
-  const [formData, setFormData] = useState(defaultHeroSettings)
+  const [formData, setFormData] = useState(defaultSettings)
+  const [activeTab, setActiveTab] = useState('hero') // 'hero' | 'about' | 'contact' | 'faqs'
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -38,10 +69,14 @@ export default function AdminHero() {
       setLoading(true)
       const res = await axios.get('/api/settings')
       if (res.data.success && res.data.data) {
-        setFormData((prev) => ({ ...prev, ...res.data.data }))
+        setFormData((prev) => ({
+          ...prev,
+          ...res.data.data,
+          faqs: (res.data.data.faqs && res.data.data.faqs.length > 0) ? res.data.data.faqs : defaultSettings.faqs,
+        }))
       }
     } catch (err) {
-      setMsg({ type: 'error', text: 'Failed to fetch existing hero settings' })
+      setMsg({ type: 'error', text: 'Failed to fetch existing settings' })
     } finally {
       setLoading(false)
     }
@@ -52,7 +87,28 @@ export default function AdminHero() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  // Handle direct file upload for Hero Background Image
+  // FAQ Handlers
+  const handleFaqChange = (index, field, value) => {
+    const updatedFaqs = [...formData.faqs]
+    updatedFaqs[index][field] = value
+    setFormData((prev) => ({ ...prev, faqs: updatedFaqs }))
+  }
+
+  const handleAddFaq = () => {
+    setFormData((prev) => ({
+      ...prev,
+      faqs: [...prev.faqs, { q: '', a: '' }],
+    }))
+  }
+
+  const handleRemoveFaq = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index),
+    }))
+  }
+
+  // File Upload Handlers
   const handleHeroImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -81,7 +137,6 @@ export default function AdminHero() {
     }
   }
 
-  // Handle direct file upload for About Leader Image
   const handleAboutImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -110,6 +165,7 @@ export default function AdminHero() {
     }
   }
 
+  // Save Settings
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
@@ -122,7 +178,7 @@ export default function AdminHero() {
       })
 
       if (res.data.success) {
-        setMsg({ type: 'success', text: 'Hero Section and Website Content updated successfully!' })
+        setMsg({ type: 'success', text: 'Website settings saved and updated live successfully! 🚢' })
       }
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to save settings' })
@@ -133,336 +189,483 @@ export default function AdminHero() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-white">
-        <FiRefreshCw className="animate-spin text-blue-500 mr-2" size={24} />
-        <span>Loading Hero Section Settings...</span>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-8 max-w-5xl">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Hero & Homepage Editor</h1>
-          <p className="text-navy-300 text-xs mt-1">
-            Control main hero text, badges, CTA buttons, and upload background images.
+          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+            <FiSliders className="text-blue-500" /> Website Content & Sections Editor
+          </h1>
+          <p className="text-xs text-navy-400 mt-1">
+            Customize Home Hero, About Us history, Campus Branches, Contact information, and FAQs across the live site.
           </p>
         </div>
+
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50"
+          className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
         >
-          {saving ? <FiRefreshCw className="animate-spin" /> : <FiSave size={16} />}
+          {saving ? <FiRefreshCw className="animate-spin" /> : <FiSave />}
           {saving ? 'Saving Changes...' : 'Save All Changes'}
         </button>
       </div>
 
+      {/* Status Message */}
       {msg.text && (
         <div
-          className={`p-4 rounded-xl text-xs font-medium flex items-center gap-2 border ${
+          className={`p-4 rounded-xl text-xs flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-              : 'bg-red-500/10 border-red-500/30 text-red-400'
+              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+              : 'bg-red-500/10 border border-red-500/20 text-red-400'
           }`}
         >
-          {msg.type === 'success' ? <FiCheckCircle size={18} /> : <FiAlertCircle size={18} />}
+          {msg.type === 'success' ? <FiCheckCircle size={16} /> : <FiAlertCircle size={16} />}
           <span>{msg.text}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* HERO SECTION CARD */}
-        <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
-          <div className="border-b border-navy-800 pb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <FiImage className="text-blue-400" /> Hero Section Settings
+      {/* Tabs Navigation */}
+      <div className="flex flex-wrap gap-2 border-b border-navy-800 pb-3">
+        {[
+          { id: 'hero', label: 'Hero Section', icon: FiSliders },
+          { id: 'about', label: 'About Us Section & Page', icon: FiInfo },
+          { id: 'contact', label: 'Contact Info & Branches', icon: FiPhone },
+          { id: 'faqs', label: 'FAQs Management', icon: FiHelpCircle },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === tab.id
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                : 'bg-navy-900 text-navy-400 hover:text-white hover:bg-navy-850'
+            }`}
+          >
+            <tab.icon size={15} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* TAB 1: HERO SECTION */}
+        {activeTab === 'hero' && (
+          <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider border-b border-navy-800 pb-3">
+              🏠 Homepage Hero Header & CTA Buttons
             </h2>
-            <span className="text-[10px] text-navy-400 uppercase font-semibold tracking-wider">
-              Main Banner
-            </span>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Hero Badge */}
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Top Announcement Badge
-              </label>
-              <input
-                type="text"
-                name="heroBadge"
-                value={formData.heroBadge}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-                placeholder="e.g. ⚓ FOUNDING EXCELLENCE SINCE 2002"
-              />
-            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Top Badge Text</label>
+                <input
+                  type="text"
+                  name="heroBadge"
+                  value={formData.heroBadge}
+                  onChange={handleChange}
+                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
 
-            {/* Hero Main Headline */}
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Main Headline Title
-              </label>
-              <input
-                type="text"
-                name="heroTitle"
-                value={formData.heroTitle}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-base font-bold focus:outline-none focus:border-blue-500"
-                placeholder="e.g. The Premier Maritime Academy in Sri Lanka"
-              />
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Main Title (Heading)</label>
+                <input
+                  type="text"
+                  name="heroTitle"
+                  value={formData.heroTitle}
+                  onChange={handleChange}
+                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
 
-            {/* Hero Subtitle / Description */}
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Hero Subtitle / Description Text
-              </label>
-              <textarea
-                rows={3}
-                name="heroSubtitle"
-                value={formData.heroSubtitle}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500 leading-relaxed"
-                placeholder="Enter hero paragraph text..."
-              />
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Subtitle (Paragraph)</label>
+                <textarea
+                  name="heroSubtitle"
+                  rows={3}
+                  value={formData.heroSubtitle}
+                  onChange={handleChange}
+                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                />
+              </div>
 
-            {/* HERO IMAGE UPLOAD & PREVIEW */}
-            <div className="md:col-span-2 space-y-3 bg-navy-950/60 p-5 border border-navy-800 rounded-xl">
-              <label className="block text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                Hero Background Image (Upload File or Enter URL)
-              </label>
+              {/* Call to Action Buttons */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div className="p-4 bg-navy-950 border border-navy-800 rounded-xl space-y-3">
+                  <h3 className="text-xs font-bold text-blue-400">Primary CTA Button</h3>
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Button Text</label>
+                    <input
+                      type="text"
+                      name="heroPrimaryCtaText"
+                      value={formData.heroPrimaryCtaText}
+                      onChange={handleChange}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Button Target Link</label>
+                    <input
+                      type="text"
+                      name="heroPrimaryCtaLink"
+                      value={formData.heroPrimaryCtaLink}
+                      onChange={handleChange}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 items-center">
-                {/* File Upload Input Button */}
-                <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-4 py-3 rounded-xl inline-flex items-center gap-2 transition-all shadow-md shrink-0">
-                  <FiUpload size={16} />
-                  {uploadingHero ? 'Uploading Image...' : 'Upload New Hero Image'}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleHeroImageUpload}
-                    disabled={uploadingHero}
-                    className="hidden"
-                  />
-                </label>
+                <div className="p-4 bg-navy-950 border border-navy-800 rounded-xl space-y-3">
+                  <h3 className="text-xs font-bold text-amber-400">Secondary CTA Button</h3>
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Button Text</label>
+                    <input
+                      type="text"
+                      name="heroSecondaryCtaText"
+                      value={formData.heroSecondaryCtaText}
+                      onChange={handleChange}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Button Target Link</label>
+                    <input
+                      type="text"
+                      name="heroSecondaryCtaLink"
+                      value={formData.heroSecondaryCtaLink}
+                      onChange={handleChange}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
 
-                {/* Direct Image URL fallback input */}
-                <div className="flex-1 w-full">
+              {/* Background Image */}
+              <div className="pt-2">
+                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Background Image</label>
+                <div className="flex items-center gap-3">
                   <input
                     type="text"
                     name="heroBgImage"
                     value={formData.heroBgImage}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
-                    placeholder="or paste image URL (/hero-image.jpg or https://...)"
+                    className="flex-1 bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
                   />
+                  <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2.5 px-4 rounded-xl border border-navy-700 cursor-pointer flex items-center gap-2 shrink-0">
+                    <FiUpload /> {uploadingHero ? 'Uploading...' : 'Upload Image'}
+                    <input type="file" accept="image/*" onChange={handleHeroImageUpload} className="hidden" />
+                  </label>
                 </div>
               </div>
-
-              {/* Image Live Preview Box */}
-              {formData.heroBgImage && (
-                <div className="relative mt-3 rounded-xl overflow-hidden border border-navy-700 h-48 bg-navy-950">
-                  <img
-                    src={formData.heroBgImage}
-                    alt="Hero Preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null
-                      e.target.src = 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1000'
-                    }}
-                  />
-                  <div className="absolute top-2 right-2 bg-navy-950/80 backdrop-blur text-white text-[10px] px-2.5 py-1 rounded-md border border-navy-700 flex items-center gap-1">
-                    <FiEye size={12} /> Live Preview
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Primary CTA */}
-            <div>
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Primary Button Text
-              </label>
-              <input
-                type="text"
-                name="heroPrimaryCtaText"
-                value={formData.heroPrimaryCtaText}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Primary Button Link
-              </label>
-              <input
-                type="text"
-                name="heroPrimaryCtaLink"
-                value={formData.heroPrimaryCtaLink}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Secondary CTA */}
-            <div>
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Secondary Button Text
-              </label>
-              <input
-                type="text"
-                name="heroSecondaryCtaText"
-                value={formData.heroSecondaryCtaText}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Secondary Button Link
-              </label>
-              <input
-                type="text"
-                name="heroSecondaryCtaLink"
-                value={formData.heroSecondaryCtaLink}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
             </div>
           </div>
-        </div>
+        )}
 
-        {/* ABOUT SECTION & LEADERSHIP CARD */}
-        <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
-          <div className="border-b border-navy-800 pb-4">
-            <h2 className="text-lg font-bold text-white">About Section & Leadership Spotlight</h2>
-            <p className="text-xs text-navy-300">Customize home page about preview content and leadership captain image.</p>
-          </div>
+        {/* TAB 2: ABOUT US SECTION & PAGE */}
+        {activeTab === 'about' && (
+          <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider border-b border-navy-800 pb-3">
+              ℹ️ About Us Overview, Mission & Vision
+            </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                About Section Title
-              </label>
-              <input
-                type="text"
-                name="aboutTitle"
-                value={formData.aboutTitle}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                About Description Paragraph 1
-              </label>
-              <textarea
-                rows={3}
-                name="aboutDesc1"
-                value={formData.aboutDesc1}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500 leading-relaxed"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                About Description Paragraph 2
-              </label>
-              <textarea
-                rows={3}
-                name="aboutDesc2"
-                value={formData.aboutDesc2}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500 leading-relaxed"
-              />
-            </div>
-
-            {/* Leadership Captain Name & Role */}
-            <div>
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Leader Name
-              </label>
-              <input
-                type="text"
-                name="aboutLeaderName"
-                value={formData.aboutLeaderName}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
-                Leader Title / Role
-              </label>
-              <input
-                type="text"
-                name="aboutLeaderRole"
-                value={formData.aboutLeaderRole}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Leader Image Upload */}
-            <div className="md:col-span-2 space-y-3 bg-navy-950/60 p-5 border border-navy-800 rounded-xl">
-              <label className="block text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                Leader Photo (Upload File or Enter URL)
-              </label>
-              <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-4 py-3 rounded-xl inline-flex items-center gap-2 transition-all shadow-md shrink-0">
-                  <FiUpload size={16} />
-                  {uploadingAbout ? 'Uploading Image...' : 'Upload Leader Image'}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAboutImageUpload}
-                    disabled={uploadingAbout}
-                    className="hidden"
-                  />
-                </label>
-
-                <div className="flex-1 w-full">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 mb-1">About Section Badge</label>
                   <input
                     type="text"
-                    name="aboutLeaderImage"
-                    value={formData.aboutLeaderImage}
+                    name="aboutBadge"
+                    value={formData.aboutBadge}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
-                    placeholder="or paste image URL (/captain.jpg or https://...)"
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 mb-1">About Section Title</label>
+                  <input
+                    type="text"
+                    name="aboutTitle"
+                    value={formData.aboutTitle}
+                    onChange={handleChange}
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
 
-              {formData.aboutLeaderImage && (
-                <div className="w-32 h-32 rounded-xl overflow-hidden border border-navy-700 mt-2 bg-navy-950">
-                  <img
-                    src={formData.aboutLeaderImage}
-                    alt="Leader Preview"
-                    className="w-full h-full object-cover"
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 mb-1">Overview Paragraph 1</label>
+                <textarea
+                  name="aboutDesc1"
+                  rows={3}
+                  value={formData.aboutDesc1}
+                  onChange={handleChange}
+                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 mb-1">Overview Paragraph 2</label>
+                <textarea
+                  name="aboutDesc2"
+                  rows={3}
+                  value={formData.aboutDesc2}
+                  onChange={handleChange}
+                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                />
+              </div>
+
+              {/* Mission & Vision */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="block text-xs font-semibold text-blue-400 mb-1">Academy Mission</label>
+                  <textarea
+                    name="aboutMission"
+                    rows={3}
+                    value={formData.aboutMission}
+                    onChange={handleChange}
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
                   />
                 </div>
-              )}
+
+                <div>
+                  <label className="block text-xs font-semibold text-amber-400 mb-1">Academy Vision</label>
+                  <textarea
+                    name="aboutVision"
+                    rows={3}
+                    value={formData.aboutVision}
+                    onChange={handleChange}
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              {/* History */}
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 mb-1">History & Founding Legacy</label>
+                <textarea
+                  name="aboutHistory"
+                  rows={2}
+                  value={formData.aboutHistory}
+                  onChange={handleChange}
+                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                />
+              </div>
+
+              {/* Leader Details */}
+              <div className="p-4 bg-navy-950 border border-navy-800 rounded-xl space-y-3 pt-2">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Featured Leadership / Principal</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Leader Name</label>
+                    <input
+                      type="text"
+                      name="aboutLeaderName"
+                      value={formData.aboutLeaderName}
+                      onChange={handleChange}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Leader Role / Rank</label>
+                    <input
+                      type="text"
+                      name="aboutLeaderRole"
+                      value={formData.aboutLeaderRole}
+                      onChange={handleChange}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-navy-400 mb-1">Leader Image Path / URL</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      name="aboutLeaderImage"
+                      value={formData.aboutLeaderImage}
+                      onChange={handleChange}
+                      className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                    <label className="bg-navy-800 hover:bg-navy-750 text-white text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                      <FiUpload size={13} /> {uploadingAbout ? 'Uploading...' : 'Upload'}
+                      <input type="file" accept="image/*" onChange={handleAboutImageUpload} className="hidden" />
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Submit Bar */}
-        <div className="flex justify-end pt-4">
+        {/* TAB 3: CONTACT INFO & CAMPUS BRANCHES */}
+        {activeTab === 'contact' && (
+          <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider border-b border-navy-800 pb-3">
+              📞 Contact Information & Campus Locations
+            </h2>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 mb-1">Official Hotline / Phone</label>
+                  <input
+                    type="text"
+                    name="contactPhone"
+                    value={formData.contactPhone}
+                    onChange={handleChange}
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 mb-1">Official Helpdesk Email</label>
+                  <input
+                    type="email"
+                    name="contactEmail"
+                    value={formData.contactEmail}
+                    onChange={handleChange}
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 mb-1">Working Hours</label>
+                  <input
+                    type="text"
+                    name="contactHours"
+                    value={formData.contactHours}
+                    onChange={handleChange}
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Campus Addresses */}
+              <div className="p-4 bg-navy-950 border border-navy-800 rounded-xl space-y-4">
+                <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                  Campus & Training Center Locations
+                </h3>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white mb-1">
+                    MSTI Dehiwala - Main Branch Address
+                  </label>
+                  <input
+                    type="text"
+                    name="contactAddress"
+                    value={formData.contactAddress}
+                    onChange={handleChange}
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white mb-1">
+                    Kalutara South Training Center Address
+                  </label>
+                  <input
+                    type="text"
+                    name="kalutaraSouthAddress"
+                    value={formData.kalutaraSouthAddress}
+                    onChange={handleChange}
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white mb-1">
+                    Kalutara North Training Center Address
+                  </label>
+                  <input
+                    type="text"
+                    name="kalutaraNorthAddress"
+                    value={formData.kalutaraNorthAddress}
+                    onChange={handleChange}
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: FAQS MANAGEMENT */}
+        {activeTab === 'faqs' && (
+          <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+            <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+                ❓ Frequently Asked Questions (FAQs)
+              </h2>
+              <button
+                type="button"
+                onClick={handleAddFaq}
+                className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                <FiPlus size={14} /> Add New FAQ
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {formData.faqs.map((faq, index) => (
+                <div key={index} className="p-4 bg-navy-950 border border-navy-800 rounded-xl space-y-3 relative">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-blue-400">FAQ #{index + 1}</span>
+                    {formData.faqs.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFaq(index)}
+                        className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-navy-900 transition-colors"
+                        title="Delete Question"
+                      >
+                        <FiTrash2 size={15} />
+                      </button>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Question</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. What are the minimum academic requirements?"
+                      value={faq.q}
+                      onChange={(e) => handleFaqChange(index, 'q', e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Answer</label>
+                    <textarea
+                      rows={2}
+                      placeholder="e.g. Applicants must have GCE A/L..."
+                      value={faq.a}
+                      onChange={(e) => handleFaqChange(index, 'a', e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Save Bar */}
+        <div className="pt-4 flex justify-end">
           <button
             type="submit"
             disabled={saving}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-3.5 rounded-xl flex items-center gap-2 shadow-xl shadow-blue-600/30 transition-all disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs py-3 px-8 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            {saving ? <FiRefreshCw className="animate-spin" /> : <FiSave size={18} />}
-            {saving ? 'Saving...' : 'Save All Changes'}
+            {saving ? <FiRefreshCw className="animate-spin" /> : <FiSave />}
+            {saving ? 'Saving Changes...' : 'Save All Changes'}
           </button>
         </div>
       </form>

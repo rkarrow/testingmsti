@@ -73,6 +73,73 @@ const siteSettingsSchema = new mongoose.Schema({
     default: "/captain.jpg",
   },
 
+  // About Page Full Details
+  aboutMission: {
+    type: String,
+    default: "To continuously contribute to the growth of maritime professionals and organizations through world-class IMO-compliant training, cutting-edge bridge simulators, and rigorous seafarer development.",
+  },
+  aboutVision: {
+    type: String,
+    default: "To be recognized globally as Sri Lanka's premier benchmark institution for maritime education, officer cadetship, and merchant marine engineering excellence.",
+  },
+  aboutHistory: {
+    type: String,
+    default: "Founded in 1986, MSTI Maritime Academy is Sri Lanka's pioneer private maritime institute with a distinguished legacy spanning nearly four decades.",
+  },
+
+  // Leadership Team
+  leadership: [
+    {
+      name: { type: String },
+      role: { type: String },
+      image: { type: String },
+      rank: { type: String },
+    }
+  ],
+
+  // Facilities
+  facilities: [
+    {
+      title: { type: String },
+      desc: { type: String },
+      image: { type: String },
+    }
+  ],
+
+  // Contact Info & Campus Branches
+  contactAddress: {
+    type: String,
+    default: "No. 32, Station Road, Dehiwala 10350, Sri Lanka",
+  },
+  contactPhone: {
+    type: String,
+    default: "+94 11 747 6100",
+  },
+  contactEmail: {
+    type: String,
+    default: "helpdesk@msti.lk",
+  },
+  contactHours: {
+    type: String,
+    default: "Mon–Fri 8:30 AM – 5:30 PM",
+  },
+  kalutaraSouthAddress: {
+    type: String,
+    default: "No. 25, St. Sebastian Road, Kalutara South, Sri Lanka",
+  },
+  kalutaraNorthAddress: {
+    type: String,
+    default: "Mirishenawatta, Ethanamadala, Kalutara North, Sri Lanka",
+  },
+
+  // FAQs
+  faqs: [
+    {
+      q: { type: String },
+      a: { type: String },
+    }
+  ],
+
   updatedAt: {
     type: Date,
     default: Date.now,

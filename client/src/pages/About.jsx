@@ -1,15 +1,17 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import { FiArrowRight, FiTarget, FiEye, FiAward, FiUsers, FiMapPin } from 'react-icons/fi'
 import CTASection from '../components/CTASection'
 
-const stats = [
+const defaultStats = [
   { value: '100+', label: 'Graduates' },
   { value: '150+', label: 'Partners' },
   { value: '18+', label: 'Years' },
   { value: '$4.3M', label: 'Invested' },
 ]
 
-const leadership = [
+const defaultLeadership = [
   {
     name: 'Capt. R. Jayawardena',
     role: 'Principal & Commandant',
@@ -36,30 +38,22 @@ const leadership = [
   },
 ]
 
-const facilities = [
-  {
-    title: 'Full-Mission Bridge Simulator',
-    desc: '360° full-mission bridge simulator with realistic sea-state scenarios.',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=500',
-  },
-  {
-    title: 'Engine Room Simulator',
-    desc: 'Advanced engine room simulation for marine engineering cadets.',
-    image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=500',
-  },
-  {
-    title: 'GMDSS Laboratory',
-    desc: 'State-of-the-art Global Maritime Distress and Safety System lab.',
-    image: 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?w=500',
-  },
-  {
-    title: 'Fire-Fighting Ground',
-    desc: 'Real-fire training ground for STCW firefighting certifications.',
-    image: 'https://images.unsplash.com/photo-1504083898675-c896ecdae86e?w=500',
-  },
-]
-
 export default function About() {
+  const [settings, setSettings] = useState(null)
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get('/api/settings')
+        if (res.data.success && res.data.data) {
+          setSettings(res.data.data)
+        }
+      } catch (e) {
+        // use defaults
+      }
+    }
+    fetchSettings()
+  }, [])
   return (
     <div className="pt-[72px]">
       {/* HERO */}
@@ -106,19 +100,21 @@ export default function About() {
               <img src="https://images.unsplash.com/photo-1521791055366-0d553872952f?w=500" alt="Excellence" className="rounded-xl h-52 w-full object-cover mt-4" />
             </div>
             <div>
-              <div className="badge-blue mb-4">Our Story</div>
+              <div className="badge-blue mb-4">{settings?.aboutBadge || 'Our Story'}</div>
               <h2 className="section-title mb-4">
-                The Premier Maritime Academy in Sri Lanka
+                {settings?.aboutTitle || 'The Premier Maritime Academy in Sri Lanka'}
               </h2>
               <p className="text-navy-400 leading-relaxed mb-4">
-                Established with a mandate to elevate maritime education in Sri Lanka, MSTI has grown to become the nation's most respected maritime training institution. Our comprehensive programmes, delivered by experienced maritime professionals, are internationally recognized and industry-endorsed.
+                {settings?.aboutDesc1 || "Established with a mandate to elevate maritime education in Sri Lanka, MSTI has grown to become the nation's most respected maritime training institution. Our comprehensive programmes, delivered by experienced maritime professionals, are internationally recognized and industry-endorsed."}
               </p>
               <p className="text-navy-400 leading-relaxed mb-4">
-                We maintain strategic partnerships with leading international shipping companies, port authorities, and maritime organizations to ensure our curriculum remains current, relevant, and aligned with evolving industry demands.
+                {settings?.aboutDesc2 || "We maintain strategic partnerships with leading international shipping companies, port authorities, and maritime organizations to ensure our curriculum remains current, relevant, and aligned with evolving industry demands."}
               </p>
-              <p className="text-navy-400 leading-relaxed mb-8">
-                Every year, our graduates join the ranks of global maritime professionals, serving as officers, engineers, and maritime managers aboard vessels and in ports across more than 50 countries worldwide.
-              </p>
+              {settings?.aboutHistory && (
+                <p className="text-navy-300 font-medium leading-relaxed mb-8 bg-blue-600/10 border border-blue-500/20 p-4 rounded-xl">
+                  📜 {settings.aboutHistory}
+                </p>
+              )}
               <Link to="/courses" className="btn-primary">
                 Explore Our Programmes <FiArrowRight />
               </Link>
@@ -142,8 +138,8 @@ export default function About() {
                 <FiTarget className="text-blue-400" size={24} />
               </div>
               <h3 className="text-white font-bold text-xl mb-4">Our Mission</h3>
-              <p className="text-navy-400 leading-relaxed mb-4">
-                To provide world-class maritime education and training that empowers Sri Lankan seafarers to excel in the global maritime industry, while upholding the highest standards of safety, professionalism, and integrity.
+              <p className="text-navy-300 leading-relaxed mb-4">
+                {settings?.aboutMission || "To provide world-class maritime education and training that empowers Sri Lankan seafarers to excel in the global maritime industry, while upholding the highest standards of safety, professionalism, and integrity."}
               </p>
               <ul className="space-y-3">
                 {[
@@ -166,8 +162,8 @@ export default function About() {
                 <FiEye className="text-blue-400" size={24} />
               </div>
               <h3 className="text-white font-bold text-xl mb-4">Our Vision</h3>
-              <p className="text-navy-400 leading-relaxed mb-4">
-                To be the foremost maritime training institution in South Asia, recognized globally for producing officers of the highest caliber who lead the maritime industry with competence, integrity, and innovation.
+              <p className="text-navy-300 leading-relaxed mb-4">
+                {settings?.aboutVision || "To be the foremost maritime training institution in South Asia, recognized globally for producing officers of the highest caliber who lead the maritime industry with competence, integrity, and innovation."}
               </p>
               <ul className="space-y-3">
                 {[
