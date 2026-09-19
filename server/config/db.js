@@ -101,15 +101,13 @@ const seedDB = async () => {
 let isConnecting = false;
 
 const connectDB = async () => {
-  // Disable bufferCommands so queries fail immediately if DB is disconnected (allows our fallback auth to work)
-  mongoose.set('bufferCommands', false);
   if (mongoose.connection.readyState >= 1) return;
   if (isConnecting) return;
 
   isConnecting = true;
   try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/msti_maritime';
-    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 15000 });
+    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://rashmikak217_db_user:10Krashm%40@cluster0.qqvcriy.mongodb.net/msti_maritime?retryWrites=true&w=majority';
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 20000 });
     console.log(`✅ MongoDB Connected to Atlas/Primary Database`);
     await seedDB();
   } catch (error) {
