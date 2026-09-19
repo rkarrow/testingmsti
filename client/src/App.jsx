@@ -13,6 +13,7 @@ import AdminLogin from './pages/admin/AdminLogin'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminHero from './pages/admin/AdminHero'
+import AdminAbout from './pages/admin/AdminAbout'
 import AdminCourses from './pages/admin/AdminCourses'
 import AdminNews from './pages/admin/AdminNews'
 import AdminContacts from './pages/admin/AdminContacts'
@@ -46,6 +47,7 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="hero" element={<AdminHero />} />
+          <Route path="about" element={<AdminAbout />} />
           <Route path="courses" element={<AdminCourses />} />
           <Route path="news" element={<AdminNews />} />
           <Route path="contacts" element={<AdminContacts />} />

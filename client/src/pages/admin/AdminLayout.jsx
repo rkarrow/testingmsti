@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { FiHome, FiBookOpen, FiFileText, FiMail, FiSliders, FiLogOut, FiAnchor, FiExternalLink, FiUser } from 'react-icons/fi'
+import { FiHome, FiBookOpen, FiFileText, FiMail, FiSliders, FiLogOut, FiAnchor, FiExternalLink, FiUser, FiInfo } from 'react-icons/fi'
 
 export default function AdminLayout() {
   const navigate = useNavigate()
@@ -25,6 +25,7 @@ export default function AdminLayout() {
   const navItems = [
     { label: 'Dashboard Overview', path: '/admin', icon: FiHome, end: true },
     { label: 'Hero & Content Editor', path: '/admin/hero', icon: FiSliders },
+    { label: 'About Manage', path: '/admin/about', icon: FiInfo },
     { label: 'Courses Management', path: '/admin/courses', icon: FiBookOpen },
     { label: 'News & Announcements', path: '/admin/news', icon: FiFileText },
     { label: 'Contact Inquiries', path: '/admin/contacts', icon: FiMail },

@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       {/* Quick Action Cards Grid */}
       <div>
         <h2 className="text-lg font-bold text-white mb-4">Quick Management Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1 */}
           <Link
             to="/admin/hero"
@@ -150,15 +150,39 @@ export default function AdminDashboard() {
             </div>
             {heroTitle && (
               <div className="mt-4 pt-4 border-t border-navy-800 text-[11px] text-navy-400">
-                Current Headline: <span className="text-white italic font-medium">"{heroTitle}"</span>
+                Headline: <span className="text-white italic font-medium truncate block">"{heroTitle}"</span>
               </div>
             )}
           </Link>
 
-          {/* Card 2 */}
+          {/* Card 2: About Manage */}
+          <Link
+            to="/admin/about"
+            className="group bg-navy-900 hover:bg-navy-850 border border-navy-800 hover:border-amber-500/50 rounded-2xl p-6 transition-all shadow-lg flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-amber-600/10 text-amber-400 flex items-center justify-center">
+                  <FiSliders size={20} />
+                </div>
+                <span className="text-navy-400 group-hover:text-amber-400 transition-colors">
+                  <FiArrowRight size={20} />
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-white mb-1">About Manage</h3>
+              <p className="text-xs text-navy-300 leading-relaxed">
+                Edit About Hero header, statistics counters (100+ graduates), mission, vision, history, and leader.
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-navy-800 text-[11px] text-amber-400/80 flex items-center gap-1.5">
+              <FiCheckCircle size={13} /> Dedicated About CMS Section
+            </div>
+          </Link>
+
+          {/* Card 3 */}
           <Link
             to="/admin/courses"
-            className="group bg-navy-900 hover:bg-navy-850 border border-navy-800 hover:border-blue-500/50 rounded-2xl p-6 transition-all shadow-lg flex flex-col justify-between"
+            className="group bg-navy-900 hover:bg-navy-850 border border-navy-800 hover:border-emerald-500/50 rounded-2xl p-6 transition-all shadow-lg flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -169,13 +193,13 @@ export default function AdminDashboard() {
                   <FiArrowRight size={20} />
                 </span>
               </div>
-              <h3 className="text-base font-bold text-white mb-1">Courses & Training Programs</h3>
+              <h3 className="text-base font-bold text-white mb-1">Courses & Programs</h3>
               <p className="text-xs text-navy-300 leading-relaxed">
                 Add new cadetship programs, update course durations, entry requirements, and upload banner photos.
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-navy-800 text-[11px] text-navy-400 flex items-center gap-2">
-              <FiUploadCloud size={14} className="text-emerald-400" /> Image upload enabled for every course
+              <FiUploadCloud size={14} className="text-emerald-400" /> Image upload enabled for courses
             </div>
           </Link>
         </div>
