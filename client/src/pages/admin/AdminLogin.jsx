@@ -16,14 +16,18 @@ export default function AdminLogin() {
     setLoading(true)
 
     try {
-      const res = await axios.post('/api/auth/login', { email, password })
+      const res = await axios.post('/api/auth/login', { email, password }, { timeout: 45000 })
       if (res.data.success) {
         localStorage.setItem('msti_admin_token', res.data.token)
         localStorage.setItem('msti_admin_user', JSON.stringify(res.data.user))
         navigate('/admin')
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login. Please check credentials.')
+      if (err.code === 'ECONNABORTED' || !err.response) {
+        setError('Server is starting up (takes ~30 seconds on first visit). Please try again in a moment.')
+      } else {
+        setError(err.response?.data?.message || 'Failed to login. Please check credentials.')
+      }
     } finally {
       setLoading(false)
     }
