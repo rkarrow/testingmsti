@@ -6,6 +6,9 @@ export default function CertificateModal({ isOpen, onClose }) {
   const [fullName, setFullName] = useState('')
   const [studentEmail, setStudentEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [nicNumber, setNicNumber] = useState('')
+  const [cdcNumber, setCdcNumber] = useState('')
+  const [certificateName, setCertificateName] = useState('')
   const [dob, setDob] = useState('')
   const [certList, setCertList] = useState([
     { name: '', number: '', issuedDate: '', expireDate: '' }
@@ -34,32 +37,37 @@ export default function CertificateModal({ isOpen, onClose }) {
 
   const generateEmailBody = () => {
     const nameStr = fullName.trim() || '[Your Full Name]'
-    const dobStr = dob.trim() || '[DD/MM/YYYY]'
+    const nicStr = nicNumber.trim() || '[Your NIC Number]'
+    const cdcStr = cdcNumber.trim() || '[Your CDC Number]'
+    const certMainStr = certificateName.trim()
+    const dobStr = dob.trim()
     const emailStr = studentEmail.trim() || '[Your Email]'
     const phoneStr = phone.trim() || '[Your Phone]'
     
     let certsTable = ''
     const validCerts = certList.filter(c => c.name.trim() || c.number.trim())
     
-    if (validCerts.length > 0) {
+    if (certMainStr) {
+      certsTable = `Certificate Name: ${certMainStr}\nNIC Number (as in the certificate): ${nicStr}\nCDC Number: ${cdcStr}\n`
+    } else if (validCerts.length > 0) {
       certsTable = validCerts.map((c, i) => 
-        `Certificate ${i + 1}:\n- Certificate: ${c.name || 'N/A'}\n- Certificate Number: ${c.number || 'N/A'}\n- Issued Date: ${c.issuedDate || 'N/A'}\n- Expire Date: ${c.expireDate || 'Never Expires'}\n`
+        `Certificate ${i + 1}:\n- Certificate Name: ${c.name || 'N/A'}\n- Certificate Number: ${c.number || 'N/A'}\n- Issued Date: ${c.issuedDate || 'N/A'}\n- Expire Date: ${c.expireDate || 'Never Expires'}\n`
       ).join('\n')
     } else {
-      certsTable = `Certificate Details:\n- Advanced Fire Fighting | No: 50014/09-2024/0003 | Issued: 03/01/2025 | Exp: 03/01/2030\n- Medical First Aid | No: 50017/01-2025/0004 | Issued: 10/01/2025 | Exp: 10/01/2030\n- Engine Room Simulator | No: 50066/01-2025/0004 | Issued: 20/02/2025 | Exp: Never Expires\n- Marine High Voltage Course | No: EED-2485/089/0040 | Issued: 17/04/2025 | Exp: Never Expires\n`
+      certsTable = `Certificate Name: Advanced Fire Fighting\nNIC Number (as in the certificate): ${nicStr}\nCDC Number: ${cdcStr}\n`
     }
 
-    return `Dear Nimasha,
+    return `Dear Sir / Madam,
 
 Good day!
 
 Could you please verify the authentication of the following certificates issued by Mercantile Seaman Training Institute at the earliest possible.
 
 Full Name - ${nameStr}
-D.O.B – ${dobStr}
-Contact Email – ${emailStr}
-Phone – ${phoneStr}
-
+NIC Number (as in the certificate) - ${nicStr}
+CDC Number - ${cdcStr}
+${dobStr ? `D.O.B – ${dobStr}\n` : ''}Contact Email – ${emailStr}
+${phoneStr ? `Phone – ${phoneStr}\n` : ''}
 ${certsTable}
 Copies of the Certificates are attached for your easy reference.
 
@@ -70,8 +78,8 @@ Thank you.`
     if (e) e.preventDefault()
     setErrorMsg('')
     
-    if (!fullName.trim()) {
-      setErrorMsg('Please enter your Full Name')
+    if (!fullName.trim() && !certificateName.trim()) {
+      setErrorMsg('Please enter your Full Name or Certificate Name')
       return
     }
     if (!studentEmail.trim()) {
@@ -83,22 +91,22 @@ Thank you.`
       setSending(true)
       const bodyText = generateEmailBody()
       
-      // Submit to backend API
+      // Submit to backend API (and target testing address)
       await axios.post('/api/contact', {
-        name: fullName,
+        name: fullName || 'Student Verification',
         email: studentEmail,
         phone: phone || '+94',
-        subject: `Certificate Verification Request - ${fullName}`,
+        subject: `Certificate Verification Request - ${fullName || certificateName} (NIC: ${nicNumber || 'N/A'})`,
         enquiryType: 'Certificate Verification',
-        message: bodyText,
+        message: `[Recipient: manuthi.desilva@msti.lk]\n\n` + bodyText,
       })
 
       setSentSuccess(true)
     } catch (err) {
-      // If API error, fallback to opening mail client
-      const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || 'Student Verification'}`)
+      // Fallback: open mail client
+      const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || certificateName.trim() || 'Student Verification'}`)
       const body = encodeURIComponent(generateEmailBody())
-      window.location.href = `mailto:certificate@msti.lk?subject=${subject}&body=${body}`
+      window.location.href = `mailto:manuthi.desilva@msti.lk?subject=${subject}&body=${body}`
       setSentSuccess(true)
     } finally {
       setSending(false)
@@ -106,9 +114,9 @@ Thank you.`
   }
 
   const handleOpenGmail = () => {
-    const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || 'Student Verification'}`)
+    const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || certificateName.trim() || 'Student Verification'}`)
     const body = encodeURIComponent(generateEmailBody())
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=certificate@msti.lk&su=${subject}&body=${body}`
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=manuthi.desilva@msti.lk&su=${subject}&body=${body}`
     window.open(gmailUrl, '_blank')
   }
 
@@ -123,6 +131,9 @@ Thank you.`
     setFullName('')
     setStudentEmail('')
     setPhone('')
+    setNicNumber('')
+    setCdcNumber('')
+    setCertificateName('')
     setDob('')
     setCertList([{ name: '', number: '', issuedDate: '', expireDate: '' }])
     onClose()
@@ -159,7 +170,7 @@ Thank you.`
             <div className="space-y-2">
               <h3 className="text-lg font-bold text-white">Verification Request Sent Successfully!</h3>
               <p className="text-xs text-navy-300 max-w-md mx-auto leading-relaxed">
-                Your certificate verification request has been dispatched to <span className="text-blue-400 font-semibold">certificate@msti.lk</span>. Our verification officers will inspect the credentials and reply to <span className="text-white font-medium">{studentEmail}</span> shortly.
+                Your certificate verification request has been dispatched to <span className="text-blue-400 font-semibold">manuthi.desilva@msti.lk</span>. Our verification officers will review your credentials and reply to <span className="text-white font-medium">{studentEmail}</span> shortly.
               </p>
             </div>
 
@@ -180,8 +191,8 @@ Thank you.`
               <p className="font-semibold text-white mb-1">📢 Notice for Students & Employers:</p>
               <p className="italic text-blue-100">
                 “Dear Students, To verify your certificates, please send an email to{' '}
-                <a href="mailto:certificate@msti.lk" className="text-amber-400 underline font-semibold">
-                  certificate@msti.lk
+                <a href="mailto:manuthi.desilva@msti.lk" className="text-amber-400 underline font-semibold">
+                  manuthi.desilva@msti.lk
                 </a>
                 . Thank you.”
               </p>
@@ -196,121 +207,103 @@ Thank you.`
 
             {/* Quick Fill Form */}
             <form onSubmit={handleSendDirectly} className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                  Verification Request Details
-                </h3>
-                <span className="text-[11px] text-navy-400">All fields automatically formatted</span>
-              </div>
+              {/* PRIMARY 3 REQUIRED FIELDS AS REQUESTED */}
+              <div className="bg-navy-900/80 p-4 rounded-xl border border-blue-500/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    Primary Verification Fields (3 Key Fields)
+                  </h3>
+                  <span className="text-[10px] text-blue-300 font-medium">Quick Fill</span>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Opatha Arachchi Kankanamge Tehan"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Date of Birth (D.O.B)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 11/12/1998"
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Your Email (for Reply) *</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="yourname@gmail.com"
-                    value={studentEmail}
-                    onChange={(e) => setStudentEmail(e.target.value)}
-                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-navy-300 mb-1">Contact Phone</label>
-                  <input
-                    type="text"
-                    placeholder="+94 77 123 4567"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Certificate Items */}
-              <div className="space-y-2 pt-2">
-                <label className="block text-[11px] font-medium text-navy-300">
-                  Certificates to Verify (Name, Number, Issued & Expire Dates):
-                </label>
-                {certList.map((cert, index) => (
-                  <div key={index} className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-navy-900/60 p-2.5 rounded-lg border border-navy-800">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-white mb-1">
+                      Certificate Name *
+                    </label>
                     <input
                       type="text"
-                      placeholder="Certificate Name"
-                      value={cert.name}
-                      onChange={(e) => handleCertChange(index, 'name', e.target.value)}
-                      className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                      placeholder="e.g. Advanced Fire Fighting"
+                      value={certificateName}
+                      onChange={(e) => setCertificateName(e.target.value)}
+                      className="w-full bg-navy-950 border border-navy-750 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-amber-400"
                     />
-                    <input
-                      type="text"
-                      placeholder="Cert No (e.g. 50014/09-2024)"
-                      value={cert.number}
-                      onChange={(e) => handleCertChange(index, 'number', e.target.value)}
-                      className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Issued (e.g. 03/01/2025)"
-                      value={cert.issuedDate}
-                      onChange={(e) => handleCertChange(index, 'issuedDate', e.target.value)}
-                      className="bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                    />
-                    <div className="flex gap-1">
-                      <input
-                        type="text"
-                        placeholder="Expiry Date"
-                        value={cert.expireDate}
-                        onChange={(e) => handleCertChange(index, 'expireDate', e.target.value)}
-                        className="flex-1 bg-navy-950 border border-navy-800 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
-                      />
-                      {certList.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCert(index)}
-                          className="text-red-400 hover:text-red-300 px-2 py-1 cursor-pointer"
-                          title="Remove"
-                        >
-                          <FiX size={14} />
-                        </button>
-                      )}
-                    </div>
                   </div>
-                ))}
 
-                <button
-                  type="button"
-                  onClick={handleAddCert}
-                  className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 mt-1 cursor-pointer"
-                >
-                  + Add another certificate
-                </button>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-white mb-1">
+                      NIC Number (as in certificate) *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 199812345678 / 981234567V"
+                      value={nicNumber}
+                      onChange={(e) => setNicNumber(e.target.value)}
+                      className="w-full bg-navy-950 border border-navy-750 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-white mb-1">
+                      CDC Number *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. CD/SL/12345"
+                      value={cdcNumber}
+                      onChange={(e) => setCdcNumber(e.target.value)}
+                      className="w-full bg-navy-950 border border-navy-750 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Student Contact Info */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                  Student Contact & Identification
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-navy-300 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Opatha Arachchi Kankanamge Tehan"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-navy-300 mb-1">Your Email (for Reply) *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="yourname@gmail.com"
+                      value={studentEmail}
+                      onChange={(e) => setStudentEmail(e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-navy-300 mb-1">Phone / D.O.B</label>
+                    <input
+                      type="text"
+                      placeholder="+94 77 123 4567 / 11/12/1998"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-navy-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Email Preview Box */}
-              <div className="space-y-1.5 pt-2">
+              <div className="space-y-1.5 pt-1">
                 <div className="flex items-center justify-between text-[11px] text-navy-400">
-                  <span>Formatted Email Message (Sent to: certificate@msti.lk)</span>
+                  <span>Draft Preview (Recipient: <strong className="text-blue-400">manuthi.desilva@msti.lk</strong>)</span>
                   <button
                     type="button"
                     onClick={handleCopy}
@@ -335,7 +328,7 @@ Thank you.`
                     className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
                     {sending ? <FiLoader className="animate-spin" size={16} /> : <FiSend size={16} />}
-                    {sending ? 'Sending Request...' : 'Send Verification Request'}
+                    {sending ? 'Sending...' : 'Send Verification Request'}
                   </button>
 
                   {/* Open in Gmail Button */}
