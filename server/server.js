@@ -8,9 +8,6 @@ const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
-// Connect to database
-connectDB();
-
 const app = express();
 
 // 1. Security HTTP Headers (XSS, Clickjacking, MIME-Sniffing, HSTS)
@@ -90,7 +87,20 @@ app.get('/api/health', (req, res) => {
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚢 MSTI Server running on http://localhost:${PORT}`);
-  console.log(`🛡️ Security Middlewares Active (Helmet, RateLimit, MongoSanitize, CORS, Bcrypt, JWT)`);
-});
+
+// Start server AFTER DB is connected
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log('✅ Database connected, starting server...');
+  } catch (err) {
+    console.log('⚠️ Starting server without DB:', err.message);
+  }
+  app.listen(PORT, () => {
+    console.log(`🚢 MSTI Server running on http://localhost:${PORT}`);
+    console.log(`🛡️ Security Middlewares Active (Helmet, RateLimit, MongoSanitize, CORS, Bcrypt, JWT)`);
+  });
+};
+
+startServer();
+
