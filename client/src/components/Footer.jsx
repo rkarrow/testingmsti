@@ -20,7 +20,7 @@ export default function Footer() {
                 <FiShield size={13} /> ACCREDITATIONS & OVERSIGHT
               </h4>
               <p className="text-navy-400 text-[11px] leading-relaxed">
-                DGMS (Merchant Shipping Secretariat SL) Approved • ISO 9001:2015 Certified • IMO STCW Compliant • 360° Simulator Facilities • Modern Class Rooms with Smart Board Facilities
+                DGMS (Merchant Shipping Secretariat SL) Approved • ISO 9001:2015 Certified • IMO STCW Compliant • 360° Simulator Facilities • Engine Simulator Facilities • Modern Class Rooms with Smart Board Facilities
               </p>
             </div>
           </div>
