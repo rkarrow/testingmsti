@@ -56,6 +56,13 @@ Copies of the Certificates are attached for your easy reference.
 Thank you.`
   }
 
+  const handleOpenGmail = () => {
+    const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || 'Student Verification'}`)
+    const body = encodeURIComponent(generateEmailBody())
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=certificate@msti.lk&su=${subject}&body=${body}`
+    window.open(gmailUrl, '_blank')
+  }
+
   const handleOpenEmail = () => {
     const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || 'Student Verification'}`)
     const body = encodeURIComponent(generateEmailBody())
@@ -212,31 +219,45 @@ Thank you.`
         </div>
 
         {/* Action Buttons */}
-        <div className="pt-2 border-t border-navy-800 flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            onClick={handleOpenEmail}
-            className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 px-5 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all"
-          >
-            <FiMail size={16} /> Open in Email App (Auto-filled)
-          </button>
+        <div className="pt-2 border-t border-navy-800 flex flex-col gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Primary: Open in Gmail */}
+            <button
+              type="button"
+              onClick={handleOpenGmail}
+              className="bg-red-600 hover:bg-red-500 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-red-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <FiExternalLink size={16} /> Open & Auto-Fill in Gmail
+            </button>
 
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="bg-navy-900 hover:bg-navy-850 text-navy-200 hover:text-white font-semibold text-xs py-3 px-5 rounded-xl border border-navy-800 flex items-center justify-center gap-2 transition-all"
-          >
-            {copied ? <FiCheck className="text-emerald-400" size={16} /> : <FiCopy size={16} />}
-            {copied ? 'Copied' : 'Copy Template'}
-          </button>
+            {/* Secondary: Open in Default Email Client */}
+            <button
+              type="button"
+              onClick={handleOpenEmail}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <FiMail size={16} /> Open in Default Mail App
+            </button>
+          </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="bg-navy-900 hover:bg-navy-850 text-navy-400 hover:text-white text-xs py-3 px-4 rounded-xl border border-navy-800"
-          >
-            Close
-          </button>
+          <div className="flex gap-2.5">
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="flex-1 bg-navy-900 hover:bg-navy-850 text-navy-200 hover:text-white font-semibold text-xs py-2.5 px-4 rounded-xl border border-navy-800 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              {copied ? <FiCheck className="text-emerald-400" size={15} /> : <FiCopy size={15} />}
+              {copied ? 'Copied to Clipboard!' : 'Copy Formatted Text'}
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-navy-900 hover:bg-navy-850 text-navy-400 hover:text-white text-xs py-2.5 px-5 rounded-xl border border-navy-800 cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
