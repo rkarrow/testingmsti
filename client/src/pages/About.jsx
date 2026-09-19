@@ -60,7 +60,7 @@ export default function About() {
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600"
+            src={settings?.aboutHeroBgImage || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600"}
             alt="About MSTI"
             className="w-full h-full object-cover opacity-15"
           />
@@ -68,18 +68,18 @@ export default function About() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="badge-blue mb-4">About MSTI</div>
+            <div className="badge-blue mb-4">{settings?.aboutHeroBadge || 'About MSTI'}</div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              About MSTI — The Flagship Maritime Academy in Sri Lanka
+              {settings?.aboutHeroTitle || 'About MSTI — The Flagship Maritime Academy in Sri Lanka'}
             </h1>
             <p className="text-navy-300 text-lg leading-relaxed">
-              Since our founding, MSTI has been at the forefront of maritime education in Sri Lanka, producing world-class officers and engineers who serve with distinction in the global maritime industry.
+              {settings?.aboutHeroSubtitle || 'Since our founding, MSTI has been at the forefront of maritime education in Sri Lanka, producing world-class officers and engineers who serve with distinction in the global maritime industry.'}
             </p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-            {stats.map((s, i) => (
+            {(settings?.aboutStats && settings.aboutStats.length > 0 ? settings.aboutStats : defaultStats).map((s, i) => (
               <div key={i} className="bg-navy-900/70 border border-navy-700 rounded-xl p-5 text-center backdrop-blur-sm">
                 <div className="text-3xl font-bold text-white">{s.value}</div>
                 <div className="text-navy-400 text-sm mt-1">{s.label}</div>

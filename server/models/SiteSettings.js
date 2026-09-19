@@ -43,6 +43,30 @@ const siteSettingsSchema = new mongoose.Schema({
     }
   ],
 
+  // About Page Hero & Top Stats
+  aboutHeroBadge: {
+    type: String,
+    default: "About MSTI",
+  },
+  aboutHeroTitle: {
+    type: String,
+    default: "About MSTI — The Flagship Maritime Academy in Sri Lanka",
+  },
+  aboutHeroSubtitle: {
+    type: String,
+    default: "Since our founding, MSTI has been at the forefront of maritime education in Sri Lanka, producing world-class officers and engineers who serve with distinction in the global maritime industry.",
+  },
+  aboutHeroBgImage: {
+    type: String,
+    default: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600",
+  },
+  aboutStats: [
+    {
+      value: { type: String },
+      label: { type: String },
+    }
+  ],
+
   // About Section
   aboutBadge: {
     type: String,

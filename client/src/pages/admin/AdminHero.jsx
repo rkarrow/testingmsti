@@ -13,6 +13,18 @@ const defaultSettings = {
   heroSecondaryCtaText: "Book a Campus Visit",
   heroSecondaryCtaLink: "/contact",
 
+  // About Page Hero & Top Stats
+  aboutHeroBadge: "About MSTI",
+  aboutHeroTitle: "About MSTI — The Flagship Maritime Academy in Sri Lanka",
+  aboutHeroSubtitle: "Since our founding, MSTI has been at the forefront of maritime education in Sri Lanka, producing world-class officers and engineers who serve with distinction in the global maritime industry.",
+  aboutHeroBgImage: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600",
+  aboutStats: [
+    { value: '100+', label: 'Graduates' },
+    { value: '150+', label: 'Partners' },
+    { value: '18+', label: 'Years' },
+    { value: '$4.3M', label: 'Invested' },
+  ],
+
   // About Section & Page
   aboutBadge: "ABOUT US",
   aboutTitle: "The Premier Maritime Academy in Sri Lanka",
@@ -57,6 +69,7 @@ export default function AdminHero() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploadingHero, setUploadingHero] = useState(false)
+  const [uploadingAboutHero, setUploadingAboutHero] = useState(false)
   const [uploadingAbout, setUploadingAbout] = useState(false)
   const [msg, setMsg] = useState({ type: '', text: '' })
 
@@ -72,6 +85,7 @@ export default function AdminHero() {
         setFormData((prev) => ({
           ...prev,
           ...res.data.data,
+          aboutStats: (res.data.data.aboutStats && res.data.data.aboutStats.length > 0) ? res.data.data.aboutStats : defaultSettings.aboutStats,
           faqs: (res.data.data.faqs && res.data.data.faqs.length > 0) ? res.data.data.faqs : defaultSettings.faqs,
         }))
       }
@@ -85,6 +99,27 @@ export default function AdminHero() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  // About Stats Handlers
+  const handleAboutStatChange = (index, field, value) => {
+    const updatedStats = [...(formData.aboutStats || defaultSettings.aboutStats)]
+    updatedStats[index][field] = value
+    setFormData((prev) => ({ ...prev, aboutStats: updatedStats }))
+  }
+
+  const handleAddAboutStat = () => {
+    setFormData((prev) => ({
+      ...prev,
+      aboutStats: [...(prev.aboutStats || defaultSettings.aboutStats), { value: '', label: '' }],
+    }))
+  }
+
+  const handleRemoveAboutStat = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      aboutStats: (prev.aboutStats || defaultSettings.aboutStats).filter((_, i) => i !== index),
+    }))
   }
 
   // FAQ Handlers
@@ -134,6 +169,34 @@ export default function AdminHero() {
       setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
     } finally {
       setUploadingHero(false)
+    }
+  }
+
+  const handleAboutHeroImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const data = new FormData()
+    data.append('image', file)
+
+    try {
+      setUploadingAboutHero(true)
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.post('/api/upload', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (res.data.success) {
+        setFormData((prev) => ({ ...prev, aboutHeroBgImage: res.data.imageUrl }))
+        setMsg({ type: 'success', text: 'About hero image uploaded successfully!' })
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+    } finally {
+      setUploadingAboutHero(false)
     }
   }
 
@@ -372,10 +435,132 @@ export default function AdminHero() {
 
         {/* TAB 2: ABOUT US SECTION & PAGE */}
         {activeTab === 'about' && (
-          <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider border-b border-navy-800 pb-3">
-              ℹ️ About Us Overview, Mission & Vision
-            </h2>
+          <div className="space-y-6">
+            {/* About Page Hero Banner & Stats */}
+            <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider border-b border-navy-800 pb-3 flex items-center justify-between">
+                <span>🌟 About Page Hero Banner & Statistics Counters</span>
+                <span className="text-[11px] text-blue-400 font-normal normal-case">Controls /about page top section</span>
+              </h2>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-navy-200 mb-1">About Page Hero Badge</label>
+                    <input
+                      type="text"
+                      name="aboutHeroBadge"
+                      value={formData.aboutHeroBadge || ''}
+                      onChange={handleChange}
+                      placeholder="About MSTI"
+                      className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-navy-200 mb-1">About Page Hero Main Title</label>
+                    <input
+                      type="text"
+                      name="aboutHeroTitle"
+                      value={formData.aboutHeroTitle || ''}
+                      onChange={handleChange}
+                      placeholder="About MSTI — The Flagship Maritime Academy in Sri Lanka"
+                      className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 mb-1">About Page Hero Subtitle / Intro</label>
+                  <textarea
+                    name="aboutHeroSubtitle"
+                    rows={3}
+                    value={formData.aboutHeroSubtitle || ''}
+                    onChange={handleChange}
+                    placeholder="Since our founding, MSTI has been at the forefront..."
+                    className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                  />
+                </div>
+
+                {/* About Hero Background Image */}
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 mb-1">About Page Hero Background Image</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      name="aboutHeroBgImage"
+                      value={formData.aboutHeroBgImage || ''}
+                      onChange={handleChange}
+                      className="flex-1 bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                    <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2.5 px-4 rounded-xl border border-navy-700 cursor-pointer flex items-center gap-2 shrink-0">
+                      <FiUpload /> {uploadingAboutHero ? 'Uploading...' : 'Upload Image'}
+                      <input type="file" accept="image/*" onChange={handleAboutHeroImageUpload} className="hidden" />
+                    </label>
+                  </div>
+                </div>
+
+                {/* About Page Stats Counters */}
+                <div className="pt-3 border-t border-navy-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="text-xs font-bold text-white uppercase tracking-wider">📊 Key Statistics Counters (100+ Graduates, etc.)</h3>
+                      <p className="text-[11px] text-navy-400 mt-0.5">Customize the metric numbers and labels shown below the About Hero banner</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddAboutStat}
+                      className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <FiPlus size={13} /> Add Stat Card
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {(formData.aboutStats || defaultSettings.aboutStats).map((stat, idx) => (
+                      <div key={idx} className="bg-navy-950 border border-navy-800 rounded-xl p-3 relative space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-blue-400">Stat #{idx + 1}</span>
+                          {(formData.aboutStats || defaultSettings.aboutStats).length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveAboutStat(idx)}
+                              className="text-red-400 hover:text-red-300 p-1 rounded transition-colors"
+                              title="Delete Stat"
+                            >
+                              <FiTrash2 size={12} />
+                            </button>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-navy-400 mb-0.5">Value (e.g. 100+, 18+)</label>
+                          <input
+                            type="text"
+                            value={stat.value}
+                            onChange={(e) => handleAboutStatChange(idx, 'value', e.target.value)}
+                            className="w-full bg-navy-900 border border-navy-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-navy-400 mb-0.5">Label (e.g. Graduates)</label>
+                          <input
+                            type="text"
+                            value={stat.label}
+                            onChange={(e) => handleAboutStatChange(idx, 'label', e.target.value)}
+                            className="w-full bg-navy-900 border border-navy-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* About Us Overview, Mission & Vision */}
+            <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider border-b border-navy-800 pb-3">
+                ℹ️ About Us Overview, Mission & Vision
+              </h2>
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
