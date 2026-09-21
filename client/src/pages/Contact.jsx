@@ -350,9 +350,6 @@ export default function Contact() {
           </div>
         </div>
       </section>
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <CTASection
