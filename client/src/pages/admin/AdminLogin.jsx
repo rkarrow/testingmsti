@@ -57,7 +57,7 @@ export default function AdminLogin() {
           </div>
         )}
 
-        <form className="mt-8 space-y-6 relative z-10" onSubmit={handleLogin}>
+        <form className="mt-8 space-y-6 relative z-10" onSubmit={handleLogin} autoComplete="off">
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-2">
@@ -70,10 +70,11 @@ export default function AdminLogin() {
                 <input
                   type="email"
                   required
+                  autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-navy-950 border border-navy-800 rounded-lg text-white placeholder-navy-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
-                  placeholder="name@domain.com"
+                  placeholder=""
                 />
               </div>
             </div>
@@ -89,10 +90,11 @@ export default function AdminLogin() {
                 <input
                   type="password"
                   required
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-navy-950 border border-navy-800 rounded-lg text-white placeholder-navy-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
-                  placeholder="••••••••"
+                  placeholder=""
                 />
               </div>
             </div>
