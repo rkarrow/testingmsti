@@ -690,7 +690,8 @@ export default function AdminHero() {
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
         {/* TAB 3: CONTACT INFO & CAMPUS BRANCHES */}
         {activeTab === 'contact' && (
