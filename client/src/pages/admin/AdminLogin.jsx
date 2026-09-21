@@ -73,7 +73,7 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-navy-950 border border-navy-800 rounded-lg text-white placeholder-navy-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
-                  placeholder="admin@msti.lk"
+                  placeholder="name@domain.com"
                 />
               </div>
             </div>
@@ -101,15 +101,11 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-blue-600/30 transition-all duration-200 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-blue-600/30 transition-all duration-200 text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'Authenticating...' : 'Sign In to Dashboard'}
           </button>
         </form>
-
-        <div className="text-center pt-2 text-xs text-navy-400">
-          Default Login: <span className="text-blue-400 font-mono">admin@msti.lk</span> / <span className="text-blue-400 font-mono">admin123</span>
-        </div>
       </div>
     </div>
   )
