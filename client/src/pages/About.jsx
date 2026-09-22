@@ -40,6 +40,7 @@ const defaultLeadership = [
 
 export default function About() {
   const [settings, setSettings] = useState(null)
+  const [selectedMember, setSelectedMember] = useState(null)
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -196,7 +197,11 @@ export default function About() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {(settings?.leadership && settings.leadership.length > 0 ? settings.leadership : defaultLeadership).map((member, i) => (
-              <div key={i} className="card group hover-lift text-center overflow-hidden">
+              <div
+                key={i}
+                onClick={() => setSelectedMember(member)}
+                className="card group hover-lift text-center overflow-hidden cursor-pointer"
+              >
                 <div className="relative h-52 overflow-hidden">
                   <img
                     src={member.image}
@@ -204,6 +209,11 @@ export default function About() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 to-transparent" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="bg-blue-600/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">
+                      View Details
+                    </span>
+                  </div>
                 </div>
                 <div className="p-5">
                   <h3 className="text-white font-semibold text-sm">{member.name}</h3>
@@ -215,6 +225,68 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      {/* LEADERSHIP POPUP MODAL */}
+      {selectedMember && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedMember(null)}
+        >
+          <div className="absolute inset-0 bg-navy-950/90 backdrop-blur-sm" />
+          <div
+            className="relative z-10 bg-navy-900 border border-navy-700 rounded-3xl overflow-hidden max-w-sm w-full shadow-2xl shadow-black/50"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedMember(null)}
+              className="absolute top-4 right-4 z-20 w-8 h-8 bg-navy-800 hover:bg-navy-700 rounded-full flex items-center justify-center text-navy-400 hover:text-white transition-colors cursor-pointer text-sm"
+            >
+              ✕
+            </button>
+            <div className="relative h-64 overflow-hidden">
+              <img
+                src={selectedMember.image}
+                alt={selectedMember.name}
+                className="w-full h-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <h2 className="text-white font-black text-xl leading-tight">{selectedMember.name}</h2>
+                <p className="text-blue-400 text-sm font-semibold mt-1">{selectedMember.role}</p>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-3 bg-navy-800/60 rounded-xl p-3">
+                <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center shrink-0">
+                  <FiAward size={16} className="text-blue-400" />
+                </div>
+                <div>
+                  <div className="text-navy-400 text-[10px] font-semibold uppercase tracking-wider">Qualification / Rank</div>
+                  <div className="text-white text-sm font-semibold">{selectedMember.rank}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 bg-navy-800/60 rounded-xl p-3">
+                <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center shrink-0">
+                  <FiUsers size={16} className="text-blue-400" />
+                </div>
+                <div>
+                  <div className="text-navy-400 text-[10px] font-semibold uppercase tracking-wider">Position</div>
+                  <div className="text-white text-sm font-semibold">{selectedMember.role}</div>
+                </div>
+              </div>
+              {selectedMember.bio && (
+                <div className="bg-navy-800/40 border border-navy-700 rounded-xl p-4">
+                  <p className="text-navy-300 text-sm leading-relaxed">{selectedMember.bio}</p>
+                </div>
+              )}
+              <div className="flex items-center gap-2 pt-1">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="text-navy-500 text-xs">MSTI Maritime Academy — Sri Lanka</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FACILITIES */}
       <section className="py-20 bg-navy-900/40">
