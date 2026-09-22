@@ -17,6 +17,7 @@ import AdminAbout from './pages/admin/AdminAbout'
 import AdminCourses from './pages/admin/AdminCourses'
 import AdminNews from './pages/admin/AdminNews'
 import AdminContacts from './pages/admin/AdminContacts'
+import AdminAnalytics from './pages/admin/AdminAnalytics'
 
 function PublicLayout({ children }) {
   return (
@@ -51,6 +52,7 @@ function App() {
           <Route path="courses" element={<AdminCourses />} />
           <Route path="news" element={<AdminNews />} />
           <Route path="contacts" element={<AdminContacts />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
         </Route>
       </Routes>
     </Router>
