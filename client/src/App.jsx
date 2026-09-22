@@ -6,6 +6,7 @@ import About from './pages/About'
 import Courses from './pages/Courses'
 import News from './pages/News'
 import Contact from './pages/Contact'
+import Gallery from './pages/Gallery'
 import ScrollToTop from './components/ScrollToTop'
 import usePageTracking from './hooks/usePageTracking'
 
@@ -19,6 +20,7 @@ import AdminCourses from './pages/admin/AdminCourses'
 import AdminNews from './pages/admin/AdminNews'
 import AdminContacts from './pages/admin/AdminContacts'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
+import AdminGallery from './pages/admin/AdminGallery'
 
 function PublicLayout({ children }) {
   return (
@@ -48,6 +50,7 @@ function App() {
         <Route path="/courses" element={<PublicLayout><Courses /></PublicLayout>} />
         <Route path="/news" element={<PublicLayout><News /></PublicLayout>} />
         <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
+        <Route path="/gallery" element={<PublicLayout><Gallery /></PublicLayout>} />
 
         {/* Admin Login Route */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -61,6 +64,7 @@ function App() {
           <Route path="news" element={<AdminNews />} />
           <Route path="contacts" element={<AdminContacts />} />
           <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="gallery" element={<AdminGallery />} />
         </Route>
       </Routes>
     </Router>

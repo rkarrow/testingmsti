@@ -84,6 +84,7 @@ app.use('/api/courses', require('./routes/courses'));
 app.use('/api/news', require('./routes/news'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/track', require('./routes/track'));
+app.use('/api/gallery', require('./routes/gallery'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
