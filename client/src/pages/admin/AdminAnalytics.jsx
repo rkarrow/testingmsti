@@ -1,147 +1,117 @@
-import { useState } from 'react'
-import { FiUsers, FiTrendingUp, FiMonitor, FiGlobe, FiBarChart2, FiActivity, FiEye, FiMousePointer, FiSmartphone } from 'react-icons/fi'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import {
+  FiUsers, FiTrendingUp, FiMonitor, FiGlobe,
+  FiBarChart2, FiActivity, FiEye, FiMousePointer,
+  FiSmartphone, FiRefreshCw, FiClock, FiAlertCircle
+} from 'react-icons/fi'
 
-// ─── Real MSTI GA4 Data (Jan 2024 – Sep 2026) ─────────────────────────────────
-const summaryCards = [
-  { label: 'Active Users',       value: '50.6K',   change: '+1,057.9%', up: true,  icon: FiUsers },
-  { label: 'New Users',          value: '50.6K',   change: '+1,060.5%', up: true,  icon: FiTrendingUp },
-  { label: 'New User %',         value: '100%',    change: '+0.2%',     up: true,  icon: FiActivity },
-  { label: 'Engaged Sessions',   value: '74%',     change: '+0.9%',     up: true,  icon: FiEye },
-  { label: 'Pageviews / User',   value: '4.4',     change: '-4.9%',     up: false, icon: FiMonitor },
-  { label: 'Avg. Eng. Time',     value: '1:36',    change: '-18.0%',    up: false, icon: FiBarChart2 },
-]
-
-const deviceData = [
-  { label: 'Mobile',  pct: 77.9, color: '#3b82f6' },
-  { label: 'Desktop', pct: 21.4, color: '#f97316' },
-  { label: 'Tablet',  pct: 0.7,  color: '#22c55e' },
-]
-
-const topCountries = [
-  { country: 'Sri Lanka',     users: 47200, pct: 93.2 },
-  { country: 'Philippines',   users: 1120,  pct: 2.2 },
-  { country: 'United States', users: 750,   pct: 1.5 },
-  { country: 'India',         users: 420,   pct: 0.8 },
-  { country: 'Singapore',     users: 280,   pct: 0.6 },
-  { country: 'UAE',           users: 190,   pct: 0.4 },
-  { country: 'Indonesia',     users: 140,   pct: 0.3 },
-]
-
-const topOS = [
-  { os: 'Android',   users: 30200, pct: 100 },
-  { os: 'iOS',       users: 14100, pct: 46.7 },
-  { os: 'Windows',   users: 8300,  pct: 27.5 },
-  { os: 'Linux',     users: 2100,  pct: 6.9 },
-  { os: 'Macintosh', users: 1500,  pct: 5.0 },
-  { os: 'Chrome OS', users: 400,   pct: 1.3 },
-]
-
-const topBrowsers = [
-  { browser: 'Chrome',          users: 40100, pct: 100 },
-  { browser: 'Safari',          users: 13200, pct: 32.9 },
-  { browser: 'Android Webview', users: 4100,  pct: 10.2 },
-  { browser: 'Edge',            users: 2000,  pct: 5.0 },
-  { browser: 'Samsung Internet',users: 1100,  pct: 2.7 },
-]
-
-const topSources = [
-  { source: 'google',        medium: 'organic',  sessions: 55415, pct: 79.0 },
-  { source: '(direct)',      medium: '(none)',    sessions: 8192,  pct: 11.7 },
-  { source: 'm.facebook.com',medium: 'referral', sessions: 1630,  pct: 2.3 },
-  { source: 'bing',          medium: 'organic',  sessions: 1243,  pct: 1.8 },
-  { source: 'lm.facebook.com',medium:'referral', sessions: 787,   pct: 1.1 },
-  { source: 'l.facebook.com', medium:'referral', sessions: 447,   pct: 0.6 },
-  { source: 'mercemarine.net',medium:'referral', sessions: 369,   pct: 0.5 },
-]
-
-const topEvents = [
-  { event: 'page_view',       count: 221898, pct: 36.7, users: 50523 },
-  { event: 'user_engagement', count: 186191, pct: 30.8, users: 38849 },
-  { event: 'session_start',   count: 69640,  pct: 11.5, users: 50455 },
-  { event: 'scroll',          count: 57549,  pct: 9.5,  users: 28771 },
-  { event: 'first_visit',     count: 50619,  pct: 8.4,  users: 50238 },
-  { event: 'click',           count: 18109,  pct: 3.0,  users: 11081 },
-  { event: 'form_start',      count: 1038,   pct: 0.2,  users: 896   },
-  { event: 'form_submit',     count: 49,     pct: '<0.1',users: 42   },
-]
-
-const topPages = [
-  { path: '/',                                    views: 50223, pct: 22.6, users: 33007 },
-  { path: '/courses/',                            views: 20435, pct: 9.2,  users: 14290 },
-  { path: '/courses/officer-rating-training/',   views: 20231, pct: 9.1,  users: 13403 },
-  { path: '/courses/short-courses/',             views: 19520, pct: 8.8,  users: 13002 },
-  { path: '/courses/officer-rating-training/...', views: 18127, pct: 8.2, users: 11417 },
-  { path: '/contact-us/',                         views: 9858,  pct: 4.4,  users: 6532  },
-]
-
-// Sparkline month data (relative active users trend)
-const trendPoints = [130,100,90,110,80,95,120,85,70,90,130,100,150,110,95,80,120,200,160,110,90,100,280,180,120,90,110,100]
-
-function Sparkline({ points, color = '#3b82f6', height = 40 }) {
-  const max = Math.max(...points)
-  const min = Math.min(...points)
-  const w = 200
-  const h = height
-  const pts = points.map((v, i) => {
-    const x = (i / (points.length - 1)) * w
-    const y = h - ((v - min) / (max - min || 1)) * h
+// ─── Simple SVG Sparkline ──────────────────────────────────────────────────────
+function Sparkline({ points = [], height = 60, color = '#3b82f6' }) {
+  if (!points.length) return <div className="h-14 bg-navy-800/50 rounded animate-pulse" />
+  const values = points.map(p => p.views || p || 0)
+  const max = Math.max(...values) || 1
+  const min = Math.min(...values)
+  const w = 300; const h = height
+  const pts = values.map((v, i) => {
+    const x = (i / Math.max(values.length - 1, 1)) * w
+    const y = h - ((v - min) / (max - min || 1)) * (h - 4) - 2
     return `${x},${y}`
   }).join(' ')
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }}>
-      <polyline fill="none" stroke={color} strokeWidth="1.5" points={pts} strokeLinejoin="round" strokeLinecap="round" />
-      <polyline
-        fill={`${color}20`}
-        stroke="none"
-        points={`0,${h} ${pts} ${w},${h}`}
-      />
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }} preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <polygon fill="url(#grad)" points={`0,${h} ${pts} ${w},${h}`} />
+      <polyline fill="none" stroke={color} strokeWidth="2" points={pts}
+        strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   )
 }
 
-function PieChart({ data }) {
-  const r = 60; const cx = 70; const cy = 70
-  let cumulative = 0
-  const slices = data.map(d => {
-    const startAngle = (cumulative / 100) * 2 * Math.PI - Math.PI / 2
-    cumulative += d.pct
-    const endAngle = (cumulative / 100) * 2 * Math.PI - Math.PI / 2
-    const x1 = cx + r * Math.cos(startAngle)
-    const y1 = cy + r * Math.sin(startAngle)
-    const x2 = cx + r * Math.cos(endAngle)
-    const y2 = cy + r * Math.sin(endAngle)
-    const largeArc = d.pct > 50 ? 1 : 0
-    return { ...d, x1, y1, x2, y2, largeArc, cx, cy, r }
-  })
-  return (
-    <svg viewBox="0 0 140 140" className="w-36 h-36">
-      {slices.map((s, i) => (
-        <path
-          key={i}
-          d={`M ${s.cx} ${s.cy} L ${s.x1} ${s.y1} A ${s.r} ${s.r} 0 ${s.largeArc} 1 ${s.x2} ${s.y2} Z`}
-          fill={s.color}
-          opacity={0.9}
-        />
-      ))}
-    </svg>
-  )
-}
-
+// ─── Bar Row ──────────────────────────────────────────────────────────────────
 function BarRow({ label, value, pct, color = '#3b82f6', maxPct = 100 }) {
-  const w = (pct / maxPct) * 100
+  const w = Math.min((pct / maxPct) * 100, 100)
   return (
     <div className="flex items-center gap-3">
-      <div className="w-32 text-xs text-navy-300 truncate shrink-0">{label}</div>
+      <div className="w-36 text-xs text-navy-300 truncate shrink-0">{label}</div>
       <div className="flex-1 h-2 bg-navy-800 rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all" style={{ width: `${w}%`, backgroundColor: color }} />
+        <div className="h-full rounded-full transition-all duration-700"
+          style={{ width: `${w}%`, backgroundColor: color }} />
       </div>
-      <div className="w-16 text-right text-xs text-navy-400 shrink-0">{typeof value === 'number' ? value.toLocaleString() : value}</div>
+      <div className="w-14 text-right text-xs text-navy-400 shrink-0 font-medium">
+        {typeof value === 'number' ? value.toLocaleString() : value}
+      </div>
     </div>
   )
 }
 
+// ─── Donut / Pie Chart ────────────────────────────────────────────────────────
+const PIE_COLORS = ['#3b82f6', '#f97316', '#22c55e', '#a855f7', '#ec4899', '#14b8a6']
+function PieChart({ data = [] }) {
+  if (!data.length) return <div className="w-32 h-32 rounded-full bg-navy-800 animate-pulse mx-auto" />
+  const total = data.reduce((s, d) => s + d.count, 0) || 1
+  let cumulative = 0
+  const cx = 60; const cy = 60; const r = 50
+  const slices = data.map((d, i) => {
+    const pct = d.count / total
+    const startAngle = cumulative * 2 * Math.PI - Math.PI / 2
+    cumulative += pct
+    const endAngle = cumulative * 2 * Math.PI - Math.PI / 2
+    const x1 = cx + r * Math.cos(startAngle)
+    const y1 = cy + r * Math.sin(startAngle)
+    const x2 = cx + r * Math.cos(endAngle)
+    const y2 = cy + r * Math.sin(endAngle)
+    return { ...d, pct: Math.round(pct * 1000) / 10, x1, y1, x2, y2, largeArc: pct > 0.5 ? 1 : 0, color: PIE_COLORS[i % PIE_COLORS.length] }
+  })
+  return (
+    <svg viewBox="0 0 120 120" className="w-32 h-32">
+      {slices.map((s, i) => (
+        <path key={i} d={`M ${cx} ${cy} L ${s.x1} ${s.y1} A ${r} ${r} 0 ${s.largeArc} 1 ${s.x2} ${s.y2} Z`}
+          fill={s.color} opacity={0.9} />
+      ))}
+      <circle cx={cx} cy={cy} r={30} fill="#0f172a" />
+    </svg>
+  )
+}
+
+// ─── Loading Skeleton ─────────────────────────────────────────────────────────
+function Skeleton({ className = '' }) {
+  return <div className={`bg-navy-800/60 rounded-xl animate-pulse ${className}`} />
+}
+
 export default function AdminAnalytics() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [days, setDays] = useState(30)
   const [activeTab, setActiveTab] = useState('overview')
+
+  const fetchAnalytics = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.get(`/api/track/analytics?days=${days}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.data.success) {
+        setData(res.data.data)
+      } else {
+        setError('Failed to load analytics data.')
+      }
+    } catch (err) {
+      setError('Could not connect to analytics endpoint.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchAnalytics() }, [days])
 
   const tabs = [
     { id: 'overview',  label: 'Overview' },
@@ -150,32 +120,82 @@ export default function AdminAnalytics() {
     { id: 'behavior',  label: 'Behavior' },
   ]
 
+  const deviceColors = { mobile: '#3b82f6', desktop: '#f97316', tablet: '#22c55e', unknown: '#64748b' }
+
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-white">Website Analytics</h1>
-          <p className="text-navy-400 text-sm mt-1">Google Analytics 4 — Jan 1, 2024 – Sep 21, 2026</p>
+          <p className="text-navy-400 text-sm mt-1">Real visitor data tracked from your website</p>
         </div>
-        <div className="flex items-center gap-2 bg-navy-900 border border-navy-700 rounded-xl px-4 py-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs text-navy-300 font-semibold">Live Data</span>
+        <div className="flex items-center gap-3">
+          {/* Date range */}
+          <select
+            value={days}
+            onChange={e => setDays(Number(e.target.value))}
+            className="bg-navy-900 border border-navy-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 cursor-pointer"
+          >
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+            <option value={365}>Last 1 year</option>
+          </select>
+          <button
+            onClick={fetchAnalytics}
+            className="flex items-center gap-2 px-4 py-2 bg-navy-900 border border-navy-700 text-navy-300 hover:text-white rounded-xl text-sm transition-colors cursor-pointer"
+          >
+            <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
         </div>
       </div>
 
+      {/* Error */}
+      {error && (
+        <div className="mb-6 bg-red-500/10 border border-red-500/25 text-red-400 px-4 py-3.5 rounded-xl text-sm flex items-center gap-3">
+          <FiAlertCircle size={18} />
+          {error}
+          {data === null && <span className="text-navy-500 ml-1">— Visitors will appear here once they visit your site.</span>}
+        </div>
+      )}
+
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-        {summaryCards.map((card, i) => (
-          <div key={i} className="bg-navy-900 border border-navy-700 rounded-2xl p-4">
-            <div className="w-8 h-8 rounded-lg bg-blue-600/15 flex items-center justify-center mb-3">
-              <card.icon size={16} className="text-blue-400" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {[
+          {
+            label: 'Total Page Views',
+            value: loading ? '...' : (data?.summary?.totalViews || 0).toLocaleString(),
+            sub: `${(data?.summary?.periodViews || 0).toLocaleString()} in last ${days}d`,
+            icon: FiEye, color: 'text-blue-400', bg: 'bg-blue-600/15'
+          },
+          {
+            label: 'Unique Sessions',
+            value: loading ? '...' : (data?.summary?.totalSessions || 0).toLocaleString(),
+            sub: `${(data?.summary?.periodSessions || 0).toLocaleString()} in last ${days}d`,
+            icon: FiUsers, color: 'text-emerald-400', bg: 'bg-emerald-600/15'
+          },
+          {
+            label: 'Top Page',
+            value: loading ? '...' : (data?.topPages?.[0]?.page || '—'),
+            sub: `${(data?.topPages?.[0]?.views || 0).toLocaleString()} views`,
+            icon: FiTrendingUp, color: 'text-purple-400', bg: 'bg-purple-600/15'
+          },
+          {
+            label: 'Top Source',
+            value: loading ? '...' : (data?.referrers?.[0]?._id || 'direct'),
+            sub: `${(data?.referrers?.[0]?.sessions || 0).toLocaleString()} sessions`,
+            icon: FiGlobe, color: 'text-orange-400', bg: 'bg-orange-600/15'
+          },
+        ].map((card, i) => (
+          <div key={i} className="bg-navy-900 border border-navy-700 rounded-2xl p-5">
+            <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center mb-3`}>
+              <card.icon size={18} className={card.color} />
             </div>
-            <div className="text-xl font-black text-white">{card.value}</div>
-            <div className="text-xs text-navy-400 mt-0.5 mb-1">{card.label}</div>
-            <div className={`text-[11px] font-semibold ${card.up ? 'text-emerald-400' : 'text-red-400'}`}>
-              {card.change} vs prev period
-            </div>
+            <div className="text-xl font-black text-white truncate">{card.value}</div>
+            <div className="text-xs text-navy-400 mt-0.5">{card.label}</div>
+            {!loading && <div className="text-[11px] text-navy-500 mt-1">{card.sub}</div>}
           </div>
         ))}
       </div>
@@ -183,258 +203,299 @@ export default function AdminAnalytics() {
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-navy-800 pb-1">
         {tabs.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            className={`px-4 py-2 text-sm font-semibold rounded-t-lg transition-all ${
-              activeTab === t.id
-                ? 'text-white bg-blue-600'
-                : 'text-navy-400 hover:text-white hover:bg-navy-800'
-            }`}
-          >
+          <button key={t.id} onClick={() => setActiveTab(t.id)}
+            className={`px-4 py-2 text-sm font-semibold rounded-t-lg transition-all cursor-pointer ${
+              activeTab === t.id ? 'text-white bg-blue-600' : 'text-navy-400 hover:text-white hover:bg-navy-800'
+            }`}>
             {t.label}
           </button>
         ))}
       </div>
 
-      {/* OVERVIEW TAB */}
+      {/* ── OVERVIEW ── */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          {/* Trend Chart */}
+          {/* Trend chart */}
           <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-white font-bold">Active Users Trend</h3>
-                <p className="text-navy-400 text-xs mt-0.5">Daily active users over time (Jan 2024 – Sep 2026)</p>
+                <h3 className="text-white font-bold">Daily Page Views</h3>
+                <p className="text-navy-400 text-xs mt-0.5">Last {days} days — real visitor traffic</p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-black text-white">50.6K</div>
-                <div className="text-xs text-emerald-400 font-semibold">+1,057.9%</div>
+                <div className="text-2xl font-black text-white">
+                  {loading ? '...' : (data?.summary?.periodViews || 0).toLocaleString()}
+                </div>
+                <div className="text-xs text-navy-400">views this period</div>
               </div>
             </div>
-            <Sparkline points={trendPoints} height={80} />
-            <div className="flex justify-between text-[10px] text-navy-500 mt-1">
-              <span>Jan 2024</span><span>Jul 2024</span><span>Jan 2025</span><span>Jul 2025</span><span>Mar 2026</span><span>Sep 2026</span>
-            </div>
+            {loading
+              ? <Skeleton className="h-20 w-full" />
+              : <Sparkline points={data?.dailyTrend || []} height={80} />
+            }
+            {!loading && data?.dailyTrend?.length > 0 && (
+              <div className="flex justify-between text-[10px] text-navy-500 mt-1">
+                <span>{data.dailyTrend[0]?.date}</span>
+                <span>{data.dailyTrend[Math.floor(data.dailyTrend.length / 2)]?.date}</span>
+                <span>{data.dailyTrend[data.dailyTrend.length - 1]?.date}</span>
+              </div>
+            )}
+            {!loading && (!data?.dailyTrend?.length) && (
+              <div className="h-20 flex items-center justify-center text-navy-500 text-sm">
+                No data yet — visitors will appear here automatically
+              </div>
+            )}
           </div>
 
-          {/* 2-col grid */}
+          {/* Device + Top Pages */}
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Device */}
             <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
               <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                <FiSmartphone size={16} className="text-blue-400" /> Device Category
+                <FiSmartphone size={16} className="text-blue-400" /> Device Type
               </h3>
-              <div className="flex items-center gap-6">
-                <PieChart data={deviceData} />
-                <div className="space-y-3">
-                  {deviceData.map((d, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: d.color }} />
-                      <span className="text-navy-300 text-xs">{d.label}</span>
-                      <span className="text-white text-xs font-bold ml-auto">{d.pct}%</span>
+              {loading
+                ? <Skeleton className="h-32" />
+                : (
+                  <div className="flex items-center gap-6">
+                    <PieChart data={data?.devices || []} />
+                    <div className="space-y-2.5">
+                      {(data?.devices || []).map((d, i) => {
+                        const total = (data?.devices || []).reduce((s, x) => s + x.count, 0) || 1
+                        return (
+                          <div key={i} className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-sm shrink-0"
+                              style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
+                            <span className="text-navy-300 text-xs capitalize">{d._id}</span>
+                            <span className="text-white text-xs font-bold ml-auto">
+                              {Math.round(d.count / total * 100)}%
+                            </span>
+                          </div>
+                        )
+                      })}
+                      {!data?.devices?.length && (
+                        <p className="text-navy-500 text-xs">No data yet</p>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                )
+              }
             </div>
 
-            {/* Top Countries */}
             <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
               <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                <FiGlobe size={16} className="text-blue-400" /> Top Countries
+                <FiEye size={16} className="text-blue-400" /> Top Pages
               </h3>
-              <div className="space-y-3">
-                {topCountries.map((c, i) => (
-                  <BarRow key={i} label={c.country} value={c.users} pct={c.pct} maxPct={93.2} />
-                ))}
-              </div>
+              {loading
+                ? <Skeleton className="h-32" />
+                : (
+                  <div className="space-y-3">
+                    {(data?.topPages || []).slice(0, 6).map((p, i) => {
+                      const maxViews = data.topPages[0]?.views || 1
+                      return (
+                        <BarRow key={i} label={p.page} value={p.views}
+                          pct={(p.views / maxViews) * 100} maxPct={100} color="#3b82f6" />
+                      )
+                    })}
+                    {!data?.topPages?.length && (
+                      <p className="text-navy-500 text-sm">No page views recorded yet</p>
+                    )}
+                  </div>
+                )
+              }
             </div>
           </div>
         </div>
       )}
 
-      {/* AUDIENCE TAB */}
+      {/* ── AUDIENCE ── */}
       {activeTab === 'audience' && (
         <div className="grid md:grid-cols-2 gap-6">
-          {/* OS */}
           <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
             <h3 className="text-white font-bold mb-5">Operating System</h3>
-            <div className="space-y-4">
-              {topOS.map((o, i) => (
-                <BarRow key={i} label={o.os} value={o.users} pct={o.pct} color="#3b82f6" maxPct={100} />
-              ))}
-            </div>
+            {loading ? <Skeleton className="h-40" /> : (
+              <div className="space-y-4">
+                {(data?.osStats || []).map((o, i) => {
+                  const max = data.osStats[0]?.count || 1
+                  return <BarRow key={i} label={o._id} value={o.count}
+                    pct={(o.count / max) * 100} color="#3b82f6" />
+                })}
+                {!data?.osStats?.length && <p className="text-navy-500 text-sm">No data yet</p>}
+              </div>
+            )}
           </div>
 
-          {/* Browser */}
           <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
             <h3 className="text-white font-bold mb-5">Browser</h3>
-            <div className="space-y-4">
-              {topBrowsers.map((b, i) => (
-                <BarRow key={i} label={b.browser} value={b.users} pct={b.pct} color="#8b5cf6" maxPct={100} />
-              ))}
-            </div>
+            {loading ? <Skeleton className="h-40" /> : (
+              <div className="space-y-4">
+                {(data?.browsers || []).map((b, i) => {
+                  const max = data.browsers[0]?.count || 1
+                  return <BarRow key={i} label={b._id} value={b.count}
+                    pct={(b.count / max) * 100} color="#8b5cf6" />
+                })}
+                {!data?.browsers?.length && <p className="text-navy-500 text-sm">No data yet</p>}
+              </div>
+            )}
           </div>
 
-          {/* Device pie (larger) */}
           <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6 md:col-span-2">
-            <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-              <FiSmartphone size={16} className="text-blue-400" /> Device Breakdown
-            </h3>
-            <div className="flex items-center gap-10">
-              <PieChart data={deviceData} />
-              <div className="grid grid-cols-3 gap-6">
-                {deviceData.map((d, i) => (
-                  <div key={i} className="text-center">
-                    <div className="w-4 h-4 rounded mx-auto mb-2" style={{ backgroundColor: d.color }} />
-                    <div className="text-2xl font-black text-white">{d.pct}%</div>
-                    <div className="text-navy-400 text-xs">{d.label}</div>
-                  </div>
-                ))}
+            <h3 className="text-white font-bold mb-4">Device Breakdown</h3>
+            {loading ? <Skeleton className="h-24" /> : (
+              <div className="flex items-center gap-10">
+                <PieChart data={data?.devices || []} />
+                <div className="grid grid-cols-3 gap-6">
+                  {(data?.devices || []).map((d, i) => {
+                    const total = (data?.devices || []).reduce((s, x) => s + x.count, 0) || 1
+                    return (
+                      <div key={i} className="text-center">
+                        <div className="w-4 h-4 rounded mx-auto mb-2"
+                          style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
+                        <div className="text-2xl font-black text-white">
+                          {Math.round(d.count / total * 100)}%
+                        </div>
+                        <div className="text-navy-400 text-xs capitalize">{d._id}</div>
+                        <div className="text-navy-500 text-xs">{d.count.toLocaleString()} visits</div>
+                      </div>
+                    )
+                  })}
+                  {!data?.devices?.length && <p className="text-navy-500 text-sm">No data yet</p>}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* TRAFFIC SOURCES TAB */}
+      {/* ── TRAFFIC SOURCES ── */}
       {activeTab === 'traffic' && (
         <div className="space-y-6">
           <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
             <h3 className="text-white font-bold mb-6 flex items-center gap-2">
-              <FiTrendingUp size={16} className="text-blue-400" /> Top Traffic Sources
+              <FiTrendingUp size={16} className="text-blue-400" /> Traffic Sources
             </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-navy-800">
-                    <th className="text-left text-xs text-navy-400 font-semibold py-2 pr-4">Session Source</th>
-                    <th className="text-left text-xs text-navy-400 font-semibold py-2 pr-4">Medium</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2 pr-4">Sessions</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2">% Sessions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-navy-800">
-                  {topSources.map((s, i) => (
-                    <tr key={i} className="hover:bg-navy-800/50 transition-colors">
-                      <td className="py-3 pr-4 text-white text-xs font-medium">{s.source}</td>
-                      <td className="py-3 pr-4">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                          s.medium === 'organic' ? 'bg-emerald-500/15 text-emerald-400' :
-                          s.medium === 'referral' ? 'bg-blue-500/15 text-blue-400' :
-                          'bg-navy-700 text-navy-400'
-                        }`}>{s.medium}</span>
-                      </td>
-                      <td className="py-3 pr-4 text-right text-xs text-navy-200 font-medium">{s.sessions.toLocaleString()}</td>
-                      <td className="py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <div className="w-16 h-1.5 bg-navy-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${s.pct}%` }} />
-                          </div>
-                          <span className="text-xs text-navy-300 w-10 text-right">{s.pct}%</span>
-                        </div>
-                      </td>
+            {loading ? <Skeleton className="h-48" /> : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-navy-800">
+                      <th className="text-left text-xs text-navy-400 font-semibold py-2 pr-4">Source</th>
+                      <th className="text-right text-xs text-navy-400 font-semibold py-2 pr-4">Sessions</th>
+                      <th className="text-right text-xs text-navy-400 font-semibold py-2">% Share</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Source Visual */}
-          <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
-            <h3 className="text-white font-bold mb-4">Source Distribution</h3>
-            <div className="space-y-3">
-              {topSources.map((s, i) => (
-                <BarRow
-                  key={i}
-                  label={`${s.source} / ${s.medium}`}
-                  value={`${s.pct}%`}
-                  pct={s.pct}
-                  color={i === 0 ? '#22c55e' : i === 1 ? '#3b82f6' : '#f97316'}
-                  maxPct={79}
-                />
-              ))}
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-navy-800">
+                    {(data?.referrers || []).map((r, i) => {
+                      const total = (data?.referrers || []).reduce((s, x) => s + x.sessions, 0) || 1
+                      const pct = Math.round(r.sessions / total * 100)
+                      const src = r._id || 'direct'
+                      return (
+                        <tr key={i} className="hover:bg-navy-800/50 transition-colors">
+                          <td className="py-3 pr-4 text-xs font-medium">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold mr-2 ${
+                              src === 'direct' ? 'bg-navy-700 text-navy-300' :
+                              'bg-blue-500/15 text-blue-400'
+                            }`}>{src}</span>
+                          </td>
+                          <td className="py-3 pr-4 text-right text-xs text-navy-200 font-medium">
+                            {r.sessions.toLocaleString()}
+                          </td>
+                          <td className="py-3 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <div className="w-16 h-1.5 bg-navy-800 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+                              </div>
+                              <span className="text-xs text-navy-400 w-8 text-right">{pct}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                    {!data?.referrers?.length && (
+                      <tr><td colSpan={3} className="py-8 text-center text-navy-500 text-sm">No traffic data yet</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* BEHAVIOR TAB */}
+      {/* ── BEHAVIOR ── */}
       {activeTab === 'behavior' && (
         <div className="space-y-6">
-          {/* Top Events */}
+          {/* Top Pages table */}
           <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
             <h3 className="text-white font-bold mb-6 flex items-center gap-2">
-              <FiMousePointer size={16} className="text-blue-400" /> Top Events
+              <FiEye size={16} className="text-blue-400" /> All Pages
             </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-navy-800">
-                    <th className="text-left text-xs text-navy-400 font-semibold py-2 pr-4">Event Name</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2 pr-4">Event Count</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2 pr-4">% Events</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2">Active Users</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-navy-800">
-                  {topEvents.map((e, i) => (
-                    <tr key={i} className="hover:bg-navy-800/50 transition-colors">
-                      <td className="py-3 pr-4 text-white text-xs font-mono">{e.event}</td>
-                      <td className="py-3 pr-4 text-right text-xs text-navy-200 font-medium">{typeof e.count === 'number' ? e.count.toLocaleString() : e.count}</td>
-                      <td className="py-3 pr-4 text-right text-xs text-navy-400">{e.pct}%</td>
-                      <td className="py-3 text-right text-xs text-blue-400 font-medium">{typeof e.users === 'number' ? e.users.toLocaleString() : e.users}</td>
+            {loading ? <Skeleton className="h-48" /> : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-navy-800">
+                      <th className="text-left text-xs text-navy-400 font-semibold py-2 pr-4">Page</th>
+                      <th className="text-right text-xs text-navy-400 font-semibold py-2 pr-4">Views</th>
+                      <th className="text-right text-xs text-navy-400 font-semibold py-2">% of Total</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-navy-800">
+                    {(data?.topPages || []).map((p, i) => {
+                      const total = data?.summary?.totalViews || 1
+                      const pct = Math.round(p.views / total * 100)
+                      return (
+                        <tr key={i} className="hover:bg-navy-800/50 transition-colors">
+                          <td className="py-3 pr-4 text-blue-400 text-xs font-mono">{p.page}</td>
+                          <td className="py-3 pr-4 text-right text-xs text-navy-200 font-medium">{p.views.toLocaleString()}</td>
+                          <td className="py-3 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <div className="w-12 h-1.5 bg-navy-800 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min(pct * 4, 100)}%` }} />
+                              </div>
+                              <span className="text-xs text-navy-400 w-8 text-right">{pct}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                    {!data?.topPages?.length && (
+                      <tr><td colSpan={3} className="py-8 text-center text-navy-500 text-sm">No page view data yet</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
-          {/* Top Pages */}
+          {/* Recent visits */}
           <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6">
-            <h3 className="text-white font-bold mb-6 flex items-center gap-2">
-              <FiEye size={16} className="text-blue-400" /> Top Pages
+            <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+              <FiClock size={16} className="text-blue-400" /> Recent Visits (Live)
             </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-navy-800">
-                    <th className="text-left text-xs text-navy-400 font-semibold py-2 pr-4">Page Path</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2 pr-4">Views</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2 pr-4">% Views</th>
-                    <th className="text-right text-xs text-navy-400 font-semibold py-2">Active Users</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-navy-800">
-                  {topPages.map((p, i) => (
-                    <tr key={i} className="hover:bg-navy-800/50 transition-colors">
-                      <td className="py-3 pr-4 text-blue-400 text-xs font-mono">{p.path}</td>
-                      <td className="py-3 pr-4 text-right text-xs text-navy-200 font-medium">{p.views.toLocaleString()}</td>
-                      <td className="py-3 pr-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <div className="w-12 h-1.5 bg-navy-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(p.pct / 22.6) * 100}%` }} />
-                          </div>
-                          <span className="text-xs text-navy-400 w-8 text-right">{p.pct}%</span>
-                        </div>
-                      </td>
-                      <td className="py-3 text-right text-xs text-navy-300 font-medium">{p.users.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {loading ? <Skeleton className="h-48" /> : (
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                {(data?.recent || []).map((r, i) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-navy-800/50 text-xs">
+                    <span className="text-blue-400 font-mono">{r.page}</span>
+                    <div className="flex items-center gap-3 text-navy-400">
+                      <span className="capitalize">{r.device}</span>
+                      <span>{r.browser}</span>
+                      <span className="text-navy-500">{new Date(r.timestamp).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  </div>
+                ))}
+                {!data?.recent?.length && (
+                  <p className="text-center text-navy-500 text-sm py-8">No recent visits recorded yet</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Footer note */}
-      <div className="mt-8 p-4 bg-navy-900/40 border border-navy-800 rounded-xl text-center">
-        <p className="text-navy-500 text-xs">
-          Data from Google Analytics 4 — MSTI Maritime Academy — Jan 1, 2024 to Sep 21, 2026
+      <div className="mt-8 p-4 bg-navy-900/40 border border-navy-800 rounded-xl">
+        <p className="text-navy-500 text-xs text-center">
+          📊 Live tracking — data updates with every real visitor to your website. Admin pages are excluded.
         </p>
       </div>
     </div>

@@ -7,6 +7,7 @@ import Courses from './pages/Courses'
 import News from './pages/News'
 import Contact from './pages/Contact'
 import ScrollToTop from './components/ScrollToTop'
+import usePageTracking from './hooks/usePageTracking'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -29,10 +30,17 @@ function PublicLayout({ children }) {
   )
 }
 
+// Must be rendered inside <Router> to access location
+function Tracker() {
+  usePageTracking()
+  return null
+}
+
 function App() {
   return (
     <Router>
       <ScrollToTop />
+      <Tracker />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
