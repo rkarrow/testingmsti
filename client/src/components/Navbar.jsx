@@ -47,7 +47,7 @@ export default function Navbar() {
       </div>
 
       {/* Main Navbar */}
-      <nav className="bg-navy-900 border-b border-navy-800">
+      <nav className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -65,8 +65,8 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `text-sm font-semibold transition-colors relative py-2 ${
                     isActive
-                      ? 'text-blue-400'
-                      : 'text-navy-300 hover:text-white'
+                      ? 'text-blue-600'
+                      : 'text-navy-800 hover:text-blue-600'
                   }`
                 }
               >
@@ -74,7 +74,7 @@ export default function Navbar() {
                   <>
                     {link.label}
                     {isActive && (
-                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-t-full" />
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
                     )}
                   </>
                 )}
@@ -84,7 +84,7 @@ export default function Navbar() {
 
           {/* Right Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/contact" className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2.5 px-6 rounded-lg transition-colors shadow-lg shadow-blue-600/25">
+            <Link to="/contact" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-6 rounded transition-colors">
               Apply Now
             </Link>
           </div>
@@ -92,7 +92,7 @@ export default function Navbar() {
           {/* Mobile toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-navy-300 p-2 rounded-lg hover:bg-navy-800 transition-colors"
+            className="md:hidden text-navy-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
@@ -101,7 +101,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-navy-900 border-t border-navy-800">
+        <div className="md:hidden bg-white border-t border-gray-100">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <NavLink
@@ -111,18 +111,18 @@ export default function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   `block px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
-                    isActive ? 'text-blue-400 bg-blue-600/10' : 'text-navy-300 hover:text-white hover:bg-navy-800'
+                    isActive ? 'text-blue-600 bg-blue-50' : 'text-navy-800 hover:text-blue-600 hover:bg-gray-50'
                   }`
                 }
               >
                 {link.label}
               </NavLink>
             ))}
-            <div className="pt-4 mt-2 border-t border-navy-800 flex gap-3">
+            <div className="pt-4 mt-2 border-t border-gray-100 flex gap-3">
               <Link
                 to="/contact"
                 onClick={() => setIsOpen(false)}
-                className="bg-blue-600 text-white text-sm font-semibold py-2.5 px-6 rounded-lg text-center flex-1"
+                className="bg-blue-600 text-white text-sm font-semibold py-2.5 px-6 rounded text-center flex-1"
               >
                 Apply Now
               </Link>
