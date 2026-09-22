@@ -52,7 +52,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src="/msti-logo.png" alt="MSTI Maritime Academy" className="h-14 w-auto object-contain" />
+            <img src="/msti-logo.jpg" alt="MSTI Maritime Academy" className="h-16 w-auto object-contain" />
           </Link>
 
           {/* Desktop Nav */}
