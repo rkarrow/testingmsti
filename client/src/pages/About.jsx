@@ -195,7 +195,7 @@ export default function About() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {leadership.map((member, i) => (
+            {(settings?.leadership && settings.leadership.length > 0 ? settings.leadership : defaultLeadership).map((member, i) => (
               <div key={i} className="card group hover-lift text-center overflow-hidden">
                 <div className="relative h-52 overflow-hidden">
                   <img
@@ -228,7 +228,12 @@ export default function About() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {facilities.map((facility, i) => (
+            {(settings?.facilities && settings.facilities.length > 0 ? settings.facilities : [
+              { title: '360° Full Mission Bridge Simulator', desc: 'Industry-leading bridge simulation technology providing realistic ship handling scenarios for officer trainees.', image: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?w=500' },
+              { title: 'Engine Room Simulator', desc: 'State-of-the-art engine room simulation facility for marine engineering trainees.', image: 'https://images.unsplash.com/photo-1581094794329-c8112d4e5f9e?w=500' },
+              { title: 'GMDSS Radio Laboratory', desc: 'Fully equipped Global Maritime Distress & Safety System laboratory for communications training.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500' },
+              { title: 'Survival Craft Training Pool', desc: 'Professional training facility for liferaft deployment, sea survival, and rescue operations.', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500' },
+            ]).map((facility, i) => (
               <div key={i} className="card group hover-lift">
                 <div className="relative h-44 overflow-hidden">
                   <img
