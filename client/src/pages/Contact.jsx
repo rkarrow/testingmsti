@@ -92,7 +92,7 @@ export default function Contact() {
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-            {stats.map((s, i) => (
+            {defaultStats.map((s, i) => (
               <div key={i} className="bg-navy-900/70 border border-navy-700 rounded-xl p-5 text-center">
                 <div className="text-3xl font-bold text-white">{s.value}</div>
                 <div className="text-navy-400 text-sm mt-1">{s.label}</div>
