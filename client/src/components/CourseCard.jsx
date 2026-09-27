@@ -13,8 +13,10 @@ export default function CourseCard({ course }) {
 
   const colorClass = categoryColors[course.category] || 'bg-blue-600/20 text-blue-400 border-blue-500/30'
 
+  const courseId = course._id || course.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+
   return (
-    <div className="card group hover-lift flex flex-col">
+    <Link to={`/courses/${courseId}`} className="card group hover-lift flex flex-col cursor-pointer transition-all">
       {/* Image */}
       <div className="relative overflow-hidden h-48">
         {course.image ? (
@@ -45,7 +47,7 @@ export default function CourseCard({ course }) {
           {course.title}
         </h3>
         <p className="text-navy-400 text-sm leading-relaxed mb-4 flex-1">
-          {course.shortDescription || course.description.substring(0, 100) + '...'}
+          {course.shortDescription || (course.description ? course.description.substring(0, 100) + '...' : '')}
         </p>
 
         <div className="flex items-center justify-between pt-4 border-t border-navy-800">
@@ -53,11 +55,11 @@ export default function CourseCard({ course }) {
             <FiClock size={14} />
             <span>{course.duration}</span>
           </div>
-          <span className="text-xs font-medium text-navy-500 bg-navy-800 px-2.5 py-1 rounded">
-            {course.level}
-          </span>
+          <div className="flex items-center gap-1 text-xs font-semibold text-blue-400 group-hover:translate-x-1 transition-transform">
+            View Details <FiArrowRight size={14} />
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

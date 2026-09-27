@@ -45,6 +45,41 @@ const siteSettingsSchema = new mongoose.Schema({
     }
   ],
 
+  // Structured Training Programmes
+  officerCadetPrograms: [
+    {
+      title: { type: String },
+      category: { type: String, default: 'Officer Cadetship' },
+      duration: { type: String },
+      overview: { type: String },
+      journey: [{ type: String }],
+      requirements: [{ type: String }],
+      outcome: { type: String },
+      careerSea: { type: String },
+      careerAshore: { type: String },
+      image: { type: String },
+    }
+  ],
+
+  ratingPrograms: [
+    {
+      title: { type: String },
+      category: { type: String, default: 'Rating Training' },
+      duration: { type: String },
+      overview: { type: String },
+      requirements: { type: String },
+      careerPath: { type: String },
+      image: { type: String },
+    }
+  ],
+
+  shortCourses: {
+    stcw: [{ type: String }],
+    nonStcw: [{ type: String }],
+    simulator: [{ type: String }],
+    customized: [{ type: String }],
+  },
+
   // Stats
   stats: [
     {

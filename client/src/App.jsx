@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import About from './pages/About'
 import Courses from './pages/Courses'
+import CourseDetail from './pages/CourseDetail'
 import News from './pages/News'
 import Contact from './pages/Contact'
 import Gallery from './pages/Gallery'
@@ -48,6 +49,7 @@ function App() {
         <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
         <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
         <Route path="/courses" element={<PublicLayout><Courses /></PublicLayout>} />
+        <Route path="/courses/:id" element={<PublicLayout><CourseDetail /></PublicLayout>} />
         <Route path="/news" element={<PublicLayout><News /></PublicLayout>} />
         <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
         <Route path="/gallery" element={<PublicLayout><Gallery /></PublicLayout>} />

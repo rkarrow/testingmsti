@@ -219,7 +219,11 @@ export default function Courses() {
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('All')
   
-  // New state variables for detailed tabs
+  // Dynamic programmes from settings
+  const [officerList, setOfficerList] = useState(officerCadetPrograms)
+  const [ratingList, setRatingList] = useState(ratingPrograms)
+  const [shortCoursesList, setShortCoursesList] = useState(shortCourses)
+
   const [activeTab, setActiveTab] = useState('officer')
   const [activeShortCourseTab, setActiveShortCourseTab] = useState('stcw')
 
@@ -228,11 +232,27 @@ export default function Courses() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await axios.get('/api/courses')
-        setCourses(res.data.data)
+        const [res, setRes] = await Promise.all([
+          axios.get('/api/courses'),
+          axios.get('/api/settings')
+        ])
+        if (res.data?.data) {
+          setCourses(res.data.data)
+        }
+        if (setRes.data?.data) {
+          const s = setRes.data.data
+          if (s.officerCadetPrograms && s.officerCadetPrograms.length > 0) {
+            setOfficerList(s.officerCadetPrograms)
+          }
+          if (s.ratingPrograms && s.ratingPrograms.length > 0) {
+            setRatingList(s.ratingPrograms)
+          }
+          if (s.shortCourses && Object.keys(s.shortCourses).length > 0) {
+            setShortCoursesList((prev) => ({ ...prev, ...s.shortCourses }))
+          }
+        }
       } catch (err) {
         console.error('Failed to fetch courses:', err)
-        setCourses([])
       } finally {
         setLoading(false)
       }
@@ -372,11 +392,19 @@ export default function Courses() {
           {/* OFFICER CADET PROGRAMS */}
           {activeTab === 'officer' && (
             <div className="space-y-16">
-              {officerCadetPrograms.map((program, idx) => (
+              {officerList.map((program, idx) => (
                 <div key={idx} className="bg-navy-950 border border-navy-800 rounded-2xl p-6 md:p-10 shadow-xl">
-                  <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-                    <FiAnchor className="text-blue-500" /> {program.title}
-                  </h2>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+                      <FiAnchor className="text-blue-500" /> {program.title}
+                    </h2>
+                    <Link
+                      to={`/courses/${program.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 transition-all self-start sm:self-auto"
+                    >
+                      View Full Programme Details <FiArrowRight />
+                    </Link>
+                  </div>
                   <div className="prose prose-invert max-w-none">
                     {program.overview.split('\n\n').map((para, i) => (
                       <p key={i} className="text-navy-300 leading-relaxed mb-4">{para}</p>
@@ -389,7 +417,7 @@ export default function Courses() {
                         <FiClock className="text-blue-400" /> Your Journey
                       </h3>
                       <ul className="space-y-3">
-                        {program.journey.map((phase, i) => (
+                        {(Array.isArray(program.journey) ? program.journey : (program.journey ? program.journey.split('\n') : [])).map((phase, i) => (
                           <li key={i} className="flex items-start gap-3 text-navy-300 text-sm bg-navy-800/50 p-3 rounded-lg border border-navy-700/50">
                             <span className="w-6 h-6 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center flex-shrink-0 text-[10px] font-bold">{i+1}</span>
                             <span className="mt-0.5">{phase}</span>
@@ -403,7 +431,7 @@ export default function Courses() {
                         <FiCheckCircle className="text-green-400" /> Entry Requirements
                       </h3>
                       <ul className="space-y-2 mb-8">
-                        {program.requirements.map((req, i) => (
+                        {(Array.isArray(program.requirements) ? program.requirements : (program.requirements ? program.requirements.split('\n') : [])).map((req, i) => (
                           <li key={i} className="flex items-start gap-3 text-navy-300 text-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-2" />
                             <span>{req}</span>
@@ -431,9 +459,17 @@ export default function Courses() {
           {/* RATING TRAINING PROGRAMS */}
           {activeTab === 'rating' && (
             <div className="grid md:grid-cols-2 gap-8">
-              {ratingPrograms.map((program, idx) => (
+              {ratingList.map((program, idx) => (
                 <div key={idx} className="bg-navy-950 border border-navy-800 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col">
-                  <h3 className="text-2xl font-bold text-white mb-4 text-blue-400">{program.title}</h3>
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <h3 className="text-2xl font-bold text-blue-400">{program.title}</h3>
+                    <Link
+                      to={`/courses/${program.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                      className="text-xs text-blue-400 hover:text-white font-semibold flex items-center gap-1 shrink-0"
+                    >
+                      Details <FiArrowRight size={13} />
+                    </Link>
+                  </div>
                   <p className="text-navy-300 text-sm leading-relaxed mb-6">{program.overview}</p>
                   
                   <div className="mt-auto space-y-6">
@@ -482,11 +518,20 @@ export default function Courses() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                {shortCourses[activeShortCourseTab].map((course, idx) => (
-                  <div key={idx} className="bg-navy-800/50 border border-navy-700/50 rounded-xl p-4 flex items-start gap-3">
-                    <FiBook className="text-blue-500 mt-1 shrink-0" />
-                    <span className="text-navy-200 text-sm">{course}</span>
-                  </div>
+                {(shortCoursesList[activeShortCourseTab] || []).map((course, idx) => (
+                  <Link
+                    key={idx}
+                    to={`/contact?course=${encodeURIComponent(course)}`}
+                    className="bg-navy-800/50 hover:bg-navy-800 border border-navy-700/50 hover:border-blue-500/50 rounded-xl p-4 flex items-center justify-between gap-3 group transition-all"
+                  >
+                    <div className="flex items-start gap-3">
+                      <FiBook className="text-blue-500 mt-0.5 shrink-0 group-hover:scale-110 transition-transform" />
+                      <span className="text-navy-200 text-sm group-hover:text-white">{course}</span>
+                    </div>
+                    <span className="text-[11px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      Inquire →
+                    </span>
+                  </Link>
                 ))}
               </div>
               
