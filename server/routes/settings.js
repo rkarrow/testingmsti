@@ -45,7 +45,8 @@ router.put('/', protect, async (req, res) => {
     if (!settings) {
       settings = new SiteSettings({ ...defaultSettings, ...req.body });
     } else {
-      Object.assign(settings, req.body, { updatedAt: Date.now() });
+      settings.set(req.body);
+      settings.updatedAt = Date.now();
     }
     await settings.save();
     res.json({ success: true, message: 'Settings updated successfully', data: settings });
