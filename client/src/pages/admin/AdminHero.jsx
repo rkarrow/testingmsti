@@ -99,6 +99,7 @@ export default function AdminHero() {
   const [uploadingHero, setUploadingHero] = useState(false)
   const [uploadingAboutHero, setUploadingAboutHero] = useState(false)
   const [uploadingAbout, setUploadingAbout] = useState(false)
+  const [uploadingSlideIdx, setUploadingSlideIdx] = useState(null)
   const [msg, setMsg] = useState({ type: '', text: '' })
 
   useEffect(() => {
@@ -133,9 +134,13 @@ export default function AdminHero() {
 
   // Hero Slides Handlers
   const handleHeroSlideChange = (index, field, value) => {
-    const updatedSlides = [...(formData.heroSlides || defaultSettings.heroSlides)]
-    updatedSlides[index][field] = value
-    setFormData((prev) => ({ ...prev, heroSlides: updatedSlides }))
+    setFormData((prev) => {
+      const currentSlides = prev.heroSlides || defaultSettings.heroSlides
+      const updatedSlides = currentSlides.map((slide, i) =>
+        i === index ? { ...slide, [field]: value } : slide
+      )
+      return { ...prev, heroSlides: updatedSlides }
+    })
   }
 
   const handleAddHeroSlide = () => {
@@ -152,6 +157,7 @@ export default function AdminHero() {
     }))
   }
 
+
   const handleHeroSlideImageUpload = async (index, e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -160,6 +166,7 @@ export default function AdminHero() {
     data.append('image', file)
 
     try {
+      setUploadingSlideIdx(index)
       setMsg({ type: 'info', text: 'Uploading slide image...' })
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
@@ -175,6 +182,10 @@ export default function AdminHero() {
       }
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+    } finally {
+      setUploadingSlideIdx(null)
+      // Reset the file input so the same file can be uploaded again if needed
+      e.target.value = ''
     }
   }
 
@@ -364,7 +375,9 @@ export default function AdminHero() {
           className={`p-4 rounded-xl text-xs flex items-center gap-2 ${
             msg.type === 'success'
               ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
-              : 'bg-red-500/10 border border-red-500/20 text-red-400'
+              : msg.type === 'error'
+              ? 'bg-red-500/10 border border-red-500/20 text-red-400'
+              : 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
           }`}
         >
           {msg.type === 'success' ? <FiCheckCircle size={16} /> : <FiAlertCircle size={16} />}
@@ -531,8 +544,8 @@ export default function AdminHero() {
                             placeholder="/hero-image.jpg"
                           />
                           <label className="bg-navy-800 hover:bg-navy-700 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
-                            <FiUpload size={14} /> Upload
-                            <input type="file" accept="image/*" onChange={(e) => handleHeroSlideImageUpload(idx, e)} className="hidden" />
+                            <FiUpload size={14} /> {uploadingSlideIdx === idx ? 'Uploading...' : 'Upload'}
+                            <input type="file" accept="image/*" onChange={(e) => handleHeroSlideImageUpload(idx, e)} className="hidden" disabled={uploadingSlideIdx === idx} />
                           </label>
                         </div>
                       </div>
