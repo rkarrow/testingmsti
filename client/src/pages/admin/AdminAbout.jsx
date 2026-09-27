@@ -39,6 +39,35 @@ const defaultAboutSettings = {
   aboutLeaderName: "Capt. Ayesha Fernando",
   aboutLeaderRole: "Valedictorian • Officer of the Watch (STCW II/1)",
   aboutLeaderImage: "/captain.jpg",
+
+  // Leadership Team
+  leadership: [
+    {
+      name: 'Capt. R. Jayawardena',
+      role: 'Principal & Commandant',
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300',
+      rank: 'Master Mariner — FG',
+    },
+    {
+      name: 'Dr. S. K. Mendis',
+      role: 'Head of Academic Studies',
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300',
+      rank: 'PhD Marine Engineering',
+    },
+    {
+      name: 'Chief Eng. T. Perera',
+      role: 'Chief Engineering Instructor',
+      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300',
+      rank: 'Class I Engineer',
+    },
+    {
+      name: 'Capt. A. Fernando',
+      role: 'Senior Navigation Instructor',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300',
+      rank: 'Master Mariner',
+    }
+  ],
+
 }
 
 export default function AdminAbout() {
@@ -61,10 +90,14 @@ export default function AdminAbout() {
         setFormData((prev) => ({
           ...prev,
           ...res.data.data,
-          aboutStats:
+                    aboutStats:
             res.data.data.aboutStats && res.data.data.aboutStats.length > 0
               ? res.data.data.aboutStats
               : defaultAboutSettings.aboutStats,
+          leadership:
+            res.data.data.leadership && res.data.data.leadership.length > 0
+              ? res.data.data.leadership
+              : defaultAboutSettings.leadership,
         }))
       }
     } catch (err) {
@@ -77,6 +110,64 @@ export default function AdminAbout() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+
+  const [uploadingLeaderIdx, setUploadingLeaderIdx] = useState(null)
+
+  // Leadership Handlers
+  const handleLeadershipChange = (index, field, value) => {
+    setFormData((prev) => {
+      const currentLeaders = prev.leadership || defaultAboutSettings.leadership
+      const updatedLeaders = currentLeaders.map((leader, i) =>
+        i === index ? { ...leader, [field]: value } : leader
+      )
+      return { ...prev, leadership: updatedLeaders }
+    })
+  }
+
+  const handleAddLeadership = () => {
+    setFormData((prev) => ({
+      ...prev,
+      leadership: [...(prev.leadership || defaultAboutSettings.leadership), { name: '', role: '', rank: '', image: '' }],
+    }))
+  }
+
+  const handleRemoveLeadership = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      leadership: (prev.leadership || defaultAboutSettings.leadership).filter((_, i) => i !== index),
+    }))
+  }
+
+  const handleLeadershipImageUpload = async (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const data = new FormData()
+    data.append('image', file)
+
+    try {
+      setUploadingLeaderIdx(index)
+      setMsg({ type: 'info', text: 'Uploading member image...' })
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.post('/api/upload', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (res.data.success) {
+        handleLeadershipChange(index, 'image', res.data.imageUrl)
+        setMsg({ type: 'success', text: 'Member image uploaded successfully!' })
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+    } finally {
+      setUploadingLeaderIdx(null)
+      e.target.value = ''
+    }
   }
 
   // Stats Handlers
@@ -216,7 +307,9 @@ export default function AdminAbout() {
           className={`p-4 rounded-xl text-xs flex items-center gap-2 ${
             msg.type === 'success'
               ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
-              : 'bg-red-500/10 border border-red-500/20 text-red-400'
+              : msg.type === 'error'
+              ? 'bg-red-500/10 border border-red-500/20 text-red-400'
+              : 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
           }`}
         >
           {msg.type === 'success' ? <FiCheckCircle size={16} /> : <FiAlertCircle size={16} />}
@@ -494,7 +587,94 @@ export default function AdminAbout() {
           </div>
         </div>
 
+        
+        {/* SECTION 3: ACADEMY LEADERSHIP TEAM */}
+        <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+          <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <FiEye className="text-blue-400" /> 3. Academy Leadership Team
+            </h2>
+            <button
+              type="button"
+              onClick={handleAddLeadership}
+              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              <FiPlus size={13} /> Add Member
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(formData.leadership || defaultAboutSettings.leadership).map((leader, idx) => (
+              <div key={idx} className="bg-navy-950 border border-navy-800 rounded-xl p-4 relative space-y-3">
+                <div className="flex items-center justify-between border-b border-navy-800 pb-2 mb-2">
+                  <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Member #{idx + 1}</span>
+                  {(formData.leadership || defaultAboutSettings.leadership).length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveLeadership(idx)}
+                      className="text-red-400 hover:text-red-300 p-1 rounded transition-colors"
+                      title="Delete Member"
+                    >
+                      <FiTrash2 size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Name</label>
+                    <input
+                      type="text"
+                      value={leader.name || ''}
+                      onChange={(e) => handleLeadershipChange(idx, 'name', e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                      placeholder="Capt. J. Doe"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Role / Position</label>
+                    <input
+                      type="text"
+                      value={leader.role || ''}
+                      onChange={(e) => handleLeadershipChange(idx, 'role', e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                      placeholder="Principal"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[11px] text-navy-400 mb-1">Rank / Qualifications</label>
+                    <input
+                      type="text"
+                      value={leader.rank || ''}
+                      onChange={(e) => handleLeadershipChange(idx, 'rank', e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                      placeholder="Master Mariner"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <label className="block text-[11px] text-navy-400 mb-1">Photo Image URL</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      value={leader.image || ''}
+                      onChange={(e) => handleLeadershipChange(idx, 'image', e.target.value)}
+                      className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                    />
+                    <label className="bg-navy-800 hover:bg-navy-700 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                      <FiUpload size={14} /> {uploadingLeaderIdx === idx ? 'Uploading...' : 'Upload'}
+                      <input type="file" accept="image/*" onChange={(e) => handleLeadershipImageUpload(idx, e)} className="hidden" disabled={uploadingLeaderIdx === idx} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Save Bar */}
+
         <div className="flex justify-end pt-2">
           <button
             type="submit"
