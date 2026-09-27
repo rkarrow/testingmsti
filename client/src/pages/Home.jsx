@@ -148,7 +148,15 @@ export default function Home() {
     fetchData()
   }, [])
 
-  const activeSlideData = heroSlides[currentSlide]
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-navy-950 flex flex-col items-center justify-center pt-20">
+        <div className="w-16 h-16 border-4 border-navy-800 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+      </div>
+    )
+  }
+
+  const activeSlideData = heroSlides[currentSlide] || heroSlides[0]
 
   return (
     <div className="pt-20 sm:pt-28"> {/* Offset for navbar & top bar */}
