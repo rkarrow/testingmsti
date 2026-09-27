@@ -34,6 +34,16 @@ const siteSettingsSchema = new mongoose.Schema({
     type: String,
     default: "/contact",
   },
+  
+  // Dynamic Hero Slides Array
+  heroSlides: [
+    {
+      image: { type: String },
+      badge: { type: String },
+      title: { type: String },
+      subtitle: { type: String },
+    }
+  ],
 
   // Stats
   stats: [

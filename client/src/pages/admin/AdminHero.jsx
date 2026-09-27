@@ -13,6 +13,34 @@ const defaultSettings = {
   heroSecondaryCtaText: "Book a Campus Visit",
   heroSecondaryCtaLink: "/contact",
 
+  heroSlides: [
+    {
+      image: "/hero-image.jpg",
+      badge: "⚓ FOUNDING EXCELLENCE SINCE 1986 • SRI LANKA'S PREMIER CADET CORPS",
+      title: "The Premier Maritime Academy in Sri Lanka",
+      subtitle: "We aspire to become the premier training institute for maritime careers in Sri Lanka and overseas. Fully accredited merchant navy officer training under IMO STCW and DG Shipping."
+    },
+    {
+      image: '/hero-image-2.jpg',
+      badge: "🌐 180° FULL MISSION NAVIGATION SIMULATORS",
+      title: "State-of-the-Art Bridge & Radar Simulation",
+      subtitle: "Train on industry-leading Transas & Kongsberg bridge navigation simulators mirroring real-world ocean vessels and weather conditions."
+    },
+    {
+      image: '/hero-image-3.jpg',
+      badge: "⚙️ MARINE ENGINEERING LABS & WORKSHOPS",
+      title: "Advanced Propulsion & Mechanical Engineering",
+      subtitle: "Hands-on engineering cadetship working with heavy marine diesel engines, automation systems, and electrical control panels."
+    },
+    {
+      image: '/hero-image-4.jpg',
+      badge: "🎓 IMO STCW OFFICER CADET GRADUATION",
+      title: "Global Merchant Navy Fleet Placement",
+      subtitle: "Our accredited graduates serve as certified Deck & Engineering Officers on leading international commercial fleets worldwide."
+    }
+  ],
+
+
   // About Page Hero & Top Stats
   aboutHeroBadge: "About MSTI",
   aboutHeroTitle: "About MSTI — The Flagship Maritime Academy in Sri Lanka",
@@ -85,6 +113,7 @@ export default function AdminHero() {
         setFormData((prev) => ({
           ...prev,
           ...res.data.data,
+          heroSlides: (res.data.data.heroSlides && res.data.data.heroSlides.length > 0) ? res.data.data.heroSlides : defaultSettings.heroSlides,
           aboutStats: (res.data.data.aboutStats && res.data.data.aboutStats.length > 0) ? res.data.data.aboutStats : defaultSettings.aboutStats,
           faqs: (res.data.data.faqs && res.data.data.faqs.length > 0) ? res.data.data.faqs : defaultSettings.faqs,
         }))
@@ -99,6 +128,54 @@ export default function AdminHero() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+
+  // Hero Slides Handlers
+  const handleHeroSlideChange = (index, field, value) => {
+    const updatedSlides = [...(formData.heroSlides || defaultSettings.heroSlides)]
+    updatedSlides[index][field] = value
+    setFormData((prev) => ({ ...prev, heroSlides: updatedSlides }))
+  }
+
+  const handleAddHeroSlide = () => {
+    setFormData((prev) => ({
+      ...prev,
+      heroSlides: [...(prev.heroSlides || defaultSettings.heroSlides), { image: '', badge: '', title: '', subtitle: '' }],
+    }))
+  }
+
+  const handleRemoveHeroSlide = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      heroSlides: (prev.heroSlides || defaultSettings.heroSlides).filter((_, i) => i !== index),
+    }))
+  }
+
+  const handleHeroSlideImageUpload = async (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const data = new FormData()
+    data.append('image', file)
+
+    try {
+      setMsg({ type: 'info', text: 'Uploading slide image...' })
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.post('/api/upload', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (res.data.success) {
+        handleHeroSlideChange(index, 'image', res.data.imageUrl)
+        setMsg({ type: 'success', text: 'Slide image uploaded successfully!' })
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+    }
   }
 
   // About Stats Handlers
@@ -327,42 +404,9 @@ export default function AdminHero() {
               🏠 Homepage Hero Header & CTA Buttons
             </h2>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Top Badge Text</label>
-                <input
-                  type="text"
-                  name="heroBadge"
-                  value={formData.heroBadge}
-                  onChange={handleChange}
-                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Main Title (Heading)</label>
-                <input
-                  type="text"
-                  name="heroTitle"
-                  value={formData.heroTitle}
-                  onChange={handleChange}
-                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Subtitle (Paragraph)</label>
-                <textarea
-                  name="heroSubtitle"
-                  rows={3}
-                  value={formData.heroSubtitle}
-                  onChange={handleChange}
-                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
-                />
-              </div>
-
-              {/* Call to Action Buttons */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div className="space-y-6">
+              {/* Call to Action Buttons (Global for Hero) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-navy-950 border border-navy-800 rounded-xl space-y-3">
                   <h3 className="text-xs font-bold text-blue-400">Primary CTA Button</h3>
                   <div>
@@ -412,21 +456,88 @@ export default function AdminHero() {
                 </div>
               </div>
 
-              {/* Background Image */}
-              <div className="pt-2">
-                <label className="block text-xs font-semibold text-navy-200 mb-1">Hero Background Image</label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="text"
-                    name="heroBgImage"
-                    value={formData.heroBgImage}
-                    onChange={handleChange}
-                    className="flex-1 bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
-                  />
-                  <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2.5 px-4 rounded-xl border border-navy-700 cursor-pointer flex items-center gap-2 shrink-0">
-                    <FiUpload /> {uploadingHero ? 'Uploading...' : 'Upload Image'}
-                    <input type="file" accept="image/*" onChange={handleHeroImageUpload} className="hidden" />
-                  </label>
+              {/* Dynamic Slides */}
+              <div className="border-t border-navy-800 pt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-bold text-white">Dynamic Hero Slides</h3>
+                  <button
+                    type="button"
+                    onClick={handleAddHeroSlide}
+                    className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <FiPlus size={13} /> Add Slide
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {(formData.heroSlides || defaultSettings.heroSlides).map((slide, idx) => (
+                    <div key={idx} className="bg-navy-950 border border-navy-800 rounded-xl p-4 relative space-y-3">
+                      <div className="flex items-center justify-between border-b border-navy-800 pb-2 mb-2">
+                        <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Slide #{idx + 1}</span>
+                        {(formData.heroSlides || defaultSettings.heroSlides).length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveHeroSlide(idx)}
+                            className="text-red-400 hover:text-red-300 p-1 rounded transition-colors"
+                            title="Delete Slide"
+                          >
+                            <FiTrash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-[11px] text-navy-400 mb-1">Badge / Top Text</label>
+                            <input
+                              type="text"
+                              value={slide.badge || ''}
+                              onChange={(e) => handleHeroSlideChange(idx, 'badge', e.target.value)}
+                              className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-navy-400 mb-1">Main Title</label>
+                            <input
+                              type="text"
+                              value={slide.title || ''}
+                              onChange={(e) => handleHeroSlideChange(idx, 'title', e.target.value)}
+                              className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-[11px] text-navy-400 mb-1">Subtitle / Description</label>
+                            <textarea
+                              rows={3}
+                              value={slide.subtitle || ''}
+                              onChange={(e) => handleHeroSlideChange(idx, 'subtitle', e.target.value)}
+                              className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <label className="block text-[11px] text-navy-400 mb-1">Background Image</label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="text"
+                            value={slide.image || ''}
+                            onChange={(e) => handleHeroSlideChange(idx, 'image', e.target.value)}
+                            className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                            placeholder="/hero-image.jpg"
+                          />
+                          <label className="bg-navy-800 hover:bg-navy-700 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                            <FiUpload size={14} /> Upload
+                            <input type="file" accept="image/*" onChange={(e) => handleHeroSlideImageUpload(idx, e)} className="hidden" />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

@@ -89,7 +89,7 @@ export default function Home() {
   })
   const [loading, setLoading] = useState(true)
 
-  const heroSlides = [
+  const heroSlides = (settings.heroSlides && settings.heroSlides.length > 0) ? settings.heroSlides : [
     {
       image: settings.heroBgImage || '/hero-image.jpg',
       badge: settings.heroBadge || "⚓ FOUNDING EXCELLENCE SINCE 2002 • SRI LANKA'S PREMIER CADET CORPS",
@@ -120,13 +120,13 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 4)
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [heroSlides.length])
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % 4)
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + 4) % 4)
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)
 
   useEffect(() => {
     const fetchData = async () => {
