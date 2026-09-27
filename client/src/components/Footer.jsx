@@ -16,69 +16,97 @@ export default function Footer() {
               MSTI MARITIME ACADEMY
             </h3>
             <p className="text-navy-400 text-xs leading-relaxed">
-              Sri Lanka's pioneer private maritime training institute established with a proud legacy since 1986. Dedicated to producing world-class merchant navy officers and ratings.
+              Established In 1986, Mercmarine Is The First Private Maritime Training Facility In Sri Lanka. The Wealth Of Experience Is Channeled Towards Providing The Best Possible Training For Students.
             </p>
             <div className="pt-2 border-t border-navy-900">
               <h4 className="text-white text-[11px] font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5 text-blue-400">
-                <FiShield size={13} /> ACCREDITATIONS & OVERSIGHT
+                <FiShield size={13} /> ACCREDITATIONS
               </h4>
               <p className="text-navy-400 text-[11px] leading-relaxed">
-                DGMS (Merchant Shipping Secretariat SL) Approved • ISO 9001:2015 Certified • IMO STCW Compliant • 360° Full Mission Bridge Simulator Facilities • Engine Simulator Facilities • Modern Class Rooms with Smart Board Facilities
+                DGMS Approved • ISO 9001:2015 Certified • TVEC Approved
               </p>
+            </div>
+            
+            <div className="pt-2 flex items-center gap-3">
+              <a href="https://facebook.com/MercmarineTraining" target="_blank" rel="noreferrer" className="text-navy-400 hover:text-blue-500 transition-colors">
+                Facebook
+              </a>
+              <span className="text-navy-800">|</span>
+              <a href="https://instagram.com/msti.maritimeacademy" target="_blank" rel="noreferrer" className="text-navy-400 hover:text-pink-500 transition-colors">
+                Instagram
+              </a>
+              <span className="text-navy-800">|</span>
+              <a href="https://linkedin.com/school/mstimaritimeacademysl" target="_blank" rel="noreferrer" className="text-navy-400 hover:text-blue-400 transition-colors">
+                LinkedIn
+              </a>
             </div>
           </div>
 
-          {/* Column 2: Campus & Training Centers */}
+          {/* Column 2: Quick Links */}
           <div className="space-y-4">
-            <div>
-              <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2 mb-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                MSTI Dehiwala - Main Branch
-              </h3>
-              <div className="space-y-1.5 text-xs text-navy-300">
-                <div className="flex items-start gap-2">
-                  <FiMapPin className="text-blue-400 shrink-0 mt-0.5" size={13} />
-                  <span>No. 32, Station Road, Dehiwala 10350, Sri Lanka</span>
-                </div>
-                <div className="flex items-center gap-4 text-xs">
-                  <a href="tel:+94117476100" className="hover:text-white transition-colors flex items-center gap-1">
-                    <FiPhone className="text-blue-400 shrink-0" size={12} /> +94 11 747 6100
+            <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+              Quick Links
+            </h3>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'Home', to: '/' },
+                { label: 'About Us', to: '/about' },
+                { label: 'Awards', to: '/about' }, // Added to about page
+                { label: 'Gallery', to: '/gallery' },
+                { label: 'Contact Us', to: '/contact' },
+              ].map((link, i) => (
+                <li key={`q1-${i}`}>
+                  <Link to={link.to} className="text-navy-400 text-xs hover:text-blue-400 transition-colors flex items-center gap-1.5">
+                    <span className="text-navy-600">›</span> {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          <div className="space-y-4">
+            <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+              Student Life
+            </h3>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'Student Life', to: '/about' },
+                { label: 'Alumni', to: '/about' },
+                { label: 'Career Growth', to: '/courses' },
+                { label: 'Journal', to: '/news' },
+              ].map((link, i) => (
+                <li key={`q2-${i}`}>
+                  <Link to={link.to} className="text-navy-400 text-xs hover:text-blue-400 transition-colors flex items-center gap-1.5">
+                    <span className="text-navy-600">›</span> {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Contact & Certificate Verification */}
+          <div className="space-y-4">
+            <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+              Contact Us
+            </h3>
+            <div className="space-y-2 text-xs text-navy-300">
+                <p>MSTI Maritime Academy,<br/>No. 32, Station Road,<br/>Dehiwala, Sri Lanka.</p>
+                <p className="pt-2">
+                  <a href="tel:+94117476100" className="hover:text-white transition-colors flex items-center gap-1.5">
+                    Phone: +94 11 747 6100
                   </a>
-                  <a href="mailto:helpdesk@msti.lk" className="hover:text-white transition-colors flex items-center gap-1">
-                    <FiMail className="text-blue-400 shrink-0" size={12} /> helpdesk@msti.lk
+                </p>
+                <p>
+                  <a href="mailto:helpdesk@msti.lk" className="hover:text-white transition-colors flex items-center gap-1.5">
+                    Email: helpdesk@msti.lk
                   </a>
-                </div>
-              </div>
+                </p>
             </div>
-
-            {/* Kalutara South Training Center */}
-            <div className="pt-3 border-t border-navy-900">
-              <h4 className="text-white text-xs font-semibold flex items-center gap-1.5 mb-1 text-blue-400">
-                <FiMapPin size={13} className="text-amber-400" /> Kalutara South Training Center
-              </h4>
-              <p className="text-navy-300 text-[11px] leading-relaxed">
-                No. 25, St. Sebastian Road, Kalutara South, Sri Lanka
-              </p>
-              <p className="text-navy-400 text-[10px] mt-0.5">
-                Practical Workshops, Basic Seamanship, Seafarer Physical Readiness.
-              </p>
-            </div>
-
-            {/* Kalutara North Training Center */}
-            <div className="pt-3 border-t border-navy-900">
-              <h4 className="text-white text-xs font-semibold flex items-center gap-1.5 mb-1 text-blue-400">
-                <FiMapPin size={13} className="text-amber-400" /> Kalutara North Training Center
-              </h4>
-              <p className="text-navy-300 text-[11px] leading-relaxed">
-                Mirishenawatta, Ethanamadala, Kalutara North, Sri Lanka
-              </p>
-              <p className="text-navy-400 text-[10px] mt-0.5">
-                Specialized Practical Grounds, Marine Safety Training, Outdoor Exercises.
-              </p>
-            </div>
-
-            {/* Certificate Verification CTA */}
-            <div className="pt-2">
+            
+            <div className="pt-4">
               <button
                 type="button"
                 onClick={() => setCertModalOpen(true)}
@@ -89,72 +117,16 @@ export default function Footer() {
               </button>
             </div>
           </div>
-
-          {/* Column 3: Quick Navigation */}
-          <div className="space-y-4">
-            <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              Quick Access
-            </h3>
-            <ul className="space-y-2.5">
-              {[
-                { label: 'Home Landing', to: '/' },
-                { label: 'About Us (History & Vision)', to: '/about' },
-                { label: 'Navigation & Engineering Cadetship', to: '/courses' },
-                { label: 'STCW & Modular Courses', to: '/courses' },
-                { label: 'Latest Maritime News & Notices', to: '/news' },
-                { label: 'Contact Us & Campus Locations', to: '/contact' },
-              ].map((link, i) => (
-                <li key={i}>
-                  <Link to={link.to} className="text-navy-400 text-xs hover:text-blue-400 transition-colors flex items-center gap-1.5">
-                    <span className="text-navy-600">›</span> {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 4: Newsletter / Admissions Updates */}
-          <div className="space-y-4">
-            <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              Admissions Desk
-            </h3>
-            <p className="text-navy-400 text-xs leading-relaxed">
-              Stay updated on upcoming batch commencement dates, GCE A/L cadetship intakes, and DGMS regulations.
-            </p>
-            <form className="flex flex-col gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="bg-navy-900 border border-navy-800 text-white text-xs px-3.5 py-2.5 rounded-lg focus:outline-none focus:border-blue-500 transition-colors placeholder:text-navy-500 w-full"
-              />
-              <button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors w-full shadow-lg shadow-blue-600/20"
-              >
-                Subscribe for Intake Updates
-              </button>
-            </form>
-          </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="border-t border-navy-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-navy-400">
           <p>
-            &copy; {new Date().getFullYear()} MSTI Maritime Academy Dehiwala. All rights reserved.
+            &copy; {new Date().getFullYear()} MSTI Maritime Academy. All Rights Reserved.
           </p>
           <div className="flex gap-5 text-xs">
-            <Link to="/about" className="hover:text-blue-400 transition-colors">DGMS Approval</Link>
-            <Link to="/courses" className="hover:text-blue-400 transition-colors">STCW Programs</Link>
-            <button 
-              type="button" 
-              onClick={() => setCertModalOpen(true)} 
-              className="hover:text-blue-400 transition-colors text-xs text-navy-400 cursor-pointer"
-            >
-              Certificate Verification
-            </button>
-            <Link to="/contact" className="hover:text-blue-400 transition-colors">MSTI Dehiwala - Main Branch</Link>
+             <Link to="/courses" className="hover:text-blue-400 transition-colors">Short Courses</Link>
+             <Link to="/courses" className="hover:text-blue-400 transition-colors">Officer & Rating Training</Link>
           </div>
         </div>
       </div>

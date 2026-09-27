@@ -67,12 +67,12 @@ export default function Home() {
   const [settings, setSettings] = useState({
     heroBadge: "⚓ FOUNDING EXCELLENCE SINCE 2002 • SRI LANKA'S PREMIER CADET CORPS",
     heroTitle: "The Premier Maritime Academy in Sri Lanka",
-    heroSubtitle: "We aspire to become the premier training institute for maritime careers in Sri Lanka and overseas. Fully accredited merchant navy officer training under IMO STCW and DG Shipping.",
+    heroSubtitle: "We aim to continuously contribute to the growth of individuals and organization to ensure they are qualified to deliver results at the highest levels of performance. To do so, we engage in the most suitable solutions in training, assessment and development, delivering the best maritime courses Sri Lanka has to offer.",
     heroBgImage: "/hero-image.jpg",
-    heroPrimaryCtaText: "Explore Programs",
+    heroPrimaryCtaText: "Our Courses",
     heroPrimaryCtaLink: "/courses",
-    heroSecondaryCtaText: "Book a Campus Visit",
-    heroSecondaryCtaLink: "/contact",
+    heroSecondaryCtaText: "Student Life",
+    heroSecondaryCtaLink: "/student-life",
     stats: [
       { value: '12:1', label: 'STUDENT-FACULTY RATIO' },
       { value: '94%', label: 'FLEET PLACEMENT RATE' },
@@ -80,9 +80,9 @@ export default function Home() {
       { value: '$42M', label: 'TRAINING SIMULATORS & FLEET' },
     ],
     aboutBadge: "ABOUT US",
-    aboutTitle: "The Premier Maritime Academy in Sri Lanka",
-    aboutDesc1: "We aim to continuously contribute to the growth of individuals and organizations to ensure they are qualified to deliver results at the highest levels of performance.",
-    aboutDesc2: "Our goal at MSTI Maritime Academy is to be recognized worldwide as a top quality service provider to the international marine industry in maritime training.",
+    aboutTitle: "Welcome to MSTI Maritime Academy",
+    aboutDesc1: "We aim to continuously contribute to the growth of individuals and organizations to ensure they are qualified to deliver results at the highest levels of performance. To do so, we engage in the most suitable solutions in training, assessment, and development, delivering the best maritime courses Sri Lanka has to offer.",
+    aboutDesc2: "Our goal at MSTI Maritime Academy Limited is to be recognized worldwide as a top-quality service provider to the international marine industry in maritime training.",
     aboutLeaderName: "Capt. Ayesha Fernando",
     aboutLeaderRole: "Valedictorian • Officer of the Watch (STCW II/1)",
     aboutLeaderImage: "/captain.jpg",
@@ -241,18 +241,49 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FACILITIES TEASER */}
+      <section className="bg-navy-900 py-16 border-b border-navy-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">state-of-the-art facilities</h2>
+          <p className="text-navy-200 text-sm md:text-base max-w-3xl mx-auto leading-relaxed mb-8">
+            Discover the world of maritime education with the state-of-the-art facilities at our academy! Experience hands-on learning with our modern simulators, well equipped classrooms, and extensive docks for practical training. Join us for a brighter future in the maritime industry.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/gallery" className="bg-navy-800 hover:bg-navy-700 text-white font-semibold px-6 py-2 rounded border border-navy-700 transition-colors">
+              View Gallery
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* STATS SECTION */}
       <section className="bg-navy-950 py-10 border-b border-navy-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
-            {(settings.stats || []).map((s, i) => (
-              <div key={i} className="text-left px-4">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">{s.value}</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 text-center">
+             <div className="px-4">
+                <div className="text-2xl md:text-3xl font-bold text-white mb-1">1986</div>
                 <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
-                  {s.label}
+                  Established as Sri Lanka's first private maritime training institute.
                 </div>
               </div>
-            ))}
+              <div className="px-4">
+                <div className="text-2xl md:text-3xl font-bold text-white mb-1">ISO 9001:2015</div>
+                <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
+                  Certified Quality Management System
+                </div>
+              </div>
+              <div className="px-4">
+                <div className="text-2xl md:text-3xl font-bold text-white mb-1">DGMS Approved</div>
+                <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
+                  Director General of Merchant Shipping
+                </div>
+              </div>
+              <div className="px-4">
+                <div className="text-2xl md:text-3xl font-bold text-white mb-1">TVEC Approved</div>
+                <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
+                  Tertiary and Vocational Education Commission
+                </div>
+              </div>
           </div>
         </div>
       </section>
