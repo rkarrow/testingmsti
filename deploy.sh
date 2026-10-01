@@ -21,9 +21,16 @@ sudo npm install -g pm2
 
 # 4. Clone or update repository into /var/www/testingmsti
 echo "📂 Setting up project in /var/www/testingmsti..."
-sudo rm -rf /var/www/testingmsti
-cd /var/www
-sudo git clone https://github.com/rkarrow/testingmsti.git
+if [ -d "/var/www/testingmsti/.git" ]; then
+    echo "📂 Pulling latest code..."
+    cd /var/www/testingmsti
+    git pull origin main
+else
+    cd /var/www
+    sudo git clone https://github.com/rkarrow/testingmsti.git
+    sudo chown -R ubuntu:ubuntu /var/www/testingmsti
+fi
+mkdir -p /var/www/testingmsti/server/uploads
 sudo chown -R ubuntu:ubuntu /var/www/testingmsti
 
 # 5. Setup Backend

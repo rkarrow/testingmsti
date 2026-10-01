@@ -46,8 +46,9 @@ export default function AdminGallery() {
       const res = await axios.post('/api/upload', fd, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
       })
-      if (res.data.url) {
-        setForm(f => ({ ...f, imageUrl: res.data.url }))
+      const uploadedUrl = res.data.imageUrl || res.data.url
+      if (uploadedUrl) {
+        setForm(f => ({ ...f, imageUrl: uploadedUrl }))
         showMsg('success', 'Image uploaded!')
       }
     } catch { showMsg('error', 'Upload failed. Try again.') }
