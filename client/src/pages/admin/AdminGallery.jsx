@@ -173,7 +173,7 @@ export default function AdminGallery() {
                   <span className="text-navy-600 text-xs">or paste URL</span>
                   <div className="flex-1 h-px bg-navy-800" />
                 </div>
-                <input type="url" placeholder="https://example.com/photo.jpg"
+                <input type="text" placeholder="https://example.com/photo.jpg or uploaded image"
                   value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
                   className="w-full mt-2 px-4 py-2.5 bg-navy-800 border border-navy-700 rounded-xl text-white text-sm placeholder-navy-600 focus:outline-none focus:border-blue-500" />
               </div>
