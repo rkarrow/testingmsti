@@ -38,13 +38,16 @@ echo "⚙️ Setting up Backend..."
 cd /var/www/testingmsti/server
 npm install
 
+if [ ! -f .env ]; then
 cat << 'EOF' > .env
 PORT=5000
 NODE_ENV=production
 MONGO_URI=mongodb+srv://rashmikak217_db_user:Rashmika10K2026@cluster0.qqvcriy.mongodb.net/msti_maritime?retryWrites=true&w=majority&appName=Cluster0
 JWT_SECRET=msti_jwt_secret_key_2026_super_secure
 CLIENT_URL=http://13.205.118.251
+CERTIFICATE_EMAIL=certificate.department@mst.lk
 EOF
+fi
 
 # Start backend with PM2
 pm2 delete msti-backend 2>/dev/null || true

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Contact = require('../models/Contact');
+const { sendNotificationEmail } = require('../services/emailService');
 
 // POST submit contact form
 exports.submitContact = async (req, res) => {
@@ -14,6 +15,11 @@ exports.submitContact = async (req, res) => {
     } catch (dbErr) {
       console.log('Contact save DB error:', dbErr.message);
     }
+
+    // Trigger async email dispatch (does not block client response)
+    sendNotificationEmail({ name, email, phone, subject, message, enquiryType })
+      .catch(err => console.error('Background email dispatch error:', err.message));
+
     res.status(201).json({
       success: true,
       message: 'Your enquiry has been submitted successfully. We will get back to you shortly.',
