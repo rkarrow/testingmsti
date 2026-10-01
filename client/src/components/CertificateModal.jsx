@@ -98,7 +98,7 @@ Thank you.`
         phone: phone || '+94',
         subject: `Certificate Verification Request - ${fullName || certificateName} (NIC: ${nicNumber || 'N/A'})`,
         enquiryType: 'Certificate Verification',
-        message: `[Recipient: manuthi.desilva@msti.lk]\n\n` + bodyText,
+        message: `[Recipient: certificate.department@mst.lk]\n\n` + bodyText,
       })
 
       setSentSuccess(true)
@@ -106,7 +106,7 @@ Thank you.`
       // Fallback: open mail client
       const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || certificateName.trim() || 'Student Verification'}`)
       const body = encodeURIComponent(generateEmailBody())
-      window.location.href = `mailto:manuthi.desilva@msti.lk?subject=${subject}&body=${body}`
+      window.location.href = `mailto:certificate.department@mst.lk?subject=${subject}&body=${body}`
       setSentSuccess(true)
     } finally {
       setSending(false)
@@ -116,7 +116,7 @@ Thank you.`
   const handleOpenGmail = () => {
     const subject = encodeURIComponent(`Certificate Verification Request - ${fullName.trim() || certificateName.trim() || 'Student Verification'}`)
     const body = encodeURIComponent(generateEmailBody())
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=manuthi.desilva@msti.lk&su=${subject}&body=${body}`
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=certificate.department@mst.lk&su=${subject}&body=${body}`
     window.open(gmailUrl, '_blank')
   }
 
@@ -170,7 +170,7 @@ Thank you.`
             <div className="space-y-2">
               <h3 className="text-lg font-bold text-white">Verification Request Sent Successfully!</h3>
               <p className="text-xs text-navy-300 max-w-md mx-auto leading-relaxed">
-                Your certificate verification request has been dispatched to <span className="text-blue-400 font-semibold">manuthi.desilva@msti.lk</span>. Our verification officers will review your credentials and reply to <span className="text-white font-medium">{studentEmail}</span> shortly.
+                Your certificate verification request has been dispatched to <span className="text-blue-400 font-semibold">certificate.department@mst.lk</span>. Our verification officers will review your credentials and reply to <span className="text-white font-medium">{studentEmail}</span> shortly.
               </p>
             </div>
 
@@ -191,8 +191,8 @@ Thank you.`
               <p className="font-semibold text-white mb-1">📢 Notice for Students & Employers:</p>
               <p className="italic text-blue-100">
                 “Dear Students, To verify your certificates, please send an email to{' '}
-                <a href="mailto:manuthi.desilva@msti.lk" className="text-amber-400 underline font-semibold">
-                  manuthi.desilva@msti.lk
+                <a href="mailto:certificate.department@mst.lk" className="text-amber-400 underline font-semibold">
+                  certificate.department@mst.lk
                 </a>
                 . Thank you.”
               </p>
@@ -303,7 +303,7 @@ Thank you.`
               {/* Email Preview Box */}
               <div className="space-y-1.5 pt-1">
                 <div className="flex items-center justify-between text-[11px] text-navy-400">
-                  <span>Draft Preview (Recipient: <strong className="text-blue-400">manuthi.desilva@msti.lk</strong>)</span>
+                  <span>Draft Preview (Recipient: <strong className="text-blue-400">certificate.department@mst.lk</strong>)</span>
                   <button
                     type="button"
                     onClick={handleCopy}
