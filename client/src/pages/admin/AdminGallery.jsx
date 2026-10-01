@@ -43,16 +43,27 @@ export default function AdminGallery() {
     try {
       const fd = new FormData()
       fd.append('image', file)
+      const currentToken = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', fd, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+        headers: { 
+          Authorization: `Bearer ${currentToken}`, 
+          'Content-Type': 'multipart/form-data' 
+        }
       })
       const uploadedUrl = res.data.imageUrl || res.data.url
       if (uploadedUrl) {
         setForm(f => ({ ...f, imageUrl: uploadedUrl }))
-        showMsg('success', 'Image uploaded!')
+        showMsg('success', 'Image uploaded successfully!')
+      } else {
+        showMsg('error', 'Upload failed: No image URL returned')
       }
-    } catch { showMsg('error', 'Upload failed. Try again.') }
-    finally { setUploading(false) }
+    } catch (err) { 
+      const errMsg = err.response?.data?.message || 'Upload failed. Try again.'
+      showMsg('error', errMsg) 
+    } finally { 
+      setUploading(false)
+      e.target.value = ''
+    }
   }
 
   const openAdd = () => {
