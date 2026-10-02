@@ -31,7 +31,7 @@ const sendNotificationEmail = async ({ name, email, phone, subject, message, enq
 
   const isVerification = enquiryType === 'Certificate Verification';
   const recipientEmail = isVerification
-    ? (process.env.CERTIFICATE_EMAIL || 'certificate.department@mst.lk')
+    ? (process.env.CERTIFICATE_EMAIL || 'certificate.department@msti.lk')
     : (process.env.ADMIN_EMAIL || process.env.EMAIL_USER);
 
   const emailSubject = subject || (isVerification 

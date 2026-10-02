@@ -45,7 +45,7 @@ NODE_ENV=production
 MONGO_URI=mongodb+srv://rashmikak217_db_user:Rashmika10K2026@cluster0.qqvcriy.mongodb.net/msti_maritime?retryWrites=true&w=majority&appName=Cluster0
 JWT_SECRET=msti_jwt_secret_key_2026_super_secure
 CLIENT_URL=http://13.205.118.251
-CERTIFICATE_EMAIL=certificate.department@mst.lk
+CERTIFICATE_EMAIL=certificate.department@msti.lk
 EOF
 fi
 
