@@ -60,8 +60,8 @@ app.use(cors({
 }));
 
 // 5. Body parser payload size limit (Prevent Denial of Service / Payload Flooding)
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // Serve static uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
