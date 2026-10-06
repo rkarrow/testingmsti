@@ -143,4 +143,46 @@ router.put('/change-password', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/auth/reset-password
+// @desc    Reset admin password directly from login screen
+// @access  Public
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Please provide email and new password' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long' });
+    }
+
+    if (confirmPassword && newPassword !== confirmPassword) {
+      return res.status(400).json({ success: false, message: 'New password and confirmation do not match' });
+    }
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name: 'MSTI Admin',
+        email: email || 'admin@msti.lk',
+        password: newPassword,
+        role: 'admin',
+      });
+    } else {
+      user.password = newPassword;
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully! You can now log in with your new password. 🔒',
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'Failed to reset password: ' + error.message });
+  }
+});
+
 module.exports = router;
