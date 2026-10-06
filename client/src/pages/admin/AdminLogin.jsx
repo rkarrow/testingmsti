@@ -26,7 +26,7 @@ export default function AdminLogin() {
 
   // Forgot Password Mode State
   const [showForgot, setShowForgot] = useState(false)
-  const [resetEmail, setResetEmail] = useState('admin@msti.lk')
+  const [resetEmail, setResetEmail] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -249,7 +249,7 @@ export default function AdminLogin() {
                       value={resetEmail}
                       onChange={(e) => setResetEmail(e.target.value)}
                       className="w-full pl-10 pr-3 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs placeholder-navy-600 focus:outline-none focus:border-blue-500"
-                      placeholder="admin@msti.lk"
+                      placeholder=""
                     />
                   </div>
                 </div>
@@ -347,7 +347,7 @@ export default function AdminLogin() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 bg-navy-900 border border-navy-700 rounded-xl text-white text-sm placeholder-navy-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    placeholder="admin@msti.lk"
+                    placeholder=""
                   />
                 </div>
               </div>
