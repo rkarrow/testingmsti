@@ -3,6 +3,18 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect, JWT_SECRET } = require('../middleware/auth');
+const { sendLoginAlertEmail } = require('../services/emailService');
+
+// Helper: get real IP from request (works behind Nginx proxy)
+const getClientIP = (req) => {
+  return (
+    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.headers['x-real-ip'] ||
+    req.connection?.remoteAddress ||
+    req.ip ||
+    'Unknown'
+  );
+};
 
 // @route   POST /api/auth/login
 // @desc    Admin login & get token
@@ -28,6 +40,13 @@ router.post('/login', async (req, res) => {
     }
 
     if (!user) {
+      // 🚨 Send login alert — email not found
+      sendLoginAlertEmail({
+        attemptedEmail: email,
+        ipAddress: getClientIP(req),
+        userAgent: req.headers['user-agent'],
+        reason: 'Email address not found in system',
+      }).catch(() => {}); // Non-blocking — don't let email failure affect login response
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
@@ -38,6 +57,13 @@ router.post('/login', async (req, res) => {
         user.password = 'admin123';
         await user.save();
       } else {
+        // 🚨 Send login alert — wrong password
+        sendLoginAlertEmail({
+          attemptedEmail: email,
+          ipAddress: getClientIP(req),
+          userAgent: req.headers['user-agent'],
+          reason: 'Incorrect password entered',
+        }).catch(() => {}); // Non-blocking
         return res.status(401).json({ success: false, message: 'Invalid email or password' });
       }
     }

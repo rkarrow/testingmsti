@@ -126,6 +126,109 @@ const sendNotificationEmail = async ({ name, email, phone, subject, message, enq
   }
 };
 
+/**
+ * Send a security alert email when someone fails to log in to the Admin Panel
+ */
+const sendLoginAlertEmail = async ({ attemptedEmail, ipAddress, userAgent, reason }) => {
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    console.log('ℹ️ EMAIL_USER or EMAIL_PASS not configured. Skipping login alert email.');
+    return { sent: false, reason: 'unconfigured' };
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Colombo' });
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { background: #7f1d1d; color: #ffffff; padding: 24px; text-align: center; border-bottom: 3px solid #ef4444; }
+        .header h1 { margin: 0; font-size: 20px; letter-spacing: 0.5px; }
+        .header p { margin: 6px 0 0 0; font-size: 13px; color: #fca5a5; }
+        .alert-badge { display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 10px; background: #ef4444; color: #ffffff; }
+        .content { padding: 28px 24px; }
+        .warning-box { background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #ef4444; padding: 16px; border-radius: 6px; margin-bottom: 20px; }
+        .warning-box p { margin: 0; font-size: 14px; color: #991b1b; }
+        .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .meta-table td { padding: 10px 12px; font-size: 14px; border-bottom: 1px solid #e2e8f0; }
+        .meta-table td.label { font-weight: 600; color: #475569; width: 40%; background: #f8fafc; }
+        .meta-table td.value { color: #0f172a; font-family: monospace; }
+        .footer { background: #f8fafc; padding: 16px 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
+        .action-note { background: #fffbeb; border: 1px solid #fde68a; padding: 12px 16px; border-radius: 6px; font-size: 13px; color: #92400e; margin-top: 20px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🚨 MSTI Admin Panel — Security Alert</h1>
+          <p>Unauthorized Login Attempt Detected</p>
+          <span class="alert-badge">⚠️ Security Warning</span>
+        </div>
+        <div class="content">
+          <div class="warning-box">
+            <p>⚠️ <strong>Someone tried to log in to your Admin Panel with invalid credentials.</strong> If this was not you, your panel may be under attack. Please review immediately.</p>
+          </div>
+
+          <table class="meta-table">
+            <tr>
+              <td class="label">📧 Attempted Email</td>
+              <td class="value">${attemptedEmail || 'Unknown'}</td>
+            </tr>
+            <tr>
+              <td class="label">🌐 IP Address</td>
+              <td class="value">${ipAddress || 'Unknown'}</td>
+            </tr>
+            <tr>
+              <td class="label">❌ Failure Reason</td>
+              <td class="value">${reason || 'Invalid credentials'}</td>
+            </tr>
+            <tr>
+              <td class="label">🕐 Time (Sri Lanka)</td>
+              <td class="value">${timestamp}</td>
+            </tr>
+            <tr>
+              <td class="label">💻 Browser / Device</td>
+              <td class="value" style="font-size:12px;">${(userAgent || 'Unknown').substring(0, 120)}</td>
+            </tr>
+          </table>
+
+          <div class="action-note">
+            💡 <strong>What to do:</strong> If you see many alerts from an unknown IP, consider changing your Admin password immediately via the Admin Panel → Security & Password section.
+          </div>
+        </div>
+        <div class="footer">
+          This is an automated security alert from the MSTI Maritime Academy Web Portal.<br>
+          Alert sent to: <strong>${adminEmail}</strong> • ${timestamp}
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"MSTI Security Alert 🚨" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: `🚨 Admin Login Alert — Failed Attempt from ${ipAddress || 'Unknown IP'} [${timestamp}]`,
+      text: `SECURITY ALERT\n\nSomeone tried to log in to your Admin Panel.\n\nAttempted Email: ${attemptedEmail}\nIP Address: ${ipAddress}\nReason: ${reason}\nTime: ${timestamp}\nBrowser: ${userAgent}\n\nIf this was not you, change your password immediately.`,
+      html: htmlContent,
+    });
+
+    console.log(`🚨 Login alert email sent to ${adminEmail} (ID: ${info.messageId})`);
+    return { sent: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('❌ Login alert email failed:', error.message);
+    return { sent: false, error: error.message };
+  }
+};
+
 module.exports = {
   sendNotificationEmail,
+  sendLoginAlertEmail,
 };
