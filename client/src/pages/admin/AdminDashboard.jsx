@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { FiBookOpen, FiFileText, FiMail, FiSliders, FiArrowRight, FiCheckCircle, FiUploadCloud } from 'react-icons/fi'
+import { FiBookOpen, FiFileText, FiMail, FiSliders, FiArrowRight, FiCheckCircle, FiUploadCloud, FiShield, FiKey } from 'react-icons/fi'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ courses: 0, news: 0, inquiries: 0 })
@@ -200,6 +200,30 @@ export default function AdminDashboard() {
             </div>
             <div className="mt-4 pt-4 border-t border-navy-800 text-[11px] text-navy-400 flex items-center gap-2">
               <FiUploadCloud size={14} className="text-emerald-400" /> Image upload enabled for courses
+            </div>
+          </Link>
+
+          {/* Card 4: Security & Change Password */}
+          <Link
+            to="/admin/security"
+            className="group bg-navy-900 hover:bg-navy-850 border border-navy-800 hover:border-blue-500/50 rounded-2xl p-6 transition-all shadow-lg flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/10 text-purple-400 flex items-center justify-center">
+                  <FiKey size={20} />
+                </div>
+                <span className="text-navy-400 group-hover:text-purple-400 transition-colors">
+                  <FiArrowRight size={20} />
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-white mb-1">Account Security & Password</h3>
+              <p className="text-xs text-navy-300 leading-relaxed">
+                Change Admin password, monitor active Bcrypt encryption and rate-limiting shield status.
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-navy-800 text-[11px] text-purple-400/90 flex items-center gap-1.5">
+              <FiShield size={13} /> Bcrypt & Shield Protected
             </div>
           </Link>
         </div>

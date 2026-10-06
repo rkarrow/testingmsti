@@ -22,6 +22,7 @@ import AdminNews from './pages/admin/AdminNews'
 import AdminContacts from './pages/admin/AdminContacts'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
 import AdminGallery from './pages/admin/AdminGallery'
+import AdminSecurity from './pages/admin/AdminSecurity'
 
 function PublicLayout({ children }) {
   return (
@@ -67,6 +68,7 @@ function App() {
           <Route path="contacts" element={<AdminContacts />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="gallery" element={<AdminGallery />} />
+          <Route path="security" element={<AdminSecurity />} />
         </Route>
       </Routes>
     </Router>

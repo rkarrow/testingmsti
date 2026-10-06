@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { FiHome, FiBookOpen, FiFileText, FiMail, FiSliders, FiLogOut, FiAnchor, FiExternalLink, FiUser, FiInfo, FiBarChart2, FiCamera } from 'react-icons/fi'
+import { FiHome, FiBookOpen, FiFileText, FiMail, FiSliders, FiLogOut, FiAnchor, FiExternalLink, FiUser, FiInfo, FiBarChart2, FiCamera, FiShield, FiKey } from 'react-icons/fi'
 
 export default function AdminLayout() {
   const navigate = useNavigate()
@@ -31,6 +31,7 @@ export default function AdminLayout() {
     { label: 'Courses Management', path: '/admin/courses', icon: FiBookOpen },
     { label: 'News & Announcements', path: '/admin/news', icon: FiFileText },
     { label: 'Contact Inquiries', path: '/admin/contacts', icon: FiMail },
+    { label: 'Security & Password', path: '/admin/security', icon: FiShield },
   ]
 
   return (
@@ -94,13 +95,22 @@ export default function AdminLayout() {
               </div>
             </div>
 
-            <button
-              onClick={handleLogout}
-              title="Logout"
-              className="p-2 text-navy-400 hover:text-red-400 hover:bg-navy-800 rounded-lg transition-colors"
-            >
-              <FiLogOut size={18} />
-            </button>
+            <div className="flex items-center gap-1">
+              <Link
+                to="/admin/security"
+                title="Change Password & Security"
+                className="p-2 text-navy-400 hover:text-amber-400 hover:bg-navy-800 rounded-lg transition-colors"
+              >
+                <FiKey size={16} />
+              </Link>
+              <button
+                onClick={handleLogout}
+                title="Logout"
+                className="p-2 text-navy-400 hover:text-red-400 hover:bg-navy-800 rounded-lg transition-colors cursor-pointer"
+              >
+                <FiLogOut size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
