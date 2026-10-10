@@ -13,6 +13,7 @@ import {
   FiCheckCircle,
   FiArrowLeft,
   FiRefreshCw,
+  FiSend,
 } from 'react-icons/fi'
 
 export default function AdminLogin() {
@@ -24,9 +25,11 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  // Forgot Password Mode State
+  // Reset Password — 3-step OTP Flow
   const [showForgot, setShowForgot] = useState(false)
+  const [resetStep, setResetStep] = useState(1) // 1=email, 2=otp, 3=newpassword
   const [resetEmail, setResetEmail] = useState('')
+  const [otpCode, setOtpCode] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -58,50 +61,86 @@ export default function AdminLogin() {
     }
   }
 
-  const handleResetPassword = async (e) => {
+  // Step 1 — Send OTP
+  const handleSendOTP = async (e) => {
     e.preventDefault()
     setResetMsg({ type: '', text: '' })
-
-    if (!resetEmail || !newPassword) {
-      setResetMsg({ type: 'error', text: 'Please fill in all fields.' })
+    if (!resetEmail) {
+      setResetMsg({ type: 'error', text: 'Please enter your admin email address.' })
       return
     }
-
-    if (newPassword.length < 6) {
-      setResetMsg({ type: 'error', text: 'New password must be at least 6 characters long.' })
-      return
-    }
-
-    if (newPassword !== confirmPassword) {
-      setResetMsg({ type: 'error', text: 'Passwords do not match. Please re-enter.' })
-      return
-    }
-
     setResetLoading(true)
     try {
-      const res = await axios.post('/api/auth/reset-password', {
-        email: resetEmail,
-        newPassword,
-        confirmPassword,
-      })
-
+      const res = await axios.post('/api/auth/send-reset-otp', { email: resetEmail })
       if (res.data.success) {
-        setSuccessMsg('Password reset successfully! Please sign in with your new password below.')
-        setShowForgot(false)
-        setPassword(newPassword)
-        setEmail(resetEmail)
-        setNewPassword('')
-        setConfirmPassword('')
+        setResetMsg({ type: 'success', text: res.data.message })
+        setResetStep(2)
       }
     } catch (err) {
-      setResetMsg({
-        type: 'error',
-        text: err.response?.data?.message || 'Failed to reset password. Please try again.',
-      })
+      setResetMsg({ type: 'error', text: err.response?.data?.message || 'Failed to send OTP. Please try again.' })
     } finally {
       setResetLoading(false)
     }
   }
+
+  // Step 2 — Verify OTP → go to step 3
+  const handleVerifyOTP = (e) => {
+    e.preventDefault()
+    setResetMsg({ type: '', text: '' })
+    if (!otpCode || otpCode.length < 6) {
+      setResetMsg({ type: 'error', text: 'Please enter the 6-digit OTP from your email.' })
+      return
+    }
+    setResetStep(3)
+  }
+
+  // Step 3 — Reset Password
+  const handleResetPassword = async (e) => {
+    e.preventDefault()
+    setResetMsg({ type: '', text: '' })
+    if (!newPassword || newPassword.length < 6) {
+      setResetMsg({ type: 'error', text: 'New password must be at least 6 characters.' })
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setResetMsg({ type: 'error', text: 'Passwords do not match.' })
+      return
+    }
+    setResetLoading(true)
+    try {
+      const res = await axios.post('/api/auth/reset-password', {
+        email: resetEmail,
+        otp: otpCode,
+        newPassword,
+        confirmPassword,
+      })
+      if (res.data.success) {
+        setSuccessMsg('Password reset successfully! Please sign in with your new password.')
+        setShowForgot(false)
+        setResetStep(1)
+        setPassword(newPassword)
+        setEmail(resetEmail)
+        setOtpCode('')
+        setNewPassword('')
+        setConfirmPassword('')
+      }
+    } catch (err) {
+      setResetMsg({ type: 'error', text: err.response?.data?.message || 'Failed to reset password.' })
+    } finally {
+      setResetLoading(false)
+    }
+  }
+
+  const resetForgotFlow = () => {
+    setShowForgot(false)
+    setResetStep(1)
+    setResetEmail('')
+    setOtpCode('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setResetMsg({ type: '', text: '' })
+  }
+
 
   return (
     <div className="min-h-screen bg-navy-950 flex">
@@ -217,9 +256,18 @@ export default function AdminLogin() {
             </div>
           )}
 
-          {/* FORGOT / RESET PASSWORD FORM */}
+          {/* FORGOT / RESET PASSWORD FORM (3-STEP SECURE OTP) */}
           {showForgot ? (
             <div className="bg-navy-900/90 border border-navy-800 rounded-2xl p-6 shadow-xl space-y-4">
+              {/* Stepper Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-navy-800 text-xs">
+                <span className={`font-bold ${resetStep === 1 ? 'text-blue-400' : 'text-navy-400'}`}>1. Email</span>
+                <span className="text-navy-600">→</span>
+                <span className={`font-bold ${resetStep === 2 ? 'text-blue-400' : 'text-navy-400'}`}>2. OTP Code</span>
+                <span className="text-navy-600">→</span>
+                <span className={`font-bold ${resetStep === 3 ? 'text-blue-400' : 'text-navy-400'}`}>3. New Password</span>
+              </div>
+
               {resetMsg.text && (
                 <div
                   className={`p-3 rounded-xl text-xs font-medium flex items-center gap-2 border ${
@@ -233,100 +281,179 @@ export default function AdminLogin() {
                 </div>
               )}
 
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                {/* Email Address */}
-                <div>
-                  <label className="block text-xs font-bold text-navy-300 uppercase tracking-wider mb-1">
-                    Admin Email Address *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-500">
-                      <FiMail size={15} />
+              {/* STEP 1: Enter Email & Request OTP */}
+              {resetStep === 1 && (
+                <form onSubmit={handleSendOTP} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-navy-300 uppercase tracking-wider mb-1">
+                      Admin Email Address *
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-500">
+                        <FiMail size={15} />
+                      </div>
+                      <input
+                        type="email"
+                        required
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="w-full pl-10 pr-3 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs placeholder-navy-600 focus:outline-none focus:border-blue-500"
+                        placeholder="admin@msti.lk"
+                      />
                     </div>
-                    <input
-                      type="email"
-                      required
-                      value={resetEmail}
-                      onChange={(e) => setResetEmail(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs placeholder-navy-600 focus:outline-none focus:border-blue-500"
-                      placeholder=""
-                    />
+                    <p className="text-[11px] text-navy-400 mt-2">
+                      🔒 For security, the verification OTP will be sent to the registered recovery email (<strong className="text-blue-400">superkavi40@gmail.com</strong>).
+                    </p>
                   </div>
-                </div>
 
-                {/* New Password */}
-                <div>
-                  <label className="block text-xs font-bold text-navy-300 uppercase tracking-wider mb-1">
-                    New Password *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-500">
-                      <FiLock size={15} />
-                    </div>
-                    <input
-                      type={showNewPassword ? 'text' : 'password'}
-                      required
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs placeholder-navy-600 focus:outline-none focus:border-blue-500"
-                      placeholder="Min. 6 characters"
-                    />
+                  <div className="flex gap-2 pt-2">
                     <button
                       type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-500 hover:text-white cursor-pointer"
+                      onClick={resetForgotFlow}
+                      className="w-1/3 py-2.5 bg-navy-800 hover:bg-navy-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      {showNewPassword ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                      <FiArrowLeft size={14} /> Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={resetLoading}
+                      className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      {resetLoading ? <FiRefreshCw className="animate-spin" size={14} /> : <FiSend size={14} />}
+                      {resetLoading ? 'Sending OTP...' : 'Send Verification OTP'}
                     </button>
                   </div>
-                </div>
+                </form>
+              )}
 
-                {/* Confirm New Password */}
-                <div>
-                  <label className="block text-xs font-bold text-navy-300 uppercase tracking-wider mb-1">
-                    Confirm New Password *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-500">
-                      <FiLock size={15} />
+              {/* STEP 2: Enter 6-digit OTP */}
+              {resetStep === 2 && (
+                <form onSubmit={handleVerifyOTP} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-navy-300 uppercase tracking-wider mb-1">
+                      Enter 6-Digit OTP *
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-500">
+                        <FiKey size={15} />
+                      </div>
+                      <input
+                        type="text"
+                        maxLength="6"
+                        required
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        className="w-full pl-10 pr-3 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-base tracking-widest font-mono placeholder-navy-600 focus:outline-none focus:border-blue-500 text-center"
+                        placeholder="123456"
+                      />
                     </div>
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs placeholder-navy-600 focus:outline-none focus:border-blue-500"
-                      placeholder="Re-type new password"
-                    />
+                    <div className="flex items-center justify-between mt-2 text-[11px]">
+                      <span className="text-navy-400">Check superkavi40@gmail.com</span>
+                      <button
+                        type="button"
+                        onClick={handleSendOTP}
+                        disabled={resetLoading}
+                        className="text-blue-400 hover:underline cursor-pointer"
+                      >
+                        Resend OTP
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-500 hover:text-white cursor-pointer"
+                      onClick={() => setResetStep(1)}
+                      className="w-1/3 py-2.5 bg-navy-800 hover:bg-navy-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      {showConfirmPassword ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                      <FiArrowLeft size={14} /> Change Email
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      Verify OTP →
                     </button>
                   </div>
-                </div>
+                </form>
+              )}
 
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowForgot(false)}
-                    className="w-1/3 py-2.5 bg-navy-800 hover:bg-navy-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <FiArrowLeft size={14} /> Back
-                  </button>
+              {/* STEP 3: Enter New Password */}
+              {resetStep === 3 && (
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  {/* New Password */}
+                  <div>
+                    <label className="block text-xs font-bold text-navy-300 uppercase tracking-wider mb-1">
+                      New Password *
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-500">
+                        <FiLock size={15} />
+                      </div>
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        required
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full pl-10 pr-10 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs placeholder-navy-600 focus:outline-none focus:border-blue-500"
+                        placeholder="Min. 6 characters"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-500 hover:text-white cursor-pointer"
+                      >
+                        {showNewPassword ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                      </button>
+                    </div>
+                  </div>
 
-                  <button
-                    type="submit"
-                    disabled={resetLoading}
-                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    {resetLoading ? <FiRefreshCw className="animate-spin" size={14} /> : <FiKey size={14} />}
-                    {resetLoading ? 'Saving...' : 'Reset & Save Password'}
-                  </button>
-                </div>
-              </form>
+                  {/* Confirm New Password */}
+                  <div>
+                    <label className="block text-xs font-bold text-navy-300 uppercase tracking-wider mb-1">
+                      Confirm New Password *
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-500">
+                        <FiLock size={15} />
+                      </div>
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full pl-10 pr-10 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs placeholder-navy-600 focus:outline-none focus:border-blue-500"
+                        placeholder="Re-type new password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-500 hover:text-white cursor-pointer"
+                      >
+                        {showConfirmPassword ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setResetStep(2)}
+                      className="w-1/3 py-2.5 bg-navy-800 hover:bg-navy-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <FiArrowLeft size={14} /> Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={resetLoading}
+                      className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      {resetLoading ? <FiRefreshCw className="animate-spin" size={14} /> : <FiKey size={14} />}
+                      {resetLoading ? 'Saving...' : 'Reset & Save Password'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           ) : (
             /* STANDARD LOGIN FORM */

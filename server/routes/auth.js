@@ -3,7 +3,10 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect, JWT_SECRET } = require('../middleware/auth');
-const { sendLoginAlertEmail } = require('../services/emailService');
+const { sendLoginAlertEmail, sendOTPEmail } = require('../services/emailService');
+
+// In-memory OTP store: { email: { otp, expiry } }
+const otpStore = new Map();
 
 // Helper: get real IP from request (works behind Nginx proxy)
 const getClientIP = (req) => {
@@ -169,15 +172,59 @@ router.put('/change-password', protect, async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/reset-password
-// @desc    Reset admin password directly from login screen
+// @route   POST /api/auth/send-reset-otp
+// @desc    Generate & email OTP for secure password reset
 // @access  Public
+router.post('/send-reset-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Please provide admin email address' });
+    }
+
+    // Verify it's a known admin email
+    const user = await User.findOne({ email }).catch(() => null);
+    if (!user && email !== 'admin@msti.lk') {
+      return res.status(404).json({ success: false, message: 'No admin account found with that email address.' });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    // Store OTP
+    otpStore.set(email, { otp, expiry });
+
+    // Send OTP to recovery email
+    const result = await sendOTPEmail({ otp, attemptedEmail: email });
+
+    if (!result.sent && result.reason === 'unconfigured') {
+      // Dev fallback — log to console
+      console.log(`🔐 [DEV] OTP for ${email}: ${otp}`);
+      return res.json({ success: true, message: 'OTP sent! Check your recovery email (superkavi40@gmail.com).' });
+    }
+
+    if (!result.sent) {
+      return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again.' });
+    }
+
+    res.json({ success: true, message: 'OTP sent to your recovery email! Check superkavi40@gmail.com.' });
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset admin password — requires valid OTP
+// @access  Public (OTP-protected)
 router.post('/reset-password', async (req, res) => {
   try {
-    const { email, newPassword, confirmPassword } = req.body;
+    const { email, otp, newPassword, confirmPassword } = req.body;
 
-    if (!email || !newPassword) {
-      return res.status(400).json({ success: false, message: 'Please provide email and new password' });
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Please provide email, OTP, and new password' });
     }
 
     if (newPassword.length < 6) {
@@ -185,30 +232,40 @@ router.post('/reset-password', async (req, res) => {
     }
 
     if (confirmPassword && newPassword !== confirmPassword) {
-      return res.status(400).json({ success: false, message: 'New password and confirmation do not match' });
+      return res.status(400).json({ success: false, message: 'Passwords do not match' });
     }
 
+    // Verify OTP
+    const stored = otpStore.get(email);
+    if (!stored) {
+      return res.status(400).json({ success: false, message: 'OTP not found. Please request a new code.' });
+    }
+    if (Date.now() > stored.expiry) {
+      otpStore.delete(email);
+      return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new code.' });
+    }
+    if (stored.otp !== otp.trim()) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP. Please check the code and try again.' });
+    }
+
+    // OTP valid — delete it (single use)
+    otpStore.delete(email);
+
+    // Reset password
     let user = await User.findOne({ email });
     if (!user) {
-      user = await User.create({
-        name: 'MSTI Admin',
-        email: email || 'admin@msti.lk',
-        password: newPassword,
-        role: 'admin',
-      });
+      user = await User.create({ name: 'MSTI Admin', email, password: newPassword, role: 'admin' });
     } else {
       user.password = newPassword;
       await user.save();
     }
 
-    res.json({
-      success: true,
-      message: 'Password reset successfully! You can now log in with your new password. 🔒',
-    });
+    res.json({ success: true, message: 'Password reset successfully! You can now sign in with your new password. 🔒' });
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ success: false, message: 'Failed to reset password: ' + error.message });
   }
 });
+
 
 module.exports = router;

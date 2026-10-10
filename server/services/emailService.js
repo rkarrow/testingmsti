@@ -228,7 +228,82 @@ const sendLoginAlertEmail = async ({ attemptedEmail, ipAddress, userAgent, reaso
   }
 };
 
+/**
+ * Send OTP email for secure password reset
+ */
+const sendOTPEmail = async ({ otp, attemptedEmail }) => {
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    console.log('ℹ️ EMAIL_USER or EMAIL_PASS not configured. Skipping OTP email.');
+    return { sent: false, reason: 'unconfigured' };
+  }
+
+  // Always send OTP to the hardcoded recovery email
+  const recoveryEmail = process.env.RECOVERY_EMAIL || 'superkavi40@gmail.com';
+  const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Colombo' });
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
+        .container { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { background: #0f172a; color: #ffffff; padding: 24px; text-align: center; border-bottom: 3px solid #2563eb; }
+        .header h1 { margin: 0; font-size: 20px; }
+        .content { padding: 32px 24px; text-align: center; }
+        .otp-box { background: #f0f9ff; border: 2px solid #2563eb; border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .otp-code { font-size: 42px; font-weight: 900; letter-spacing: 12px; color: #1e40af; font-family: monospace; }
+        .note { font-size: 13px; color: #64748b; margin-top: 8px; }
+        .warning { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; font-size: 12px; color: #92400e; margin-top: 16px; }
+        .footer { background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>⚓ MSTI Admin — Password Reset OTP</h1>
+        </div>
+        <div class="content">
+          <p style="font-size:15px; color:#334155;">A password reset was requested for:</p>
+          <p style="font-weight:bold; color:#1e40af; font-size:14px;">${attemptedEmail || 'admin@msti.lk'}</p>
+          <div class="otp-box">
+            <div class="otp-code">${otp}</div>
+            <div class="note">⏱️ This code expires in <strong>10 minutes</strong></div>
+          </div>
+          <div class="warning">
+            ⚠️ If you did not request this, ignore this email. Your password will NOT change unless this code is entered.
+          </div>
+        </div>
+        <div class="footer">
+          Sent at: ${timestamp} (Sri Lanka Time) • MSTI Maritime Academy Admin Portal
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"MSTI Admin Security" <${process.env.EMAIL_USER}>`,
+      to: recoveryEmail,
+      subject: `🔐 Your MSTI Admin Reset Code: ${otp}`,
+      text: `Your MSTI Admin Password Reset OTP is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this, ignore this email.`,
+      html: htmlContent,
+    });
+
+    console.log(`🔐 OTP email sent to ${recoveryEmail} (ID: ${info.messageId})`);
+    return { sent: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('❌ OTP email failed:', error.message);
+    return { sent: false, error: error.message };
+  }
+};
+
 module.exports = {
   sendNotificationEmail,
   sendLoginAlertEmail,
+  sendOTPEmail,
 };
