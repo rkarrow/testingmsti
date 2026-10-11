@@ -99,13 +99,13 @@ export default function Navbar() {
       {/* Main Navbar */}
       <nav className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24">
-          {/* Logo - Enlarged for clearer branding */}
-          <Link to="/" className="flex items-center py-2">
+          <div className="flex items-center justify-between h-20">
+          {/* Logo - Fitted cleanly in header */}
+          <Link to="/" className="flex items-center py-1">
             <img
               src="/msti-logo.jpg"
               alt="MSTI Maritime Academy"
-              className="h-20 sm:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200"
+              className="h-14 sm:h-16 w-auto object-contain transition-transform hover:scale-105 duration-200"
             />
           </Link>
 
