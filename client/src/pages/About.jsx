@@ -111,12 +111,6 @@ export default function About() {
               <p className="text-navy-400 leading-relaxed mb-4">
                 {settings?.aboutDesc2 || "We have a highly qualified staff of professionals, including Master Mariners and Chief Engineers, along with a wealth of knowledge and experience to offer in our programs. We are proud of our top-of-the-line facilities, including Sri Lanka's most advanced 360-degree simulator, which simulates actual ship environments and provides our students with an immersive, hands-on experience that prepares them for challenges and adventure on the seas."}
               </p>
-              <p className="text-navy-400 leading-relaxed mb-4">
-                For more than thirty years, MSTI has stood out among the best in international maritime standards, consistently producing top-notch seafarers who dominate the highly competitive international shipping arena. Our well-thought-out programs are tailored to meet industry requirements, ensuring that our graduates are highly employable and highly sought after by leading maritime firms globally.
-              </p>
-              <p className="text-navy-400 leading-relaxed mb-4">
-                We do more than just educate seafarers at MSTI Maritime Academy: we cultivate tomorrow's marine leaders. Hailing from a tradition of excellence and a genuine heart for the marine industry, we strive to guide young would-be sailors on their path to fulfilling careers sailing through life on the waves.
-              </p>
               <div className="mt-8 mb-8">
                 <h3 className="text-white font-bold text-xl mb-2">MSTI is proud of its 35 years – plus history of expertise in maritime training and education.</h3>
                 <p className="text-navy-300 font-medium leading-relaxed bg-blue-600/10 border border-blue-500/20 p-4 rounded-xl">
