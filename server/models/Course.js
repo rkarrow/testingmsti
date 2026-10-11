@@ -7,11 +7,10 @@ const courseSchema = new mongoose.Schema(
     shortDescription: { type: String },
     category: {
       type: String,
-      enum: ['Officer Cadetship', 'Marine Engineering', 'Nautical Science', 'Port Management', 'Safety & Security', 'Specialized Training'],
       required: true,
     },
     duration: { type: String, required: true },
-    level: { type: String, enum: ['Certificate', 'Diploma', 'Degree', 'Advanced'], default: 'Certificate' },
+    level: { type: String, default: '' },
     image: { type: String, default: '' },
     featured: { type: Boolean, default: false },
     intake: { type: String },

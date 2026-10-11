@@ -334,9 +334,9 @@ export default function CourseDetail() {
                 </span>
               </div>
               <div className="flex items-center justify-between pb-3 border-b border-navy-800">
-                <span className="text-xs text-navy-400">Certification / Level</span>
+                <span className="text-xs text-navy-400">LICENSE</span>
                 <span className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
-                  <FiAward className="text-amber-400" /> {course.level || 'STCW Class III / Certificate'}
+                  <FiAward className="text-amber-400" /> {course.level || 'STCW / License'}
                 </span>
               </div>
               <div className="flex items-center justify-between">

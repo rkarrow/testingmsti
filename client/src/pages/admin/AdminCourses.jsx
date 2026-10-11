@@ -194,9 +194,9 @@ export default function AdminCourses() {
     shortDescription: '',
     description: '',
     category: 'Officer Cadetship',
-    duration: '36 Months',
-    level: 'Degree',
-    intake: 'January & July',
+    duration: '',
+    level: '',
+    intake: '',
     featured: false,
     isActive: true,
     image: '',
@@ -283,7 +283,7 @@ export default function AdminCourses() {
       description: course.description || '',
       category: course.category || 'Officer Cadetship',
       duration: course.duration || '',
-      level: course.level || 'Degree',
+      level: course.level || '',
       intake: course.intake || '',
       featured: course.featured || false,
       isActive: course.isActive !== undefined ? course.isActive : true,
@@ -536,7 +536,7 @@ export default function AdminCourses() {
                   <tr>
                     <th className="px-6 py-4">Course Image</th>
                     <th className="px-6 py-4">Title & Category</th>
-                    <th className="px-6 py-4">Duration & Level</th>
+                    <th className="px-6 py-4">Duration & LICENSE</th>
                     <th className="px-6 py-4">Featured</th>
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
@@ -965,14 +965,14 @@ export default function AdminCourses() {
 
                 <div>
                   <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
-                    Level
+                    LICENSE
                   </label>
                   <input
                     type="text"
                     value={formData.level}
                     onChange={(e) => setFormData({ ...formData, level: e.target.value })}
                     className="w-full px-3 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-                    placeholder="e.g. Degree / Diploma"
+                    placeholder="e.g. STCW II/1, Officer of the Watch, COC"
                   />
                 </div>
               </div>
