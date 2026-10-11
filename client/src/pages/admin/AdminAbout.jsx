@@ -13,6 +13,7 @@ import {
   FiTarget,
   FiEye,
   FiLayers,
+  FiImage,
 } from 'react-icons/fi'
 
 const defaultAboutSettings = {
@@ -68,6 +69,21 @@ const defaultAboutSettings = {
     }
   ],
 
+  // Story Images (Collage 4 images)
+  aboutStoryImages: [
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500',
+    'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=500',
+    'https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=500',
+    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500',
+  ],
+
+  // Facilities
+  facilities: [
+    { title: '360° Full Mission Bridge Simulator', desc: 'Industry-leading bridge simulation technology providing realistic ship handling scenarios for officer trainees.', image: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?w=500' },
+    { title: 'Engine Room Simulator', desc: 'State-of-the-art engine room simulation facility for marine engineering trainees.', image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500' },
+    { title: 'GMDSS Radio Laboratory', desc: 'Fully equipped Global Maritime Distress & Safety System laboratory for communications training.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500' },
+    { title: 'Survival Craft Training Pool', desc: 'Professional training facility for liferaft deployment, sea survival, and rescue operations.', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500' },
+  ],
 }
 
 export default function AdminAbout() {
@@ -76,6 +92,8 @@ export default function AdminAbout() {
   const [saving, setSaving] = useState(false)
   const [uploadingHeroBg, setUploadingHeroBg] = useState(false)
   const [uploadingLeader, setUploadingLeader] = useState(false)
+  const [uploadingStoryIdx, setUploadingStoryIdx] = useState(null)
+  const [uploadingFacilityIdx, setUploadingFacilityIdx] = useState(null)
   const [msg, setMsg] = useState({ type: '', text: '' })
 
   useEffect(() => {
@@ -90,7 +108,7 @@ export default function AdminAbout() {
         setFormData((prev) => ({
           ...prev,
           ...res.data.data,
-                    aboutStats:
+          aboutStats:
             res.data.data.aboutStats && res.data.data.aboutStats.length > 0
               ? res.data.data.aboutStats
               : defaultAboutSettings.aboutStats,
@@ -98,6 +116,14 @@ export default function AdminAbout() {
             res.data.data.leadership && res.data.data.leadership.length > 0
               ? res.data.data.leadership
               : defaultAboutSettings.leadership,
+          aboutStoryImages:
+            res.data.data.aboutStoryImages && res.data.data.aboutStoryImages.length > 0
+              ? res.data.data.aboutStoryImages
+              : defaultAboutSettings.aboutStoryImages,
+          facilities:
+            res.data.data.facilities && res.data.data.facilities.length > 0
+              ? res.data.data.facilities
+              : defaultAboutSettings.facilities,
         }))
       }
     } catch (err) {
@@ -246,6 +272,101 @@ export default function AdminAbout() {
     } finally {
       setUploadingLeader(false)
     }
+  }
+
+  // Story Collage Images Handlers
+  const handleStoryImageChange = (index, value) => {
+    setFormData((prev) => {
+      const current = [...(prev.aboutStoryImages || defaultAboutSettings.aboutStoryImages)]
+      current[index] = value
+      return { ...prev, aboutStoryImages: current }
+    })
+  }
+
+  const handleStoryImageUpload = async (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const data = new FormData()
+    data.append('image', file)
+
+    try {
+      setUploadingStoryIdx(index)
+      setMsg({ type: 'info', text: `Uploading story image #${index + 1}...` })
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.post('/api/upload', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (res.data.success) {
+        handleStoryImageChange(index, res.data.imageUrl)
+        setMsg({ type: 'success', text: `Story image #${index + 1} uploaded successfully!` })
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+    } finally {
+      setUploadingStoryIdx(null)
+      e.target.value = ''
+    }
+  }
+
+  // Facility Handlers
+  const handleFacilityChange = (index, field, value) => {
+    setFormData((prev) => {
+      const current = [...(prev.facilities || defaultAboutSettings.facilities)]
+      current[index] = { ...current[index], [field]: value }
+      return { ...prev, facilities: current }
+    })
+  }
+
+  const handleFacilityImageUpload = async (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const data = new FormData()
+    data.append('image', file)
+
+    try {
+      setUploadingFacilityIdx(index)
+      setMsg({ type: 'info', text: `Uploading facility image...` })
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.post('/api/upload', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (res.data.success) {
+        handleFacilityChange(index, 'image', res.data.imageUrl)
+        setMsg({ type: 'success', text: 'Facility image uploaded successfully!' })
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+    } finally {
+      setUploadingFacilityIdx(null)
+      e.target.value = ''
+    }
+  }
+
+  const handleAddFacility = () => {
+    setFormData((prev) => ({
+      ...prev,
+      facilities: [
+        ...(prev.facilities || defaultAboutSettings.facilities),
+        { title: '', desc: '', image: '' },
+      ],
+    }))
+  }
+
+  const handleRemoveFacility = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      facilities: (prev.facilities || defaultAboutSettings.facilities).filter((_, i) => i !== index),
+    }))
   }
 
   // Save Settings
@@ -588,11 +709,87 @@ export default function AdminAbout() {
         </div>
 
         
-        {/* SECTION 3: ACADEMY LEADERSHIP TEAM */}
+        {/* SECTION 3: STORY 4-IMAGE COLLAGE */}
+        <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+          <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+            <div>
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <FiImage className="text-purple-400" /> 3. Story Collage Images (4 Photos)
+              </h2>
+              <p className="text-[11px] text-navy-400 mt-1">
+                Customize the 4 photos in the 2×2 grid displayed next to &quot;Our Story&quot; on the About page.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[0, 1, 2, 3].map((idx) => {
+              const currentImg =
+                formData.aboutStoryImages?.[idx] ||
+                defaultAboutSettings.aboutStoryImages[idx] ||
+                ''
+              return (
+                <div key={idx} className="bg-navy-950 border border-navy-800 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider">
+                      Photo #{idx + 1}
+                    </span>
+                    <span className="text-[10px] text-navy-500 font-medium">
+                      {idx === 0 ? 'Top Left' : idx === 1 ? 'Top Right' : idx === 2 ? 'Bottom Left' : 'Bottom Right'}
+                    </span>
+                  </div>
+
+                  {/* Thumbnail Preview */}
+                  <div className="relative h-36 rounded-lg overflow-hidden border border-navy-800 bg-navy-900 flex items-center justify-center">
+                    {currentImg ? (
+                      <img
+                        src={currentImg}
+                        alt={`Story Photo ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <div className="text-navy-600 text-xs flex flex-col items-center gap-1">
+                        <FiImage size={24} /> No image selected
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-navy-400 mb-1">Image URL / Path</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={currentImg}
+                        onChange={(e) => handleStoryImageChange(idx, e.target.value)}
+                        placeholder="https://... or /image.jpg"
+                        className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+                      />
+                      <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                        <FiUpload size={13} /> {uploadingStoryIdx === idx ? 'Uploading...' : 'Upload'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleStoryImageUpload(idx, e)}
+                          className="hidden"
+                          disabled={uploadingStoryIdx === idx}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* SECTION 4: ACADEMY LEADERSHIP TEAM */}
         <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
           <div className="flex items-center justify-between border-b border-navy-800 pb-3">
             <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <FiEye className="text-blue-400" /> 3. Academy Leadership Team
+              <FiEye className="text-blue-400" /> 4. Academy Leadership Team
             </h2>
             <button
               type="button"
@@ -665,6 +862,112 @@ export default function AdminAbout() {
                     <label className="bg-navy-800 hover:bg-navy-700 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
                       <FiUpload size={14} /> {uploadingLeaderIdx === idx ? 'Uploading...' : 'Upload'}
                       <input type="file" accept="image/*" onChange={(e) => handleLeadershipImageUpload(idx, e)} className="hidden" disabled={uploadingLeaderIdx === idx} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 5: STATE-OF-THE-ART FACILITIES */}
+        <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-6">
+          <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+            <div>
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <FiLayers className="text-emerald-400" /> 5. State-of-the-Art Facilities
+              </h2>
+              <p className="text-[11px] text-navy-400 mt-1">
+                Manage the facility cards (Simulators, Laboratories, Pools) shown on the About page.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddFacility}
+              className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              <FiPlus size={13} /> Add Facility
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(formData.facilities || defaultAboutSettings.facilities).map((facility, idx) => (
+              <div key={idx} className="bg-navy-950 border border-navy-800 rounded-xl p-4 relative space-y-3">
+                <div className="flex items-center justify-between border-b border-navy-800 pb-2 mb-2">
+                  <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                    Facility #{idx + 1}
+                  </span>
+                  {(formData.facilities || defaultAboutSettings.facilities).length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFacility(idx)}
+                      className="text-red-400 hover:text-red-300 p-1 rounded transition-colors"
+                      title="Delete Facility"
+                    >
+                      <FiTrash2 size={14} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Facility Thumbnail Preview */}
+                <div className="relative h-32 rounded-lg overflow-hidden border border-navy-800 bg-navy-900 flex items-center justify-center">
+                  {facility.image ? (
+                    <img
+                      src={facility.image}
+                      alt={facility.title || 'Facility'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none'
+                      }}
+                    />
+                  ) : (
+                    <div className="text-navy-600 text-xs flex flex-col items-center gap-1">
+                      <FiImage size={24} /> No image uploaded
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-navy-400 mb-1">Facility Name / Title</label>
+                  <input
+                    type="text"
+                    value={facility.title || ''}
+                    onChange={(e) => handleFacilityChange(idx, 'title', e.target.value)}
+                    placeholder="e.g. 360° Full Mission Bridge Simulator"
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-navy-400 mb-1">Description</label>
+                  <textarea
+                    rows={2}
+                    value={facility.desc || ''}
+                    onChange={(e) => handleFacilityChange(idx, 'desc', e.target.value)}
+                    placeholder="Short description of the facility equipment and capabilities..."
+                    className="w-full bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 leading-relaxed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-navy-400 mb-1">Image URL / Upload</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={facility.image || ''}
+                      onChange={(e) => handleFacilityChange(idx, 'image', e.target.value)}
+                      placeholder="https://... or /image.jpg"
+                      className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    />
+                    <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                      <FiUpload size={13} /> {uploadingFacilityIdx === idx ? 'Uploading...' : 'Upload'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFacilityImageUpload(idx, e)}
+                        className="hidden"
+                        disabled={uploadingFacilityIdx === idx}
+                      />
                     </label>
                   </div>
                 </div>

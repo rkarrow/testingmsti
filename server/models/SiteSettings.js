@@ -175,6 +175,11 @@ const siteSettingsSchema = new mongoose.Schema({
     }
   ],
 
+  // About Page Story Images (Collage)
+  aboutStoryImages: [
+    { type: String }
+  ],
+
   // Contact Info & Campus Branches
   contactAddress: {
     type: String,

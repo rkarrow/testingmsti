@@ -95,10 +95,26 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="grid grid-cols-2 gap-4">
-              <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500" alt="MSTI" className="rounded-xl h-52 w-full object-cover" />
-              <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=500" alt="Training" className="rounded-xl h-52 w-full object-cover mt-8" />
-              <img src="https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=500" alt="Cadets" className="rounded-xl h-52 w-full object-cover -mt-4" />
-              <img src="https://images.unsplash.com/photo-1521791055366-0d553872952f?w=500" alt="Excellence" className="rounded-xl h-52 w-full object-cover mt-4" />
+              <img
+                src={settings?.aboutStoryImages?.[0] || "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500"}
+                alt="MSTI"
+                className="rounded-xl h-52 w-full object-cover"
+              />
+              <img
+                src={settings?.aboutStoryImages?.[1] || "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=500"}
+                alt="Training"
+                className="rounded-xl h-52 w-full object-cover mt-8"
+              />
+              <img
+                src={settings?.aboutStoryImages?.[2] || "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=500"}
+                alt="Cadets"
+                className="rounded-xl h-52 w-full object-cover -mt-4"
+              />
+              <img
+                src={settings?.aboutStoryImages?.[3] || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500"}
+                alt="Excellence"
+                className="rounded-xl h-52 w-full object-cover mt-4"
+              />
             </div>
             <div>
               <div className="badge-blue mb-4">{settings?.aboutBadge || 'Our Story'}</div>
@@ -277,7 +293,7 @@ export default function About() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(settings?.facilities && settings.facilities.length > 0 ? settings.facilities : [
               { title: '360° Full Mission Bridge Simulator', desc: 'Industry-leading bridge simulation technology providing realistic ship handling scenarios for officer trainees.', image: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?w=500' },
-              { title: 'Engine Room Simulator', desc: 'State-of-the-art engine room simulation facility for marine engineering trainees.', image: 'https://images.unsplash.com/photo-1581094794329-c8112d4e5f9e?w=500' },
+              { title: 'Engine Room Simulator', desc: 'State-of-the-art engine room simulation facility for marine engineering trainees.', image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500' },
               { title: 'GMDSS Radio Laboratory', desc: 'Fully equipped Global Maritime Distress & Safety System laboratory for communications training.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500' },
               { title: 'Survival Craft Training Pool', desc: 'Professional training facility for liferaft deployment, sea survival, and rescue operations.', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500' },
             ]).map((facility, i) => (
