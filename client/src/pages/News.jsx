@@ -153,7 +153,7 @@ export default function News() {
   })
 
   return (
-    <div className="pt-[72px]">
+    <div className="pt-[96px]">
       {/* HERO */}
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">

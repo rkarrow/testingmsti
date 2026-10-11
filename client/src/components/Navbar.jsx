@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { FiMenu, FiX, FiAnchor, FiPhone, FiMail } from 'react-icons/fi'
+import { FaYoutube, FaFacebook, FaInstagram, FaLinkedin, FaTiktok } from 'react-icons/fa'
 import CertificateModal from './CertificateModal'
 
 const navLinks = [
@@ -28,7 +29,56 @@ export default function Navbar() {
             <span className="text-navy-700">|</span>
             <span className="text-navy-300">📍 No. 32, Station Road, Dehiwala 10350, Sri Lanka</span>
           </div>
-          <div className="flex items-center gap-6 text-xs text-navy-300">
+          <div className="flex items-center gap-5 text-xs text-navy-300">
+            {/* Social Media Backlinks */}
+            <div className="flex items-center gap-2.5 pr-2 border-r border-navy-800">
+              <a
+                href="https://youtube.com/@mstimaritimeacademy?si=pXilsRZIagsjp4O7"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="YouTube"
+                className="text-red-500 hover:text-red-400 hover:scale-110 transition-all p-1"
+              >
+                <FaYoutube size={14} />
+              </a>
+              <a
+                href="https://www.facebook.com/MercmarineTraining/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Facebook"
+                className="text-blue-500 hover:text-blue-400 hover:scale-110 transition-all p-1"
+              >
+                <FaFacebook size={14} />
+              </a>
+              <a
+                href="https://www.instagram.com/msti.maritimeacademy/?hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Instagram"
+                className="text-pink-500 hover:text-pink-400 hover:scale-110 transition-all p-1"
+              >
+                <FaInstagram size={14} />
+              </a>
+              <a
+                href="https://lk.linkedin.com/school/mstimaritimeacademysl/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="LinkedIn"
+                className="text-sky-400 hover:text-sky-300 hover:scale-110 transition-all p-1"
+              >
+                <FaLinkedin size={14} />
+              </a>
+              <a
+                href="https://www.tiktok.com/@mediamsti"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="TikTok"
+                className="text-gray-200 hover:text-white hover:scale-110 transition-all p-1"
+              >
+                <FaTiktok size={13} />
+              </a>
+            </div>
+
             <a href="tel:+94117476100" className="hover:text-white transition-colors flex items-center gap-1.5">
               <FiPhone size={12} className="text-blue-400" /> +94 11 747 6100
             </a>
@@ -49,10 +99,14 @@ export default function Navbar() {
       {/* Main Navbar */}
       <nav className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <img src="/msti-logo.jpg" alt="MSTI Maritime Academy" className="h-16 w-auto object-contain" />
+          <div className="flex items-center justify-between h-24">
+          {/* Logo - Enlarged for clearer branding */}
+          <Link to="/" className="flex items-center py-2">
+            <img
+              src="/msti-logo.jpg"
+              alt="MSTI Maritime Academy"
+              className="h-20 sm:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200"
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -118,14 +172,57 @@ export default function Navbar() {
                 {link.label}
               </NavLink>
             ))}
-            <div className="pt-4 mt-2 border-t border-gray-100 flex gap-3">
+            <div className="pt-4 mt-2 border-t border-gray-100 flex flex-col gap-3">
               <Link
                 to="/contact"
                 onClick={() => setIsOpen(false)}
-                className="bg-blue-600 text-white text-sm font-semibold py-2.5 px-6 rounded text-center flex-1"
+                className="bg-blue-600 text-white text-sm font-semibold py-2.5 px-6 rounded text-center"
               >
                 Apply Now
               </Link>
+              {/* Mobile Social Links */}
+              <div className="flex items-center justify-center gap-4 pt-2">
+                <a
+                  href="https://youtube.com/@mstimaritimeacademy?si=pXilsRZIagsjp4O7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-base"
+                >
+                  <FaYoutube />
+                </a>
+                <a
+                  href="https://www.facebook.com/MercmarineTraining/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-base"
+                >
+                  <FaFacebook />
+                </a>
+                <a
+                  href="https://www.instagram.com/msti.maritimeacademy/?hl=en"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center text-base"
+                >
+                  <FaInstagram />
+                </a>
+                <a
+                  href="https://lk.linkedin.com/school/mstimaritimeacademysl/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center text-base"
+                >
+                  <FaLinkedin />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@mediamsti"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center text-base"
+                >
+                  <FaTiktok />
+                </a>
+              </div>
             </div>
           </div>
         </div>

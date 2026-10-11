@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { FiMail, FiPhone, FiMapPin, FiClock, FiChevronDown, FiChevronUp, FiSend, FiCheckCircle, FiShield } from 'react-icons/fi'
+import { FaYoutube, FaFacebook, FaInstagram, FaLinkedin, FaTiktok } from 'react-icons/fa'
 import CTASection from '../components/CTASection'
 
 const defaultStats = [
@@ -70,7 +71,7 @@ export default function Contact() {
   }
 
   return (
-    <div className="pt-[72px]">
+    <div className="pt-[96px]">
       {/* HERO */}
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">
@@ -311,6 +312,58 @@ export default function Contact() {
                         {settings?.contactEmail || 'helpdesk@msti.lk'}
                       </a>
                     </div>
+                  </div>
+                </div>
+
+                {/* Official Social Media Channels */}
+                <div className="bg-navy-900/90 border border-navy-700 rounded-xl p-4 mt-4">
+                  <p className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    Official Social Media Channels
+                  </p>
+                  <p className="text-navy-400 text-xs mb-3">
+                    Follow MSTI Maritime Academy for admissions news, batch intakes, cadet life, and maritime industry events:
+                  </p>
+                  <div className="flex flex-wrap gap-2.5">
+                    <a
+                      href="https://youtube.com/@mstimaritimeacademy?si=pXilsRZIagsjp4O7"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 text-xs font-semibold transition-all"
+                    >
+                      <FaYoutube size={16} /> YouTube
+                    </a>
+                    <a
+                      href="https://www.facebook.com/MercmarineTraining/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/20 text-xs font-semibold transition-all"
+                    >
+                      <FaFacebook size={15} /> Facebook
+                    </a>
+                    <a
+                      href="https://www.instagram.com/msti.maritimeacademy/?hl=en"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-pink-600/10 hover:bg-pink-600 text-pink-400 hover:text-white border border-pink-500/20 text-xs font-semibold transition-all"
+                    >
+                      <FaInstagram size={15} /> Instagram
+                    </a>
+                    <a
+                      href="https://lk.linkedin.com/school/mstimaritimeacademysl/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-sky-600/10 hover:bg-sky-600 text-sky-400 hover:text-white border border-sky-500/20 text-xs font-semibold transition-all"
+                    >
+                      <FaLinkedin size={15} /> LinkedIn
+                    </a>
+                    <a
+                      href="https://www.tiktok.com/@mediamsti"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-navy-800 hover:bg-white text-gray-300 hover:text-black border border-navy-700 text-xs font-semibold transition-all"
+                    >
+                      <FaTiktok size={14} /> TikTok
+                    </a>
                   </div>
                 </div>
               </div>

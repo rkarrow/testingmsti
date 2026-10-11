@@ -159,7 +159,7 @@ export default function Home() {
   const activeSlideData = heroSlides[currentSlide] || heroSlides[0]
 
   return (
-    <div className="pt-20 sm:pt-28"> {/* Offset for navbar & top bar */}
+    <div className="pt-24 sm:pt-32"> {/* Offset for enlarged navbar & top bar */}
       {/* HERO SECTION - DYNAMIC SLIDER */}
       <section className="relative h-[650px] md:h-[75vh] min-h-[600px] flex items-center overflow-hidden bg-navy-950">
         {/* Background Images with Fade Transition */}

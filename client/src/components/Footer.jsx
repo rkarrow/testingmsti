@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiMapPin, FiPhone, FiMail, FiCheckCircle, FiShield, FiAward } from 'react-icons/fi'
+import { FaYoutube, FaFacebook, FaInstagram, FaLinkedin, FaTiktok } from 'react-icons/fa'
 import CertificateModal from './CertificateModal'
 
 export default function Footer() {
@@ -9,8 +10,15 @@ export default function Footer() {
     <footer className="bg-navy-950 pt-16 pb-8 border-t border-navy-900 text-navy-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Column 1: MSTI Maritime Academy Dehiwala */}
+          {/* Column 1: MSTI Maritime Academy Dehiwala & Social Links */}
           <div className="space-y-4">
+            <Link to="/" className="inline-block bg-white p-2.5 rounded-xl shadow-md border border-navy-800 hover:opacity-95 transition-opacity">
+              <img
+                src="/msti-logo.jpg"
+                alt="MSTI Maritime Academy"
+                className="h-16 w-auto object-contain"
+              />
+            </Link>
             <h3 className="text-white font-bold text-sm tracking-wide flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-blue-500"></span>
               MSTI MARITIME ACADEMY
@@ -18,6 +26,61 @@ export default function Footer() {
             <p className="text-navy-400 text-xs leading-relaxed">
               Sri Lanka's pioneer private maritime training institute established with a proud legacy since 1986. Dedicated to producing world-class merchant navy officers and ratings.
             </p>
+
+            {/* HIGHLIGHTED SOCIAL MEDIA BACKLINKS */}
+            <div className="pt-2">
+              <h4 className="text-white text-[11px] font-bold uppercase tracking-wider mb-2.5 flex items-center gap-1.5 text-amber-400">
+                Connect With Us Official
+              </h4>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <a
+                  href="https://youtube.com/@mstimaritimeacademy?si=pXilsRZIagsjp4O7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Subscribe on YouTube"
+                  className="flex items-center justify-center w-9 h-9 rounded-xl bg-red-600/15 border border-red-500/30 text-red-400 hover:bg-red-600 hover:text-white hover:border-red-600 hover:scale-110 shadow-lg shadow-red-600/10 transition-all duration-200"
+                >
+                  <FaYoutube size={17} />
+                </a>
+                <a
+                  href="https://www.facebook.com/MercmarineTraining/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Follow on Facebook"
+                  className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-600/15 border border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 hover:scale-110 shadow-lg shadow-blue-600/10 transition-all duration-200"
+                >
+                  <FaFacebook size={16} />
+                </a>
+                <a
+                  href="https://www.instagram.com/msti.maritimeacademy/?hl=en"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Follow on Instagram"
+                  className="flex items-center justify-center w-9 h-9 rounded-xl bg-pink-600/15 border border-pink-500/30 text-pink-400 hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-purple-600 hover:text-white hover:border-transparent hover:scale-110 shadow-lg shadow-pink-600/10 transition-all duration-200"
+                >
+                  <FaInstagram size={16} />
+                </a>
+                <a
+                  href="https://lk.linkedin.com/school/mstimaritimeacademysl/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Connect on LinkedIn"
+                  className="flex items-center justify-center w-9 h-9 rounded-xl bg-sky-600/15 border border-sky-500/30 text-sky-400 hover:bg-sky-600 hover:text-white hover:border-sky-600 hover:scale-110 shadow-lg shadow-sky-600/10 transition-all duration-200"
+                >
+                  <FaLinkedin size={16} />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@mediamsti"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Follow on TikTok"
+                  className="flex items-center justify-center w-9 h-9 rounded-xl bg-navy-800/80 border border-navy-700 text-gray-200 hover:bg-white hover:text-black hover:border-white hover:scale-110 shadow-lg transition-all duration-200"
+                >
+                  <FaTiktok size={15} />
+                </a>
+              </div>
+            </div>
+
             <div className="pt-2 border-t border-navy-900">
               <h4 className="text-white text-[11px] font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5 text-blue-400">
                 <FiShield size={13} /> ACCREDITATIONS & OVERSIGHT
