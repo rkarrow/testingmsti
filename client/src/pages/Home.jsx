@@ -38,32 +38,7 @@ export default function Home() {
       image: '/course-ecdis.jpg',
     },
   ])
-  const [news, setNews] = useState([
-    {
-      _id: 'n1',
-      title: 'Global Shipping Giant Signs Guaranteed Cadet Placement Agreement with MSTI',
-      excerpt: 'MSTI signs guaranteed placement agreement with global shipping giant, securing maritime officer careers for all graduating cadets.',
-      category: 'News',
-      publishedAt: '2026-08-15',
-      image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800',
-    },
-    {
-      _id: 'n2',
-      title: 'MSTI Achieves ISO 9001:2015 Certification for Maritime Training Excellence',
-      excerpt: 'MSTI awarded ISO 9001:2015 certification recognizing international quality standards in merchant navy officer education.',
-      category: 'Achievement',
-      publishedAt: '2026-07-22',
-      image: 'https://images.unsplash.com/photo-1521791055366-0d553872952f?w=800',
-    },
-    {
-      _id: 'n3',
-      title: 'New $4.2M Transas 180° Full Mission Bridge Simulator Commissioned',
-      excerpt: 'State-of-the-art radar, ECDIS and bridge simulation lab commissioned at MSTI campus to train seafarers for ocean vessels.',
-      category: 'Announcement',
-      publishedAt: '2026-06-10',
-      image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
-    },
-  ])
+  const [news, setNews] = useState([])
   const [settings, setSettings] = useState({
     heroBadge: "⚓ FOUNDING EXCELLENCE SINCE 2002 • SRI LANKA'S PREMIER CADET CORPS",
     heroTitle: "The Premier Maritime Academy in Sri Lanka",
@@ -428,8 +403,8 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
-            {news.length > 0 && (
+          {news.length > 0 ? (
+            <div className="grid lg:grid-cols-2 gap-6">
               <div className="relative rounded-xl overflow-hidden h-[400px] group cursor-pointer shadow-lg border border-gray-100">
                 <img
                   src={news[0].image || 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800'}
@@ -452,26 +427,30 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-            )}
 
-            <div className="flex flex-col gap-6">
-              {news.slice(1, 3).map((item, i) => (
-                <div key={item._id || i} className="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-100 flex-1 flex flex-col justify-center">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-blue-600 text-[10px] font-bold uppercase tracking-wider">{item.category}</span>
-                    <span className="text-navy-400 text-[10px] font-semibold">
-                      {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}
-                    </span>
+              <div className="flex flex-col gap-6">
+                {news.slice(1, 3).map((item, i) => (
+                  <div key={item._id || i} className="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-100 flex-1 flex flex-col justify-center">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-blue-600 text-[10px] font-bold uppercase tracking-wider">{item.category}</span>
+                      <span className="text-navy-400 text-[10px] font-semibold">
+                        {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h3 className="text-navy-950 font-bold text-lg mb-2 leading-tight">{item.title}</h3>
+                    <p className="text-gray-500 text-xs leading-relaxed mb-4 line-clamp-2">{item.excerpt || item.content}</p>
+                    <Link to="/news" className="text-blue-600 hover:text-blue-700 text-xs font-semibold flex items-center gap-1 mt-auto self-end">
+                      Read Article <FiArrowRight size={14} />
+                    </Link>
                   </div>
-                  <h3 className="text-navy-950 font-bold text-lg mb-2 leading-tight">{item.title}</h3>
-                  <p className="text-gray-500 text-xs leading-relaxed mb-4 line-clamp-2">{item.excerpt || item.content}</p>
-                  <Link to="/news" className="text-blue-600 hover:text-blue-700 text-xs font-semibold flex items-center gap-1 mt-auto self-end">
-                    Read Article <FiArrowRight size={14} />
-                  </Link>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-100">
+              <p className="text-navy-400 text-sm">No news articles published yet.</p>
+            </div>
+          )}
         </div>
       </section>
 
