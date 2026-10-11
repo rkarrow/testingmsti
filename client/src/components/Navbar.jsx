@@ -30,52 +30,52 @@ export default function Navbar() {
             <span className="text-navy-300">📍 No. 32, Station Road, Dehiwala 10350, Sri Lanka</span>
           </div>
           <div className="flex items-center gap-5 text-xs text-navy-300">
-            {/* Social Media Backlinks */}
-            <div className="flex items-center gap-2.5 pr-2 border-r border-navy-800">
+            {/* Social Media Backlinks - Executive Minimalist */}
+            <div className="flex items-center gap-1 pr-2 border-r border-navy-800">
               <a
                 href="https://youtube.com/@mstimaritimeacademy?si=pXilsRZIagsjp4O7"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="YouTube"
-                className="text-red-500 hover:text-red-400 hover:scale-110 transition-all p-1"
+                className="text-navy-400 hover:text-red-500 hover:bg-navy-900 rounded p-1.5 transition-colors"
               >
-                <FaYoutube size={14} />
+                <FaYoutube size={13} />
               </a>
               <a
                 href="https://www.facebook.com/MercmarineTraining/"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Facebook"
-                className="text-blue-500 hover:text-blue-400 hover:scale-110 transition-all p-1"
+                className="text-navy-400 hover:text-blue-500 hover:bg-navy-900 rounded p-1.5 transition-colors"
               >
-                <FaFacebook size={14} />
+                <FaFacebook size={13} />
               </a>
               <a
-                href="https://www.instagram.com/msti.maritimeacademy/?hl=en"
+                href="https://www.instagram.com/mstimaritimeacademy/?hl=en"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Instagram"
-                className="text-pink-500 hover:text-pink-400 hover:scale-110 transition-all p-1"
+                className="text-navy-400 hover:text-pink-400 hover:bg-navy-900 rounded p-1.5 transition-colors"
               >
-                <FaInstagram size={14} />
+                <FaInstagram size={13} />
               </a>
               <a
                 href="https://lk.linkedin.com/school/mstimaritimeacademysl/"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="LinkedIn"
-                className="text-sky-400 hover:text-sky-300 hover:scale-110 transition-all p-1"
+                className="text-navy-400 hover:text-sky-400 hover:bg-navy-900 rounded p-1.5 transition-colors"
               >
-                <FaLinkedin size={14} />
+                <FaLinkedin size={13} />
               </a>
               <a
                 href="https://www.tiktok.com/@mediamsti"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="TikTok"
-                className="text-gray-200 hover:text-white hover:scale-110 transition-all p-1"
+                className="text-navy-400 hover:text-white hover:bg-navy-900 rounded p-1.5 transition-colors"
               >
-                <FaTiktok size={13} />
+                <FaTiktok size={12} />
               </a>
             </div>
 
