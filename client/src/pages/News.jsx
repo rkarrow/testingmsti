@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { FiSearch, FiCalendar, FiTag, FiFilter } from 'react-icons/fi'
 import NewsCard from '../components/NewsCard'
@@ -165,7 +166,11 @@ export default function News() {
                   <h2 className="text-3xl font-bold text-white mb-6">Recent Academy Bulletins</h2>
                   <div className="space-y-3">
                     {bulletinItems.slice(0, 5).map((b) => (
-                      <div key={b._id} className="flex items-center gap-4 bg-navy-900 border border-navy-700 rounded-xl p-4 hover:border-blue-500/40 transition-colors group">
+                      <Link
+                        key={b._id}
+                        to={`/news/${b._id}`}
+                        className="flex items-center gap-4 bg-navy-900 border border-navy-700 rounded-xl p-4 hover:border-blue-500/40 transition-colors group cursor-pointer"
+                      >
                         <div className="text-navy-400 text-xs font-medium bg-navy-800 px-2.5 py-1.5 rounded text-center shrink-0">
                           {new Date(b.publishedAt || b.createdAt).toLocaleDateString()}
                         </div>
@@ -178,7 +183,7 @@ export default function News() {
                         }`}>
                           {b.category}
                         </span>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -190,7 +195,11 @@ export default function News() {
                   <h2 className="text-3xl font-bold text-white mb-6">Upcoming Events</h2>
                   <div className="space-y-4">
                     {eventItems.slice(0, 4).map((event) => (
-                      <div key={event._id} className="flex gap-4 bg-navy-900 border border-navy-700 rounded-xl p-4 hover:border-blue-500/40 transition-colors group">
+                      <Link
+                        key={event._id}
+                        to={`/news/${event._id}`}
+                        className="flex gap-4 bg-navy-900 border border-navy-700 rounded-xl p-4 hover:border-blue-500/40 transition-colors group cursor-pointer"
+                      >
                         <div className="bg-blue-600/20 border border-blue-500/30 rounded-xl px-3 py-2 text-center shrink-0 min-w-16">
                           <div className="text-blue-400 text-xs font-bold">
                             {new Date(event.publishedAt || event.createdAt).toLocaleString('default', { month: 'short' })}
@@ -205,7 +214,7 @@ export default function News() {
                             <p className="text-navy-400 text-xs mt-1 line-clamp-2">{event.excerpt}</p>
                           )}
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>

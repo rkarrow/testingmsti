@@ -22,7 +22,18 @@ exports.getAllNews = async (req, res) => {
 // GET single news
 exports.getNewsById = async (req, res) => {
   try {
-    const news = await News.findById(req.params.id);
+    let news = null;
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      news = await News.findById(req.params.id);
+    }
+    if (!news) {
+      news = await News.findOne({
+        $or: [
+          { _id: req.params.id },
+          { title: { $regex: new RegExp('^' + req.params.id.replace(/-/g, ' '), 'i') } }
+        ]
+      }).catch(() => null);
+    }
     if (!news) return res.status(404).json({ success: false, message: 'News not found' });
     res.json({ success: true, data: news });
   } catch (error) {

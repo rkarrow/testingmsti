@@ -422,7 +422,10 @@ export default function Home() {
                   <p className="text-white/80 text-sm mb-4 line-clamp-2">
                     {news[0].excerpt || news[0].content}
                   </p>
-                  <Link to="/news" className="text-white text-xs font-semibold flex items-center gap-1 hover:text-blue-400 transition-colors">
+                  <Link
+                    to={news[0]._id ? `/news/${news[0]._id}` : '/news'}
+                    className="text-white text-xs font-semibold flex items-center gap-1 hover:text-blue-400 transition-colors"
+                  >
                     Read Full Article <FiExternalLink size={14} />
                   </Link>
                 </div>
@@ -439,7 +442,10 @@ export default function Home() {
                     </div>
                     <h3 className="text-navy-950 font-bold text-lg mb-2 leading-tight">{item.title}</h3>
                     <p className="text-gray-500 text-xs leading-relaxed mb-4 line-clamp-2">{item.excerpt || item.content}</p>
-                    <Link to="/news" className="text-blue-600 hover:text-blue-700 text-xs font-semibold flex items-center gap-1 mt-auto self-end">
+                    <Link
+                      to={item._id ? `/news/${item._id}` : '/news'}
+                      className="text-blue-600 hover:text-blue-700 text-xs font-semibold flex items-center gap-1 mt-auto self-end"
+                    >
                       Read Article <FiArrowRight size={14} />
                     </Link>
                   </div>

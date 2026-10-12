@@ -6,6 +6,7 @@ import About from './pages/About'
 import Courses from './pages/Courses'
 import CourseDetail from './pages/CourseDetail'
 import News from './pages/News'
+import NewsDetail from './pages/NewsDetail'
 import Contact from './pages/Contact'
 import Gallery from './pages/Gallery'
 import ScrollToTop from './components/ScrollToTop'
@@ -52,6 +53,7 @@ function App() {
         <Route path="/courses" element={<PublicLayout><Courses /></PublicLayout>} />
         <Route path="/courses/:id" element={<PublicLayout><CourseDetail /></PublicLayout>} />
         <Route path="/news" element={<PublicLayout><News /></PublicLayout>} />
+        <Route path="/news/:id" element={<PublicLayout><NewsDetail /></PublicLayout>} />
         <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
         <Route path="/gallery" element={<PublicLayout><Gallery /></PublicLayout>} />
 
