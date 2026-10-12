@@ -801,6 +801,8 @@ export default function AdminCourses() {
             </div>
           )}
         </div>
+      )}
+
       {/* TAB 2: STCW COURSES (HIERARCHICAL CRUD) */}
       {activeTab === 'stcw' && (
         <div className="space-y-6">
