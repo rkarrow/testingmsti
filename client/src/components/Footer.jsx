@@ -122,7 +122,7 @@ export default function Footer() {
               Admissions Desk
             </h3>
             <p className="text-navy-400 text-xs leading-relaxed">
-              Stay updated on upcoming batch commencement dates, GCE A/L cadetship intakes, and DGMS regulations.
+              Stay updated about the Course Commencement Dates, DGMS Regulations &amp; New Amendments
             </p>
             <form className="flex flex-col gap-2" onSubmit={(e) => e.preventDefault()}>
               <input
