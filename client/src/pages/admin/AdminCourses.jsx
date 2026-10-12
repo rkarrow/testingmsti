@@ -214,7 +214,7 @@ export default function AdminCourses() {
   const [stcwFilterCat, setStcwFilterCat] = useState('all')
   const [stcwModalOpen, setStcwModalOpen] = useState(false)
   const [stcwEditMode, setStcwEditMode] = useState(false)
-  const [stcwFormData, setStcwFormData] = useState({
+  const initialStcwForm = {
     original_category_id: '',
     original_id: '',
     category_id: 'basic-short-courses',
@@ -222,7 +222,14 @@ export default function AdminCourses() {
     code: '',
     name: '',
     slug: '',
-  })
+    image: '',
+    duration: '',
+    description: '',
+    requirements: '',
+    outcomes: '',
+  }
+  const [stcwFormData, setStcwFormData] = useState(initialStcwForm)
+  const [uploadingStcw, setUploadingStcw] = useState(false)
   const [savingStcw, setSavingStcw] = useState(false)
   const [subCatModalOpen, setSubCatModalOpen] = useState(false)
   const [newSubCatForm, setNewSubCatForm] = useState({ title: '', category_id: '', slug: '' })
@@ -491,16 +498,38 @@ export default function AdminCourses() {
     }
   }
 
+  const handleStcwImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const data = new FormData()
+    data.append('image', file)
+
+    try {
+      setUploadingStcw(true)
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.post('/api/upload', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (res.data.success) {
+        setStcwFormData((prev) => ({ ...prev, image: res.data.imageUrl }))
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to upload image')
+    } finally {
+      setUploadingStcw(false)
+    }
+  }
+
   const handleOpenAddStcw = (catId = 'basic-short-courses') => {
     setStcwEditMode(false)
     setStcwFormData({
-      original_category_id: '',
-      original_id: '',
+      ...initialStcwForm,
       category_id: catId,
-      id: '',
-      code: '',
-      name: '',
-      slug: '',
     })
     setStcwModalOpen(true)
   }
@@ -515,6 +544,11 @@ export default function AdminCourses() {
       code: item.code || '',
       name: item.name || '',
       slug: item.slug || '',
+      image: item.image || '',
+      duration: item.duration || '',
+      description: item.description || '',
+      requirements: item.requirements || '',
+      outcomes: item.outcomes || '',
     })
     setStcwModalOpen(true)
   }
@@ -555,6 +589,11 @@ export default function AdminCourses() {
         code: stcwFormData.code.trim().toUpperCase(),
         name: stcwFormData.name.trim(),
         slug: autoSlug,
+        image: stcwFormData.image?.trim() || '',
+        duration: stcwFormData.duration?.trim() || '',
+        description: stcwFormData.description?.trim() || '',
+        requirements: stcwFormData.requirements?.trim() || '',
+        outcomes: stcwFormData.outcomes?.trim() || '',
       })
     }
 
@@ -905,21 +944,43 @@ export default function AdminCourses() {
                           key={item.id || item.code || idx}
                           className="bg-navy-950 border border-navy-800 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-navy-700 transition-colors"
                         >
-                          <div className="space-y-1.5">
+                          <div className="space-y-2">
+                            {item.image ? (
+                              <div className="w-full h-24 rounded-lg overflow-hidden border border-navy-800 bg-navy-900">
+                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-full h-14 rounded-lg border border-dashed border-navy-800 bg-navy-900/40 flex items-center justify-center text-navy-600 gap-1.5 text-[11px]">
+                                <FiImage size={14} /> No Photo Uploaded
+                              </div>
+                            )}
+
                             <div className="flex items-center justify-between gap-2">
                               <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-mono font-bold">
                                 {item.code}
                               </span>
-                              {item.id && (
-                                <span className="text-[10px] font-mono text-navy-500">
-                                  #{item.id}
-                                </span>
-                              )}
+                              <div className="flex items-center gap-1.5">
+                                {item.duration && (
+                                  <span className="text-[10px] text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded font-medium">
+                                    {item.duration}
+                                  </span>
+                                )}
+                                {item.id && (
+                                  <span className="text-[10px] font-mono text-navy-500">
+                                    #{item.id}
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <h4 className="text-sm font-bold text-white leading-snug">
+                            <h4 className="text-sm font-bold text-white leading-snug line-clamp-2">
                               {item.name}
                             </h4>
-                            <p className="text-[11px] font-mono text-navy-500 truncate" title={item.slug}>
+                            {item.description && (
+                              <p className="text-xs text-navy-400 line-clamp-2 leading-relaxed">
+                                {item.description}
+                              </p>
+                            )}
+                            <p className="text-[10px] font-mono text-navy-500 truncate" title={item.slug}>
                               {item.slug}
                             </p>
                           </div>
@@ -1443,7 +1504,7 @@ export default function AdminCourses() {
       {/* ADD / EDIT STCW COURSE MODAL */}
       {stcwModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-navy-900 border border-navy-800 rounded-2xl max-w-lg w-full p-6 space-y-6 shadow-2xl my-8">
+          <div className="bg-navy-900 border border-navy-800 rounded-2xl max-w-2xl w-full p-6 md:p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto my-8">
             <div className="flex items-center justify-between border-b border-navy-800 pb-4">
               <h2 className="text-lg font-bold text-white">
                 {stcwEditMode ? 'Edit STCW Course' : 'Add New STCW Course'}
@@ -1516,17 +1577,109 @@ export default function AdminCourses() {
                 />
               </div>
 
+              {/* Course Photo Upload */}
               <div>
                 <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
-                  Custom Slug / URL (Optional)
+                  Course Photo (Upload or URL)
                 </label>
-                <input
-                  type="text"
-                  placeholder="Auto-generated if left empty"
-                  value={stcwFormData.slug}
-                  onChange={(e) => setStcwFormData({ ...stcwFormData, slug: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
+                <div className="flex gap-2 items-center">
+                  <label className="bg-navy-850 hover:bg-navy-800 text-white border border-navy-700 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors shrink-0">
+                    {uploadingStcw ? <FiRefreshCw className="animate-spin text-blue-400" /> : <FiUpload />}
+                    {uploadingStcw ? 'Uploading...' : 'Upload Image'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleStcwImageUpload}
+                      disabled={uploadingStcw}
+                      className="hidden"
+                    />
+                  </label>
+
+                  <input
+                    type="text"
+                    value={stcwFormData.image}
+                    onChange={(e) => setStcwFormData({ ...stcwFormData, image: e.target.value })}
+                    className="flex-1 w-full px-3 py-2 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
+                    placeholder="or paste image URL..."
+                  />
+                </div>
+
+                {stcwFormData.image && (
+                  <div className="w-full h-32 rounded-lg overflow-hidden border border-navy-700 mt-2 bg-navy-950">
+                    <img src={stcwFormData.image} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+
+              {/* Duration & Custom Slug */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                    Course Duration
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 3 Days, 1 Week"
+                    value={stcwFormData.duration}
+                    onChange={(e) => setStcwFormData({ ...stcwFormData, duration: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                    Custom Slug / URL (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Auto-generated if left empty"
+                    value={stcwFormData.slug}
+                    onChange={(e) => setStcwFormData({ ...stcwFormData, slug: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Course Overview & Description */}
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                  Course Overview & Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={stcwFormData.description}
+                  onChange={(e) => setStcwFormData({ ...stcwFormData, description: e.target.value })}
+                  className="w-full px-4 py-2 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500 leading-relaxed"
+                  placeholder="Detailed information about the STCW course syllabus, IMO requirements, and competencies covered..."
                 />
+              </div>
+
+              {/* Requirements & Certification Outcomes */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                    Entry Requirements (1 per line)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={stcwFormData.requirements}
+                    onChange={(e) => setStcwFormData({ ...stcwFormData, requirements: e.target.value })}
+                    className="w-full px-3 py-2 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500 font-mono"
+                    placeholder="Medical Fitness Certificate&#10;Minimum 16 years of age"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                    Certification Outcomes (1 per line)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={stcwFormData.outcomes}
+                    onChange={(e) => setStcwFormData({ ...stcwFormData, outcomes: e.target.value })}
+                    className="w-full px-3 py-2 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500 font-mono"
+                    placeholder="IMO STCW Certificate of Proficiency&#10;Approved by DGMS Sri Lanka"
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-navy-800">

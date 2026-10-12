@@ -14,6 +14,7 @@ import {
   FiSend,
   FiBookOpen,
 } from 'react-icons/fi'
+import { defaultStcwCourses } from '../data/defaultStcwCourses'
 
 const defaultOfficerCadetPrograms = [
   {
@@ -212,7 +213,38 @@ export default function CourseDetail() {
           return
         }
 
-        // 3. Check general courses list from API
+        // 3. Match from STCW Courses hierarchy
+        const stcwTree = setRes.data?.data?.stcwData || defaultStcwCourses
+        const allStcwItems = []
+        if (Array.isArray(stcwTree) && stcwTree[0]?.children) {
+          stcwTree[0].children.forEach((sub) => {
+            if (sub.items) {
+              sub.items.forEach((it) => {
+                allStcwItems.push({
+                  ...it,
+                  category: sub.title,
+                  title: it.name,
+                  level: 'STCW / IMO Approved',
+                  overview: it.description || 'Approved STCW training course conducted per IMO model specifications and DGMS regulations.',
+                })
+              })
+            }
+          })
+        }
+        const matchedStcw = allStcwItems.find(
+          (it) =>
+            it.code?.toLowerCase() === id?.toLowerCase() ||
+            it.id === id ||
+            it.slug?.toLowerCase().endsWith(id?.toLowerCase()) ||
+            it.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-') === id?.toLowerCase()
+        )
+        if (matchedStcw) {
+          setCourse(matchedStcw)
+          setLoading(false)
+          return
+        }
+
+        // 4. Check general courses list from API
         try {
           const generalRes = await axios.get('/api/courses')
           const found = (generalRes.data?.data || []).find(
