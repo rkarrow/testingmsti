@@ -412,20 +412,22 @@ export default function Courses() {
           </div>
 
           {/* Filter tabs */}
-          <div className="flex flex-wrap gap-2 justify-center mb-10">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md ${
-                  activeCategory === cat
-                    ? 'bg-blue-600 text-white shadow-blue-600/30'
-                    : 'bg-navy-800 text-navy-300 hover:text-white hover:bg-navy-700'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          <div className="flex justify-center mb-10 px-4">
+            <div className="inline-flex p-1.5 rounded-2xl bg-navy-900/90 border border-navy-800 backdrop-blur-sm shadow-xl w-full max-w-xs sm:w-auto">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 text-center ${
+                    activeCategory === cat
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40'
+                      : 'text-navy-300 hover:text-white hover:bg-navy-800/60'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
           {activeCategory === 'Main Courses' && (
@@ -453,33 +455,46 @@ export default function Courses() {
           {activeCategory === 'STCW Courses' && (
             <div className="space-y-10">
               {/* Sub-Category Filter Pills */}
-              <div className="flex flex-wrap gap-2 justify-center border-b border-navy-800 pb-6">
-                <button
-                  onClick={() => setSelectedStcwSubCat('all')}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-                    selectedStcwSubCat === 'all'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                      : 'bg-navy-900 text-navy-400 hover:text-white hover:bg-navy-800 border border-navy-800'
-                  }`}
-                >
-                  All Categories ({stcwData[0]?.children?.reduce((acc, c) => acc + (c.items?.length || 0), 0) || 0})
-                </button>
-                {stcwData[0]?.children?.map((subCat) => (
+              <div className="relative border-b border-navy-800/80 pb-6">
+                {/* Edge fade cues for mobile horizontal scroll */}
+                <div className="sm:hidden pointer-events-none absolute left-0 top-0 bottom-6 w-4 bg-gradient-to-r from-navy-950 to-transparent z-10 opacity-70" />
+                <div className="sm:hidden pointer-events-none absolute right-0 top-0 bottom-6 w-6 bg-gradient-to-l from-navy-950 to-transparent z-10 opacity-70" />
+
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center py-1">
                   <button
-                    key={subCat.category_id}
-                    onClick={() => setSelectedStcwSubCat(subCat.category_id)}
-                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                      selectedStcwSubCat === subCat.category_id
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                    onClick={() => setSelectedStcwSubCat('all')}
+                    className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                      selectedStcwSubCat === 'all'
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 ring-1 ring-blue-400/40'
                         : 'bg-navy-900 text-navy-400 hover:text-white hover:bg-navy-800 border border-navy-800'
                     }`}
                   >
-                    <span>{subCat.title}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-navy-800/80 text-navy-300">
-                      {subCat.items?.length || 0}
+                    <span>All Categories</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                      selectedStcwSubCat === 'all' ? 'bg-blue-700 text-white' : 'bg-navy-800 text-navy-300'
+                    }`}>
+                      {stcwData[0]?.children?.reduce((acc, c) => acc + (c.items?.length || 0), 0) || 0}
                     </span>
                   </button>
-                ))}
+                  {stcwData[0]?.children?.map((subCat) => (
+                    <button
+                      key={subCat.category_id}
+                      onClick={() => setSelectedStcwSubCat(subCat.category_id)}
+                      className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                        selectedStcwSubCat === subCat.category_id
+                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 ring-1 ring-blue-400/40'
+                          : 'bg-navy-900 text-navy-400 hover:text-white hover:bg-navy-800 border border-navy-800'
+                      }`}
+                    >
+                      <span>{subCat.title}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                        selectedStcwSubCat === subCat.category_id ? 'bg-blue-700 text-white' : 'bg-navy-800 text-navy-300'
+                      }`}>
+                        {subCat.items?.length || 0}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Sub-Category Groups */}
