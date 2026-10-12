@@ -933,7 +933,7 @@ export default function Courses() {
               </div>
 
               {/* Description / Overview */}
-              {selectedStcwModal.description ? (
+              {selectedStcwModal.description && (
                 <div className="bg-navy-950/70 border border-navy-800 rounded-2xl p-5 space-y-2">
                   <h4 className="text-xs font-bold text-navy-300 uppercase tracking-wider flex items-center gap-2">
                     <FiBook className="text-blue-400" /> Course Overview & Competencies
@@ -942,10 +942,6 @@ export default function Courses() {
                     {selectedStcwModal.description}
                   </p>
                 </div>
-              ) : (
-                <p className="text-sm text-navy-300 leading-relaxed">
-                  Conducted in accordance with international IMO standards and DGMS approval. Comprehensive theoretical and hands-on simulation training.
-                </p>
               )}
 
               {/* Requirements & Certification Grid */}
@@ -1004,24 +1000,19 @@ export default function Courses() {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-4 border-t border-navy-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <span className="text-xs text-navy-400 flex items-center gap-1.5">
-                  <FiGlobe className="text-blue-400" /> Recognized by global shipping lines
-                </span>
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <button
-                    onClick={() => setSelectedStcwModal(null)}
-                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-navy-800 hover:bg-navy-750 text-white text-xs font-semibold transition-colors cursor-pointer"
-                  >
-                    Close
-                  </button>
-                  <Link
-                    to={`/contact?course=${encodeURIComponent(selectedStcwModal.name + ' (' + selectedStcwModal.code + ')')}`}
-                    className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    Inquire / Enroll Now <FiArrowRight size={14} />
-                  </Link>
-                </div>
+              <div className="pt-4 border-t border-navy-800 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setSelectedStcwModal(null)}
+                  className="px-5 py-2.5 rounded-xl bg-navy-800 hover:bg-navy-750 text-white text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+                <Link
+                  to={`/contact?course=${encodeURIComponent(selectedStcwModal.name + ' (' + selectedStcwModal.code + ')')}`}
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  Inquire / Enroll Now <FiArrowRight size={14} />
+                </Link>
               </div>
             </div>
           </div>
