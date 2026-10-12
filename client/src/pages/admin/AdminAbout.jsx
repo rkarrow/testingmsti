@@ -116,10 +116,9 @@ export default function AdminAbout() {
             res.data.data.leadership && res.data.data.leadership.length > 0
               ? res.data.data.leadership
               : defaultAboutSettings.leadership,
-          aboutStoryImages:
-            res.data.data.aboutStoryImages && res.data.data.aboutStoryImages.length > 0
-              ? res.data.data.aboutStoryImages
-              : defaultAboutSettings.aboutStoryImages,
+          aboutStoryImages: [0, 1, 2, 3].map(
+            (i) => (res.data.data.aboutStoryImages && res.data.data.aboutStoryImages[i]) || defaultAboutSettings.aboutStoryImages[i] || ''
+          ),
           facilities:
             res.data.data.facilities && res.data.data.facilities.length > 0
               ? res.data.data.facilities
@@ -167,8 +166,18 @@ export default function AdminAbout() {
   }
 
   const handleLeadershipImageUpload = async (index, e) => {
-    const file = e.target.files[0]
+    const file = e.target?.files?.[0]
     if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, WebP, etc.).')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size exceeds 10MB limit. Please choose a smaller file.')
+      return
+    }
 
     const data = new FormData()
     data.append('image', file)
@@ -179,20 +188,24 @@ export default function AdminAbout() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
 
-      if (res.data.success) {
-        handleLeadershipChange(index, 'image', res.data.imageUrl)
+      const uploadedUrl = res.data.imageUrl || res.data.url
+      if (res.data.success && uploadedUrl) {
+        handleLeadershipChange(index, 'image', uploadedUrl)
         setMsg({ type: 'success', text: 'Member image uploaded successfully!' })
+      } else {
+        alert(res.data?.message || 'Failed to upload member image')
       }
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to upload image'
+      setMsg({ type: 'error', text: errorMsg })
+      alert(`Upload error: ${errorMsg}`)
     } finally {
       setUploadingLeaderIdx(null)
-      e.target.value = ''
+      if (e.target) e.target.value = ''
     }
   }
 
@@ -219,8 +232,18 @@ export default function AdminAbout() {
 
   // File Upload Handlers
   const handleHeroBgUpload = async (e) => {
-    const file = e.target.files[0]
+    const file = e.target?.files?.[0]
     if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, WebP, etc.).')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size exceeds 10MB limit. Please choose a smaller file.')
+      return
+    }
 
     const data = new FormData()
     data.append('image', file)
@@ -230,25 +253,40 @@ export default function AdminAbout() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
 
-      if (res.data.success) {
-        setFormData((prev) => ({ ...prev, aboutHeroBgImage: res.data.imageUrl }))
+      const uploadedUrl = res.data.imageUrl || res.data.url
+      if (res.data.success && uploadedUrl) {
+        setFormData((prev) => ({ ...prev, aboutHeroBgImage: uploadedUrl }))
         setMsg({ type: 'success', text: 'About hero background image uploaded successfully!' })
+      } else {
+        alert(res.data?.message || 'Failed to get uploaded image URL.')
       }
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to upload image'
+      setMsg({ type: 'error', text: errorMsg })
+      alert(`Upload error: ${errorMsg}`)
     } finally {
       setUploadingHeroBg(false)
+      if (e.target) e.target.value = ''
     }
   }
 
   const handleLeaderImageUpload = async (e) => {
-    const file = e.target.files[0]
+    const file = e.target?.files?.[0]
     if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, WebP, etc.).')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size exceeds 10MB limit. Please choose a smaller file.')
+      return
+    }
 
     const data = new FormData()
     data.append('image', file)
@@ -258,58 +296,94 @@ export default function AdminAbout() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
 
-      if (res.data.success) {
-        setFormData((prev) => ({ ...prev, aboutLeaderImage: res.data.imageUrl }))
+      const uploadedUrl = res.data.imageUrl || res.data.url
+      if (res.data.success && uploadedUrl) {
+        setFormData((prev) => ({ ...prev, aboutLeaderImage: uploadedUrl }))
         setMsg({ type: 'success', text: 'Leader image uploaded successfully!' })
+      } else {
+        alert(res.data?.message || 'Failed to get uploaded image URL.')
       }
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to upload image'
+      setMsg({ type: 'error', text: errorMsg })
+      alert(`Upload error: ${errorMsg}`)
     } finally {
       setUploadingLeader(false)
+      if (e.target) e.target.value = ''
     }
   }
 
   // Story Collage Images Handlers
   const handleStoryImageChange = (index, value) => {
     setFormData((prev) => {
-      const current = [...(prev.aboutStoryImages || defaultAboutSettings.aboutStoryImages)]
+      const current = [0, 1, 2, 3].map(
+        (i) => (prev.aboutStoryImages && prev.aboutStoryImages[i]) || defaultAboutSettings.aboutStoryImages[i] || ''
+      )
       current[index] = value
       return { ...prev, aboutStoryImages: current }
     })
   }
 
   const handleStoryImageUpload = async (index, e) => {
-    const file = e.target.files[0]
+    const file = e.target?.files?.[0]
     if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, WebP, etc.).')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size exceeds 10MB limit. Please choose a smaller file.')
+      return
+    }
 
     const data = new FormData()
     data.append('image', file)
 
     try {
       setUploadingStoryIdx(index)
-      setMsg({ type: 'info', text: `Uploading story image #${index + 1}...` })
+      setMsg({ type: 'info', text: `Uploading Photo #${index + 1}...` })
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
 
-      if (res.data.success) {
-        handleStoryImageChange(index, res.data.imageUrl)
-        setMsg({ type: 'success', text: `Story image #${index + 1} uploaded successfully!` })
+      const uploadedUrl = res.data.imageUrl || res.data.url
+      if (res.data.success && uploadedUrl) {
+        const current = [0, 1, 2, 3].map(
+          (i) => (formData.aboutStoryImages && formData.aboutStoryImages[i]) || defaultAboutSettings.aboutStoryImages[i] || ''
+        )
+        current[index] = uploadedUrl
+        const updatedData = { ...formData, aboutStoryImages: current }
+        setFormData(updatedData)
+
+        // Instant auto-save to database so photo is saved immediately
+        try {
+          await axios.put('/api/settings', updatedData, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          setMsg({ type: 'success', text: `Photo #${index + 1} uploaded & saved successfully! 🚢` })
+        } catch (saveErr) {
+          console.warn('Auto-save warning:', saveErr)
+          setMsg({ type: 'success', text: `Photo #${index + 1} uploaded! Click "Save" at bottom to confirm.` })
+        }
+      } else {
+        alert(res.data?.message || 'Failed to upload photo: No image URL returned.')
       }
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to upload image'
+      setMsg({ type: 'error', text: errorMsg })
+      alert(`Photo upload failed: ${errorMsg}`)
     } finally {
       setUploadingStoryIdx(null)
-      e.target.value = ''
+      if (e.target) e.target.value = ''
     }
   }
 
@@ -323,8 +397,18 @@ export default function AdminAbout() {
   }
 
   const handleFacilityImageUpload = async (index, e) => {
-    const file = e.target.files[0]
+    const file = e.target?.files?.[0]
     if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, WebP, etc.).')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size exceeds 10MB limit. Please choose a smaller file.')
+      return
+    }
 
     const data = new FormData()
     data.append('image', file)
@@ -335,20 +419,37 @@ export default function AdminAbout() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
 
-      if (res.data.success) {
-        handleFacilityChange(index, 'image', res.data.imageUrl)
-        setMsg({ type: 'success', text: 'Facility image uploaded successfully!' })
+      const uploadedUrl = res.data.imageUrl || res.data.url
+      if (res.data.success && uploadedUrl) {
+        const current = [...(formData.facilities || defaultAboutSettings.facilities)]
+        current[index] = { ...current[index], image: uploadedUrl }
+        const updatedData = { ...formData, facilities: current }
+        setFormData(updatedData)
+
+        // Instant auto-save to database
+        try {
+          await axios.put('/api/settings', updatedData, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          setMsg({ type: 'success', text: 'Facility image uploaded & saved successfully! 🚢' })
+        } catch (saveErr) {
+          console.warn('Auto-save warning:', saveErr)
+          setMsg({ type: 'success', text: 'Facility image uploaded! Click "Save" at bottom to confirm.' })
+        }
+      } else {
+        alert(res.data?.message || 'Failed to upload facility image')
       }
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload image' })
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to upload image'
+      setMsg({ type: 'error', text: errorMsg })
+      alert(`Facility upload failed: ${errorMsg}`)
     } finally {
       setUploadingFacilityIdx(null)
-      e.target.value = ''
+      if (e.target) e.target.value = ''
     }
   }
 
@@ -499,9 +600,19 @@ export default function AdminAbout() {
                   onChange={handleChange}
                   className="flex-1 bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
                 />
-                <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2.5 px-4 rounded-xl border border-navy-700 cursor-pointer flex items-center gap-2 shrink-0">
+                <input
+                  id="hero-bg-file-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleHeroBgUpload}
+                  className="hidden"
+                  disabled={uploadingHeroBg}
+                />
+                <label
+                  htmlFor="hero-bg-file-upload"
+                  className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2.5 px-4 rounded-xl border border-navy-700 cursor-pointer flex items-center gap-2 shrink-0"
+                >
                   <FiUpload /> {uploadingHeroBg ? 'Uploading...' : 'Upload Image'}
-                  <input type="file" accept="image/*" onChange={handleHeroBgUpload} className="hidden" />
                 </label>
               </div>
             </div>
@@ -698,9 +809,19 @@ export default function AdminAbout() {
                     onChange={handleChange}
                     className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
                   />
-                  <label className="bg-navy-800 hover:bg-navy-750 text-white text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                  <input
+                    id="leader-file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLeaderImageUpload}
+                    className="hidden"
+                    disabled={uploadingLeader}
+                  />
+                  <label
+                    htmlFor="leader-file-upload"
+                    className="bg-navy-800 hover:bg-navy-750 text-white text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0"
+                  >
                     <FiUpload size={13} /> {uploadingLeader ? 'Uploading...' : 'Upload'}
-                    <input type="file" accept="image/*" onChange={handleLeaderImageUpload} className="hidden" />
                   </label>
                 </div>
               </div>
@@ -767,15 +888,19 @@ export default function AdminAbout() {
                         placeholder="https://... or /image.jpg"
                         className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
                       />
-                      <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                      <input
+                        id={`story-file-upload-${idx}`}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleStoryImageUpload(idx, e)}
+                        className="hidden"
+                        disabled={uploadingStoryIdx === idx}
+                      />
+                      <label
+                        htmlFor={`story-file-upload-${idx}`}
+                        className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2 px-3 rounded-lg border border-blue-500 cursor-pointer flex items-center gap-1.5 shrink-0 transition-all shadow-md"
+                      >
                         <FiUpload size={13} /> {uploadingStoryIdx === idx ? 'Uploading...' : 'Upload'}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleStoryImageUpload(idx, e)}
-                          className="hidden"
-                          disabled={uploadingStoryIdx === idx}
-                        />
                       </label>
                     </div>
                   </div>
@@ -859,9 +984,19 @@ export default function AdminAbout() {
                       onChange={(e) => handleLeadershipChange(idx, 'image', e.target.value)}
                       className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
                     />
-                    <label className="bg-navy-800 hover:bg-navy-700 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                    <input
+                      id={`leadership-file-upload-${idx}`}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleLeadershipImageUpload(idx, e)}
+                      className="hidden"
+                      disabled={uploadingLeaderIdx === idx}
+                    />
+                    <label
+                      htmlFor={`leadership-file-upload-${idx}`}
+                      className="bg-navy-800 hover:bg-navy-700 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0"
+                    >
                       <FiUpload size={14} /> {uploadingLeaderIdx === idx ? 'Uploading...' : 'Upload'}
-                      <input type="file" accept="image/*" onChange={(e) => handleLeadershipImageUpload(idx, e)} className="hidden" disabled={uploadingLeaderIdx === idx} />
                     </label>
                   </div>
                 </div>
@@ -959,15 +1094,19 @@ export default function AdminAbout() {
                       placeholder="https://... or /image.jpg"
                       className="flex-1 bg-navy-900 border border-navy-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
                     />
-                    <label className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0">
+                    <input
+                      id={`facility-file-upload-${idx}`}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFacilityImageUpload(idx, e)}
+                      className="hidden"
+                      disabled={uploadingFacilityIdx === idx}
+                    />
+                    <label
+                      htmlFor={`facility-file-upload-${idx}`}
+                      className="bg-navy-800 hover:bg-navy-750 text-white font-medium text-xs py-2 px-3 rounded-lg border border-navy-700 cursor-pointer flex items-center gap-1.5 shrink-0"
+                    >
                       <FiUpload size={13} /> {uploadingFacilityIdx === idx ? 'Uploading...' : 'Upload'}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleFacilityImageUpload(idx, e)}
-                        className="hidden"
-                        disabled={uploadingFacilityIdx === idx}
-                      />
                     </label>
                   </div>
                 </div>

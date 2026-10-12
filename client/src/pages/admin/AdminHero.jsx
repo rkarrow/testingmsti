@@ -171,7 +171,6 @@ export default function AdminHero() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
@@ -244,7 +243,6 @@ export default function AdminHero() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
@@ -272,7 +270,6 @@ export default function AdminHero() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
@@ -300,7 +297,6 @@ export default function AdminHero() {
       const token = localStorage.getItem('msti_admin_token')
       const res = await axios.post('/api/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       })
