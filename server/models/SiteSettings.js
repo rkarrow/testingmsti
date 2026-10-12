@@ -292,6 +292,10 @@ const siteSettingsSchema = new mongoose.Schema({
     type: String,
     default: "To be recognized globally as Sri Lanka's premier benchmark institution for maritime education, officer cadetship, and merchant marine engineering excellence.",
   },
+  aboutHistoryHeading: {
+    type: String,
+    default: "MSTI is proud of its 39 years – plus history of expertise in maritime training and education.",
+  },
   aboutHistory: {
     type: String,
     default: "Founded in 1986, MSTI Maritime Academy is Sri Lanka's pioneer private maritime institute with a distinguished legacy spanning nearly four decades.",

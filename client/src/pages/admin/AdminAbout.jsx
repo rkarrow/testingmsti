@@ -36,6 +36,7 @@ const defaultAboutSettings = {
   aboutDesc2: "Our goal at MSTI Maritime Academy is to be recognized worldwide as a top quality service provider to the international marine industry in maritime training, adhering to strict IMO guidelines and global merchant fleets.",
   aboutMission: "To continuously contribute to the growth of maritime professionals and organizations through world-class IMO-compliant training, cutting-edge bridge simulators, and rigorous seafarer development.",
   aboutVision: "To be recognized globally as Sri Lanka's premier benchmark institution for maritime education, officer cadetship, and merchant marine engineering excellence.",
+  aboutHistoryHeading: "MSTI is proud of its 39 years – plus history of expertise in maritime training and education.",
   aboutHistory: "Founded in 1986, MSTI Maritime Academy is Sri Lanka's pioneer private maritime institute with a distinguished legacy spanning nearly four decades.",
   aboutLeaderName: "Capt. Ayesha Fernando",
   aboutLeaderRole: "Valedictorian • Officer of the Watch (STCW II/1)",
@@ -760,6 +761,18 @@ export default function AdminAbout() {
             </div>
 
             {/* History */}
+            <div>
+              <label className="block text-xs font-semibold text-navy-200 mb-1">History Highlight Heading</label>
+              <input
+                type="text"
+                name="aboutHistoryHeading"
+                value={formData.aboutHistoryHeading || ''}
+                onChange={handleChange}
+                placeholder="MSTI is proud of its 39 years – plus history of expertise in maritime training and education."
+                className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-navy-200 mb-1">History & Founding Legacy</label>
               <textarea

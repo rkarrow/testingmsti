@@ -128,7 +128,9 @@ export default function About() {
                 {settings?.aboutDesc2 || "We have a highly qualified staff of professionals, including Master Mariners and Chief Engineers, along with a wealth of knowledge and experience to offer in our programs. We are proud of our top-of-the-line facilities, including Sri Lanka's most advanced 360-degree simulator, which simulates actual ship environments and provides our students with an immersive, hands-on experience that prepares them for challenges and adventure on the seas."}
               </p>
               <div className="mt-8 mb-8">
-                <h3 className="text-white font-bold text-xl mb-2">MSTI is proud of its 35 years – plus history of expertise in maritime training and education.</h3>
+                <h3 className="text-white font-bold text-xl mb-2">
+                  {settings?.aboutHistoryHeading || "MSTI is proud of its 39 years – plus history of expertise in maritime training and education."}
+                </h3>
                 <p className="text-navy-300 font-medium leading-relaxed bg-blue-600/10 border border-blue-500/20 p-4 rounded-xl">
                   {settings?.aboutHistory || "Established in 1986, MSTI is the first private maritime training facility in Sri Lanka. Its German-owned parent company has over 100 years of experience in shipping, while its local parent company has over 25 years of experience in crew management. The wealth of experience is channeled towards providing the best possible training for students. Given that the training facility is equipped with the best technologies and the training is headed by master mariners and chief engineers, a love for seafaring will soon be cultivated. In addition to showcasing an extraordinary amount of experience, MSTI has also upheld German standards in establishing its training facility, which simulates real-ship environments. MSTI is a responsible training partner with training based on market demand, and its well-experienced staff members have an impeccable track record in sailing."}
                 </p>
