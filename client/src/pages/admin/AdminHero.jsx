@@ -48,8 +48,8 @@ const defaultSettings = {
   aboutHeroBgImage: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600",
   aboutStats: [
     { value: '100+', label: 'Graduates' },
-    { value: '150+', label: 'Partners' },
-    { value: '18+', label: 'Years' },
+    { value: '50+', label: 'Partners' },
+    { value: '39+', label: 'Years' },
     { value: '$4.3M', label: 'Invested' },
   ],
 

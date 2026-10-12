@@ -110,7 +110,7 @@ export default function Gallery() {
               Photo Gallery
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white mb-5 leading-tight">
-              Life at MSTI Maritime Academy
+              Student Life at MSTI Maritime Academy
             </h1>
             <p className="text-navy-300 text-lg leading-relaxed">
               A glimpse into training, campus life, events, and the vibrant community at MSTI — Sri Lanka's premier maritime training institution.
@@ -121,7 +121,7 @@ export default function Gallery() {
             {[
               { value: `${photos.length}+`, label: 'Photos' },
               { value: categories.length - 1, label: 'Categories' },
-              { value: '18+', label: 'Years' },
+              { value: '39+', label: 'Years' },
             ].map((s, i) => (
               <div key={i}>
                 <div className="text-2xl font-black text-white">{s.value}</div>
