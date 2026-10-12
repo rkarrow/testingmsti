@@ -6,7 +6,7 @@ import CTASection from '../components/CTASection'
 
 const defaultStats = [
   { value: '100+', label: 'Graduates' },
-  { value: '150+', label: 'Partners' },
+  { value: '50+', label: 'Partners' },
   { value: '18+', label: 'Years' },
   { value: '$4.3M', label: 'Invested' },
 ]

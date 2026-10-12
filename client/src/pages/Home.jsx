@@ -333,11 +333,17 @@ export default function Home() {
       {/* COURSES SECTION - DYNAMIC */}
       <section className="py-24 bg-navy-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-2">
-              CERTIFIED MERCHANT CADET PATHWAYS
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/15 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-widest mb-4 shadow-lg shadow-blue-500/5">
+              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              Certified Merchant Cadet Pathways
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white">Our Courses</h2>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
+              Our Courses
+            </h2>
+            <p className="text-navy-300 text-sm sm:text-base md:text-lg mt-4 leading-relaxed">
+              Explore our world-class, DGMS &amp; STCW approved maritime training programmes leading to prestigious global careers at sea.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">

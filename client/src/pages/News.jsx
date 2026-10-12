@@ -7,7 +7,7 @@ import CTASection from '../components/CTASection'
 
 const stats = [
   { value: '100%', label: 'Placement Rate' },
-  { value: '150+', label: 'Shipping Partners' },
+  { value: '50+', label: 'Shipping Partners' },
   { value: '3+', label: 'News Monthly' },
   { value: 'IMO', label: 'Accredited' },
 ]

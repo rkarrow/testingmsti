@@ -114,7 +114,7 @@ const siteSettingsSchema = new mongoose.Schema({
         "Medical fitness certificate",
       ],
       placementTitle: "🎯 Guaranteed Placement",
-      placementText: "All graduating cadets are guaranteed placement through our network of 150+ international shipping company partners.",
+      placementText: "All graduating cadets are guaranteed placement through our network of 50+ international shipping company partners.",
       ctaText: "Start Enrolment Process",
       ctaLink: "/contact",
     },

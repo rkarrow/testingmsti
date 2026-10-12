@@ -65,7 +65,7 @@ const pathway = [
   { step: '03', title: 'Sea Cadetship', desc: 'Practical at-sea training aboard partner shipping company vessels worldwide.', duration: '12 Months' },
   { step: '04', title: 'Advanced Studies', desc: 'Final shore-based modules, examinations, and certification preparation.', duration: '9 Months' },
   { step: '05', title: 'Certification', desc: 'Obtain Certificate of Competency as Officer of the Watch (OOW) — internationally recognized.', duration: 'Upon Completion' },
-  { step: '06', title: 'Global Placement', desc: 'Join our partner fleet of 150+ international shipping companies with guaranteed placement.', duration: 'Ongoing' },
+  { step: '06', title: 'Global Placement', desc: 'Join our partner fleet of 50+ international shipping companies with guaranteed placement.', duration: 'Ongoing' },
 ]
 
 const medicalStandards = [

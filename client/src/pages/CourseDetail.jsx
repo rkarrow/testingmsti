@@ -568,7 +568,7 @@ export default function CourseDetail() {
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-navy-300">
                   <FiAward className="text-amber-400 shrink-0" size={16} />
-                  <span>100% Placement Record with 150+ Partners</span>
+                  <span>100% Placement Record with 50+ Partners</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-navy-300">
                   <FiClock className="text-blue-400 shrink-0" size={16} />

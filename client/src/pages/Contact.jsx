@@ -5,7 +5,7 @@ import CTASection from '../components/CTASection'
 
 const defaultStats = [
   { value: '100%', label: 'Response Rate' },
-  { value: '150+', label: 'Hiring Partners' },
+  { value: '50+', label: 'Hiring Partners' },
   { value: '< 24h', label: 'Response Time' },
   { value: 'IMO', label: 'Accredited' },
 ]
@@ -21,7 +21,7 @@ const defaultFaqs = [
   },
   {
     q: 'Does MSTI guarantee employment after graduation?',
-    a: 'MSTI has signed placement agreements with over 150 international shipping companies. All qualifying graduates from our flagship cadetship programmes are offered employment through our placement partners.',
+    a: 'MSTI has signed placement agreements with over 50 international shipping companies. All qualifying graduates from our flagship cadetship programmes are offered employment through our placement partners.',
   },
 ]
 
