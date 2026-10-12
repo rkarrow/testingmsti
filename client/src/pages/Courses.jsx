@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import CourseCard from '../components/CourseCard'
 import CTASection from '../components/CTASection'
 import { defaultStcwCourses } from '../data/defaultStcwCourses'
+import { defaultCadetStandards, defaultRatingStandards } from '../data/defaultStandards'
 
 
 const disciplines = [
@@ -209,6 +210,99 @@ const shortCourses = {
   ]
 }
 
+function StandardsSection({ data, isRating }) {
+  if (!data) return null
+  const medicalList = Array.isArray(data.medicalItems)
+    ? data.medicalItems
+    : typeof data.medicalItems === 'string'
+    ? data.medicalItems.split('\n').filter(Boolean)
+    : []
+
+  const academicList = Array.isArray(data.academicRequirements)
+    ? data.academicRequirements
+    : typeof data.academicRequirements === 'string'
+    ? data.academicRequirements.split('\n').filter(Boolean)
+    : []
+
+  const ageList = Array.isArray(data.ageRequirements)
+    ? data.ageRequirements
+    : typeof data.ageRequirements === 'string'
+    ? data.ageRequirements.split('\n').filter(Boolean)
+    : []
+
+  const docList = Array.isArray(data.documentRequirements)
+    ? data.documentRequirements
+    : typeof data.documentRequirements === 'string'
+    ? data.documentRequirements.split('\n').filter(Boolean)
+    : []
+
+  return (
+    <section className={`py-20 ${isRating ? 'bg-navy-950 border-t border-navy-800' : 'bg-navy-900/40 border-t border-navy-800'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          <div>
+            <div className="badge-blue mb-4">{data.badge || (isRating ? 'Rating Admissions' : 'Admissions')}</div>
+            <h2 className="text-3xl font-bold text-white mb-4">{data.title}</h2>
+            <p className="text-navy-400 leading-relaxed mb-6">
+              {data.description}
+            </p>
+
+            <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6 mb-6">
+              <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                <FiShield className="text-blue-400" /> {data.medicalTitle || 'Medical Standards'}
+              </h3>
+              <ul className="space-y-3">
+                {medicalList.map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-navy-400 text-sm">
+                    <FiCheckCircle className="text-green-400 flex-shrink-0" size={15} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <Link to={data.ctaLink || '/contact'} className="btn-primary">
+              {data.ctaText || (isRating ? 'Apply for Rating Training' : 'Start Enrolment Process')} <FiArrowRight />
+            </Link>
+          </div>
+
+          <div>
+            <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6 mb-6">
+              <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                <FiBook className="text-blue-400" /> {data.enrolmentTitle || 'Enrolment Requirements'}
+              </h3>
+              <div className="space-y-4">
+                {[
+                  { label: 'Academic', items: academicList },
+                  { label: 'Age Criteria', items: ageList },
+                  { label: 'Documents', items: docList },
+                ].map((section, i) => (
+                  <div key={i}>
+                    <p className="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2">{section.label}</p>
+                    <ul className="space-y-1.5">
+                      {section.items.map((item, j) => (
+                        <li key={j} className="text-navy-400 text-sm flex items-start gap-2">
+                          <span className="w-1 h-1 rounded-full bg-navy-500 flex-shrink-0 mt-2" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-blue-600/10 border border-blue-500/20 rounded-2xl p-5">
+              <p className="text-blue-400 font-semibold text-sm mb-1">{data.placementTitle || '🎯 Guaranteed Placement'}</p>
+              <p className="text-navy-400 text-sm">{data.placementText}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function Courses() {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
@@ -218,6 +312,10 @@ export default function Courses() {
   const [stcwData, setStcwData] = useState(defaultStcwCourses)
   const [selectedStcwSubCat, setSelectedStcwSubCat] = useState('all')
   const [selectedStcwModal, setSelectedStcwModal] = useState(null)
+
+  // Enrolment & Medical Standards from settings
+  const [cadetStandards, setCadetStandards] = useState(defaultCadetStandards)
+  const [ratingStandards, setRatingStandards] = useState(defaultRatingStandards)
 
   // Dynamic programmes from settings
   const [officerList, setOfficerList] = useState(officerCadetPrograms)
@@ -243,6 +341,12 @@ export default function Courses() {
           const s = setRes.data.data
           if (s.stcwData && Array.isArray(s.stcwData) && s.stcwData.length > 0) {
             setStcwData(s.stcwData)
+          }
+          if (s.cadetStandards) {
+            setCadetStandards(s.cadetStandards)
+          }
+          if (s.ratingStandards) {
+            setRatingStandards(s.ratingStandards)
           }
           if (s.officerCadetPrograms && s.officerCadetPrograms.length > 0) {
             setOfficerList(s.officerCadetPrograms)
@@ -533,70 +637,11 @@ export default function Courses() {
         </div>
       </section>
 
-      {/* CADET ENROLLMENT & MEDICAL (Original Component) */}
-      <section className="py-20 bg-navy-900/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            <div>
-              <div className="badge-blue mb-4">Admissions</div>
-              <h2 className="text-3xl font-bold text-white mb-4">Cadet Enrolment & Medical Standards</h2>
-              <p className="text-navy-400 leading-relaxed mb-6">
-                All prospective cadets must meet our enrolment requirements and pass a comprehensive medical examination conducted by an approved maritime medical examiner.
-              </p>
+      {/* 1. CADET ENROLMENT & MEDICAL STANDARDS */}
+      <StandardsSection data={cadetStandards} isRating={false} />
 
-              <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6 mb-6">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <FiShield className="text-blue-400" /> Medical Standards
-                </h3>
-                <ul className="space-y-3">
-                  {medicalStandards.map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-navy-400 text-sm">
-                      <FiCheckCircle className="text-green-400 flex-shrink-0" size={15} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <Link to="/contact" className="btn-primary">
-                Start Enrolment Process <FiArrowRight />
-              </Link>
-            </div>
-
-            <div>
-              <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6 mb-6">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <FiBook className="text-blue-400" /> Enrolment Requirements
-                </h3>
-                <div className="space-y-4">
-                  {[
-                    { label: 'Academic', items: ['Minimum GCE A/L qualification (Science preferred)', 'Mathematics & Physics for Engineering track', 'English proficiency required'] },
-                    { label: 'Age Criteria', items: ['Officer Cadetship: 17–25 years', 'Marine Engineering: 17–25 years', 'Short courses: 18+ years'] },
-                    { label: 'Documents', items: ['Certified copies of educational certificates', 'Birth certificate', 'National ID or passport', 'Medical fitness certificate'] },
-                  ].map((section, i) => (
-                    <div key={i}>
-                      <p className="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2">{section.label}</p>
-                      <ul className="space-y-1.5">
-                        {section.items.map((item, j) => (
-                          <li key={j} className="text-navy-400 text-sm flex items-start gap-2">
-                            <span className="w-1 h-1 rounded-full bg-navy-500 flex-shrink-0 mt-2" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-blue-600/10 border border-blue-500/20 rounded-2xl p-5">
-                <p className="text-blue-400 font-semibold text-sm mb-1">🎯 Guaranteed Placement</p>
-                <p className="text-navy-400 text-sm">All graduating cadets are guaranteed placement through our network of 150+ international shipping company partners.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 2. RATING ENROLMENT & MEDICAL STANDARDS */}
+      <StandardsSection data={ratingStandards} isRating={true} />
 
       {/* STATE OF THE ART TRAINING (Original Component) */}
       <section className="relative py-24">

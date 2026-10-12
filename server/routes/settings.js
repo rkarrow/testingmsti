@@ -40,6 +40,16 @@ router.get('/', async (req, res) => {
         // Fallback
       }
     }
+    if (!settings.cadetStandards) {
+      try {
+        settings.cadetStandards = SiteSettings.schema.path('cadetStandards').defaultValue;
+      } catch (e) {}
+    }
+    if (!settings.ratingStandards) {
+      try {
+        settings.ratingStandards = SiteSettings.schema.path('ratingStandards').defaultValue;
+      } catch (e) {}
+    }
     res.json({ success: true, data: settings });
   } catch (error) {
     res.json({ success: true, data: defaultSettings });

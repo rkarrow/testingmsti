@@ -17,8 +17,10 @@ import {
   FiLayers,
   FiSliders,
   FiCheckCircle,
+  FiShield,
 } from 'react-icons/fi'
 import { defaultStcwCourses } from '../../data/defaultStcwCourses'
+import { defaultCadetStandards, defaultRatingStandards } from '../../data/defaultStandards'
 
 const defaultOfficerCadetPrograms = [
   {
@@ -185,6 +187,11 @@ export default function AdminCourses() {
   const [shortCoursesData, setShortCoursesData] = useState(defaultShortCourses)
   const [newShortItem, setNewShortItem] = useState({ category: 'stcw', text: '' })
 
+  // Enrolment & Medical Standards States (Cadet & Rating)
+  const [cadetStandards, setCadetStandards] = useState(defaultCadetStandards)
+  const [ratingStandards, setRatingStandards] = useState(defaultRatingStandards)
+  const [standardsSubTab, setStandardsSubTab] = useState('cadet') // 'cadet' | 'rating'
+
   // Modal State for General Courses
   const [modalOpen, setModalOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
@@ -264,6 +271,12 @@ export default function AdminCourses() {
         if (s.shortCourses && Object.keys(s.shortCourses).length > 0) {
           setShortCoursesData((prev) => ({ ...prev, ...s.shortCourses }))
         }
+        if (s.cadetStandards && Object.keys(s.cadetStandards).length > 0) {
+          setCadetStandards((prev) => ({ ...prev, ...s.cadetStandards }))
+        }
+        if (s.ratingStandards && Object.keys(s.ratingStandards).length > 0) {
+          setRatingStandards((prev) => ({ ...prev, ...s.ratingStandards }))
+        }
       }
     } catch (err) {
       setMsg({ type: 'error', text: 'Failed to fetch course data' })
@@ -272,7 +285,7 @@ export default function AdminCourses() {
     }
   }
 
-  // Save Settings (Officer, Rating, Short courses)
+  // Save Settings (Officer, Rating, Short courses, Standards)
   const handleSaveProgrammes = async () => {
     setSavingSettings(true)
     setMsg({ type: '', text: '' })
@@ -282,17 +295,27 @@ export default function AdminCourses() {
         officerCadetPrograms: officerPrograms,
         ratingPrograms: ratingPrograms,
         shortCourses: shortCoursesData,
+        cadetStandards: cadetStandards,
+        ratingStandards: ratingStandards,
       }
       const res = await axios.put('/api/settings', payload, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.data.success) {
-        setMsg({ type: 'success', text: 'Programmes & Short Courses updated live successfully! 🚢' })
+        setMsg({ type: 'success', text: 'Programmes & Standards updated live successfully! 🚢' })
       }
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to save programmes' })
     } finally {
       setSavingSettings(false)
+    }
+  }
+
+  const handleStandardsFieldChange = (sectionType, field, value) => {
+    if (sectionType === 'cadet') {
+      setCadetStandards((prev) => ({ ...prev, [field]: value }))
+    } else {
+      setRatingStandards((prev) => ({ ...prev, [field]: value }))
     }
   }
 
@@ -731,9 +754,10 @@ export default function AdminCourses() {
         {[
           { id: 'courses', label: '1. Structured Disciplines (Cards)', icon: FiLayers },
           { id: 'stcw', label: '2. STCW Courses (Hierarchical CRUD)', icon: FiCheckCircle },
-          { id: 'officer', label: '3. Officer Cadet Programmes', icon: FiAnchor },
-          { id: 'rating', label: '4. Rating Training Programmes', icon: FiAward },
-          { id: 'short', label: '5. Short Courses Catalogue', icon: FiSliders },
+          { id: 'standards', label: '3. Enrolment & Medical Standards', icon: FiShield },
+          { id: 'officer', label: '4. Officer Cadet Programmes', icon: FiAnchor },
+          { id: 'rating', label: '5. Rating Training Programmes', icon: FiAward },
+          { id: 'short', label: '6. Short Courses Catalogue', icon: FiSliders },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -1013,7 +1037,294 @@ export default function AdminCourses() {
         </div>
       )}
 
-      {/* TAB 3: OFFICER CADET PROGRAMMES */}
+      {/* TAB 3: ENROLMENT & MEDICAL STANDARDS (CADET & RATING) */}
+      {activeTab === 'standards' && (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <FiShield className="text-blue-500" /> Cadet & Rating Enrolment & Medical Standards
+              </h2>
+              <p className="text-navy-400 text-xs mt-1">
+                Customize admissions requirements, medical fitness criteria, guaranteed placement, and CTA banners for both Officer Cadets and Ratings.
+              </p>
+            </div>
+
+            <button
+              onClick={handleSaveProgrammes}
+              disabled={savingSettings}
+              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all shrink-0 cursor-pointer"
+            >
+              {savingSettings ? <FiRefreshCw className="animate-spin" /> : <FiSave />}
+              {savingSettings ? 'Saving...' : 'Save Standards'}
+            </button>
+          </div>
+
+          {/* Sub-Tabs: Cadet vs Rating */}
+          <div className="flex items-center gap-3 bg-navy-950 p-1.5 rounded-xl border border-navy-800 w-fit">
+            <button
+              onClick={() => setStandardsSubTab('cadet')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                standardsSubTab === 'cadet'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                  : 'text-navy-400 hover:text-white'
+              }`}
+            >
+              <FiAnchor size={14} /> Cadet Enrolment Standards
+            </button>
+            <button
+              onClick={() => setStandardsSubTab('rating')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                standardsSubTab === 'rating'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                  : 'text-navy-400 hover:text-white'
+              }`}
+            >
+              <FiAward size={14} /> Rating Enrolment Standards
+            </button>
+          </div>
+
+          {/* Standards Form Body */}
+          {(() => {
+            const curr = standardsSubTab === 'cadet' ? cadetStandards : ratingStandards
+            const subTitle = standardsSubTab === 'cadet' ? 'Cadet Standards Configuration' : 'Rating Standards Configuration'
+
+            return (
+              <div className="space-y-6">
+                {/* 1. Header Information */}
+                <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                  <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Section Header & Tagline ({subTitle})
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        Pill Badge Text
+                      </label>
+                      <input
+                        type="text"
+                        value={curr.badge || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'badge', e.target.value)}
+                        placeholder="e.g. Admissions or Rating Admissions"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        Section Main Title *
+                      </label>
+                      <input
+                        type="text"
+                        value={curr.title || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'title', e.target.value)}
+                        placeholder="e.g. Cadet Enrolment & Medical Standards"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                      Section Subtitle / Description
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={curr.description || ''}
+                      onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'description', e.target.value)}
+                      placeholder="Brief overview explaining standards and requirements..."
+                      className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Medical Standards & Enrolment Requirements (Two Columns) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left Column: Medical Standards */}
+                  <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                    <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                        <FiShield className="text-blue-400" /> Medical Standards Card
+                      </h3>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        Card Title
+                      </label>
+                      <input
+                        type="text"
+                        value={curr.medicalTitle || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'medicalTitle', e.target.value)}
+                        placeholder="e.g. Medical Standards"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        Medical Fitness Criteria (1 item per line)
+                      </label>
+                      <p className="text-[11px] text-navy-400 mb-2">
+                        Each line appears as a checklist item with a green checkmark icon.
+                      </p>
+                      <textarea
+                        rows={8}
+                        value={Array.isArray(curr.medicalItems) ? curr.medicalItems.join('\n') : curr.medicalItems || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'medicalItems', e.target.value.split('\n'))}
+                        placeholder="Vision: Minimum 6/6 corrected or uncorrected&#10;Color vision: No red/green color blindness&#10;Hearing: Adequate for bridge communication"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 leading-relaxed"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right Column: Enrolment Requirements */}
+                  <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                    <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                        <FiBookOpen className="text-blue-400" /> Enrolment Requirements Card
+                      </h3>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        Card Title
+                      </label>
+                      <input
+                        type="text"
+                        value={curr.enrolmentTitle || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'enrolmentTitle', e.target.value)}
+                        placeholder="e.g. Enrolment Requirements"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">
+                        Academic Requirements (1 per line)
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={Array.isArray(curr.academicRequirements) ? curr.academicRequirements.join('\n') : curr.academicRequirements || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'academicRequirements', e.target.value.split('\n'))}
+                        placeholder="Minimum GCE A/L qualification&#10;Mathematics & Physics for Engineering"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">
+                        Age Criteria (1 per line)
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={Array.isArray(curr.ageRequirements) ? curr.ageRequirements.join('\n') : curr.ageRequirements || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'ageRequirements', e.target.value.split('\n'))}
+                        placeholder="Officer Cadetship: 17–25 years&#10;Short courses: 18+ years"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">
+                        Documents Required (1 per line)
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={Array.isArray(curr.documentRequirements) ? curr.documentRequirements.join('\n') : curr.documentRequirements || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'documentRequirements', e.target.value.split('\n'))}
+                        placeholder="Certified copies of educational certificates&#10;Birth certificate&#10;National ID or passport"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Placement Banner & Action Button */}
+                <div className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                  <div className="flex items-center justify-between border-b border-navy-800 pb-3">
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <FiAward className="text-blue-400" /> Placement Guarantee & CTA Button
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        Placement Banner Title
+                      </label>
+                      <input
+                        type="text"
+                        value={curr.placementTitle || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'placementTitle', e.target.value)}
+                        placeholder="e.g. 🎯 Guaranteed Placement"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        Placement Banner Text
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={curr.placementText || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'placementText', e.target.value)}
+                        placeholder="Describe placement support or shipping line partnerships..."
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        CTA Button Label
+                      </label>
+                      <input
+                        type="text"
+                        value={curr.ctaText || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'ctaText', e.target.value)}
+                        placeholder="e.g. Start Enrolment Process"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                        CTA Button Target Link
+                      </label>
+                      <input
+                        type="text"
+                        value={curr.ctaLink || ''}
+                        onChange={(e) => handleStandardsFieldChange(standardsSubTab, 'ctaLink', e.target.value)}
+                        placeholder="e.g. /contact or /apply"
+                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Save Bar */}
+                <div className="flex items-center justify-end gap-3 pt-4">
+                  <button
+                    onClick={handleSaveProgrammes}
+                    disabled={savingSettings}
+                    className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs px-8 py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+                  >
+                    {savingSettings ? <FiRefreshCw className="animate-spin" /> : <FiSave />}
+                    {savingSettings ? 'Saving All Standards...' : 'Save All Standards'}
+                  </button>
+                </div>
+              </div>
+            )
+          })()}
+        </div>
+      )}
+
+      {/* TAB 4: OFFICER CADET PROGRAMMES */}
       {activeTab === 'officer' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
