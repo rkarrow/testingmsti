@@ -211,7 +211,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-wrap gap-5 text-xs">
-            <Link to="/about" className="hover:text-blue-400 transition-colors">DGMS Approval</Link>
+            <Link to="/about" className="hover:text-blue-400 transition-colors">DGMS Approved</Link>
             <Link to="/courses" className="hover:text-blue-400 transition-colors">STCW Programs</Link>
             <button 
               type="button" 

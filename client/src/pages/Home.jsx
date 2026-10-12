@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { FiArrowRight, FiChevronLeft, FiChevronRight, FiMapPin, FiExternalLink, FiDownload, FiMonitor, FiTool, FiLifeBuoy, FiHome } from 'react-icons/fi'
+import { FiArrowRight, FiChevronLeft, FiChevronRight, FiMapPin, FiExternalLink, FiDownload, FiMonitor, FiTool, FiLifeBuoy, FiHome, FiAnchor, FiAward, FiShield, FiCheckCircle } from 'react-icons/fi'
 
 export default function Home() {
   const [courses, setCourses] = useState([
@@ -239,34 +239,85 @@ export default function Home() {
         </div>
       </section>
 
-      {/* STATS SECTION */}
-      <section className="bg-navy-950 py-10 border-b border-navy-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 text-center">
-             <div className="px-4">
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">1986</div>
-                <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
+      {/* STATS & ACCREDITATIONS SECTION */}
+      <section className="bg-navy-950 py-12 md:py-16 border-b border-navy-900 relative overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-80 h-80 bg-amber-400/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {/* 1986 */}
+            <div className="bg-gradient-to-b from-navy-900/90 to-navy-950/90 border border-navy-800 hover:border-amber-400/40 rounded-2xl p-5 md:p-6 text-center transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/20 flex flex-col items-center justify-between group">
+              <div className="w-12 h-12 rounded-xl bg-amber-400/10 border border-amber-400/25 text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-amber-400/20 transition-all duration-300">
+                <FiAnchor size={22} />
+              </div>
+              <div className="w-full">
+                <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight group-hover:text-amber-300 transition-colors">
+                  1986
+                </div>
+                <div className="text-amber-400/90 text-[10px] sm:text-xs font-bold uppercase tracking-wider mt-1 mb-1.5">
+                  Pioneer Institute
+                </div>
+                <p className="text-navy-300 text-[11px] sm:text-xs leading-relaxed">
                   Established as Sri Lanka's first private maritime training institute.
-                </div>
+                </p>
               </div>
-              <div className="px-4">
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">ISO 9001:2015</div>
-                <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
-                  Certified Quality Management System
-                </div>
+            </div>
+
+            {/* ISO 9001:2015 */}
+            <div className="bg-gradient-to-b from-navy-900/90 to-navy-950/90 border border-navy-800 hover:border-blue-500/40 rounded-2xl p-5 md:p-6 text-center transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/20 flex flex-col items-center justify-between group">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/25 text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-300">
+                <FiAward size={22} />
               </div>
-              <div className="px-4">
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">DGMS Approved</div>
-                <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
-                  Director General of Merchant Shipping
+              <div className="w-full">
+                <div className="text-lg sm:text-2xl font-extrabold text-white tracking-tight group-hover:text-blue-300 transition-colors whitespace-nowrap">
+                  ISO 9001:2015
                 </div>
-              </div>
-              <div className="px-4">
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">TVEC Approved</div>
-                <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-snug">
-                  Tertiary and Vocational Education Commission
+                <div className="text-blue-400/90 text-[10px] sm:text-xs font-bold uppercase tracking-wider mt-1 mb-1.5">
+                  Certified Quality
                 </div>
+                <p className="text-navy-300 text-[11px] sm:text-xs leading-relaxed">
+                  Certified Quality Management System adhering to world standards.
+                </p>
               </div>
+            </div>
+
+            {/* DGMS Approved */}
+            <div className="bg-gradient-to-b from-navy-900/90 to-navy-950/90 border border-navy-800 hover:border-emerald-500/40 rounded-2xl p-5 md:p-6 text-center transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/20 flex flex-col items-center justify-between group">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all duration-300">
+                <FiShield size={22} />
+              </div>
+              <div className="w-full">
+                <div className="text-lg sm:text-2xl font-extrabold text-white tracking-tight group-hover:text-emerald-300 transition-colors">
+                  DGMS Approved
+                </div>
+                <div className="text-emerald-400/90 text-[10px] sm:text-xs font-bold uppercase tracking-wider mt-1 mb-1.5">
+                  Maritime Authority
+                </div>
+                <p className="text-navy-300 text-[11px] sm:text-xs leading-relaxed">
+                  Approved by Director General of Merchant Shipping, Sri Lanka.
+                </p>
+              </div>
+            </div>
+
+            {/* TVEC Approved */}
+            <div className="bg-gradient-to-b from-navy-900/90 to-navy-950/90 border border-navy-800 hover:border-cyan-500/40 rounded-2xl p-5 md:p-6 text-center transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/20 flex flex-col items-center justify-between group">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/25 text-cyan-400 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-cyan-500/20 transition-all duration-300">
+                <FiCheckCircle size={22} />
+              </div>
+              <div className="w-full">
+                <div className="text-lg sm:text-2xl font-extrabold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
+                  TVEC Approved
+                </div>
+                <div className="text-cyan-400/90 text-[10px] sm:text-xs font-bold uppercase tracking-wider mt-1 mb-1.5">
+                  State Accreditation
+                </div>
+                <p className="text-navy-300 text-[11px] sm:text-xs leading-relaxed">
+                  Tertiary and Vocational Education Commission registered institute.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
