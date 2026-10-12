@@ -211,7 +211,7 @@ const shortCourses = {
 export default function Courses() {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeCategory, setActiveCategory] = useState('Main Courses')
   
   // Dynamic programmes from settings
   const [officerList, setOfficerList] = useState(officerCadetPrograms)
@@ -221,7 +221,7 @@ export default function Courses() {
   const [activeTab, setActiveTab] = useState('officer')
   const [activeShortCourseTab, setActiveShortCourseTab] = useState('stcw')
 
-  const categories = ['All', 'Officer Cadetship', 'Marine Engineering', 'Nautical Science', 'Port Management', 'Safety & Security', 'Specialized Training']
+  const categories = ['Main Courses']
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -255,7 +255,7 @@ export default function Courses() {
   }, [])
 
   const displayCourses = courses.length > 0
-    ? (activeCategory === 'All' ? courses : courses.filter(c => c.category === activeCategory))
+    ? (activeCategory === 'Main Courses' || activeCategory === 'All' ? courses : courses.filter(c => c.category === activeCategory))
     : disciplines.map((d, i) => ({
         _id: i,
         title: d.title,
@@ -310,9 +310,9 @@ export default function Courses() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md ${
                   activeCategory === cat
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-blue-600 text-white shadow-blue-600/30'
                     : 'bg-navy-800 text-navy-300 hover:text-white hover:bg-navy-700'
                 }`}
               >
