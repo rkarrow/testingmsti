@@ -16,7 +16,7 @@ export default function Footer() {
               MSTI MARITIME ACADEMY
             </h3>
             <p className="text-navy-400 text-xs leading-relaxed">
-              Sri Lanka's pioneer private maritime training institute established with a proud legacy since 1986. Dedicated to producing world-class merchant navy officers and ratings.
+              Sri Lanka&apos;s pioneer private maritime training institute established with a proud legacy since 1986. Dedicated to producing world-class merchant navy officers and ratings.
             </p>
             <div className="pt-2 border-t border-navy-900">
               <h4 className="text-white text-[11px] font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5 text-blue-400">
@@ -98,12 +98,13 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2.5">
               {[
-                { label: 'Home Landing', to: '/' },
-                { label: 'About Us (History & Vision)', to: '/about' },
-                { label: 'Navigation & Engineering Cadetship', to: '/courses' },
-                { label: 'STCW & Modular Courses', to: '/courses' },
-                { label: 'Latest Maritime News & Notices', to: '/news' },
-                { label: 'Contact Us & Campus Locations', to: '/contact' },
+                { label: 'Home', to: '/' },
+                { label: 'About Us', to: '/about' },
+                { label: 'Main Courses', to: '/courses' },
+                { label: 'STCW Courses', to: '/courses' },
+                { label: 'Simulator Courses', to: '/courses' },
+                { label: 'Latest News & Notices', to: '/news' },
+                { label: 'Contact Us & Academy Locations', to: '/contact' },
               ].map((link, i) => (
                 <li key={i}>
                   <Link to={link.to} className="text-navy-400 text-xs hover:text-blue-400 transition-colors flex items-center gap-1.5">

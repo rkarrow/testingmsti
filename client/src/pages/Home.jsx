@@ -288,9 +288,6 @@ export default function Home() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
-                <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2">
-                  CADET CORPS LEADERSHIP
-                </p>
                 <h3 className="text-white text-2xl font-bold mb-1">
                   {settings.aboutLeaderName}
                 </h3>
@@ -399,9 +396,6 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
             <div>
-              <div className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-2">
-                DISPATCHES & COMMENCEMENTS
-              </div>
               <h2 className="text-3xl font-extrabold text-navy-950">Latest News & Events</h2>
             </div>
             <Link to="/news" className="text-blue-600 hover:text-blue-700 text-sm font-semibold flex items-center gap-1">
