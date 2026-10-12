@@ -77,12 +77,6 @@ const medicalStandards = [
   'No disqualifying chronic medical conditions',
 ]
 
-const certifications = [
-  { name: 'IMO', label: 'International Maritime Organization' },
-  { name: 'STCW', label: 'Standards of Training Certification' },
-  { name: 'ISO', label: 'ISO 9001:2015 Certified' },
-  { name: 'MoT', label: 'Ministry of Transport Approved' },
-]
 
 const officerCadetPrograms = [
   {
@@ -614,28 +608,6 @@ export default function Courses() {
         </div>
       </section>
 
-      {/* GLOBALLY CERTIFIED (Original Component) */}
-      <section className="py-20 bg-navy-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="badge-blue mb-3 mx-auto">Recognition</div>
-            <h2 className="section-title">Globally Certified & Exam Launched</h2>
-            <p className="text-navy-400 mt-2 max-w-2xl mx-auto">
-              Our programmes are recognized and certified by the world's leading maritime authorities, ensuring your qualifications are accepted globally.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {certifications.map((cert, i) => (
-              <div key={i} className="bg-navy-900 border border-navy-700 rounded-2xl p-6 text-center hover:border-blue-500/40 transition-colors">
-                <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-blue-400 font-bold text-lg">{cert.name}</span>
-                </div>
-                <p className="text-navy-400 text-sm">{cert.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* 1. CADET ENROLMENT & MEDICAL STANDARDS */}
       <StandardsSection data={cadetStandards} isRating={false} />
@@ -643,38 +615,6 @@ export default function Courses() {
       {/* 2. RATING ENROLMENT & MEDICAL STANDARDS */}
       <StandardsSection data={ratingStandards} isRating={true} />
 
-      {/* STATE OF THE ART TRAINING (Original Component) */}
-      <section className="relative py-24">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1600"
-            alt="Training"
-            className="w-full h-full object-cover opacity-10"
-          />
-          <div className="absolute inset-0 bg-navy-950/90" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="badge-blue mb-4 mx-auto">Infrastructure</div>
-          <h2 className="section-title mb-4">State of the Art Training Enablers</h2>
-          <p className="text-navy-400 max-w-2xl mx-auto mb-12">
-            Our training facilities match — and in many cases exceed — the standards required for real-world maritime operations.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: '🎯', title: 'Full-Mission Simulator', desc: '360° bridge navigation simulation' },
-              { icon: '⚙️', title: 'Engine Room Sim', desc: 'Realistic propulsion training' },
-              { icon: '📡', title: 'GMDSS Lab', desc: 'Advanced communications training' },
-              { icon: '🔥', title: 'Fire Training', desc: 'Real-fire STCW certification' },
-            ].map((item, i) => (
-              <div key={i} className="bg-navy-900 border border-navy-700 rounded-2xl p-6 hover:border-blue-500/40 transition-colors">
-                <div className="text-3xl mb-3">{item.icon}</div>
-                <h3 className="text-white font-semibold mb-2">{item.title}</h3>
-                <p className="text-navy-400 text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <CTASection
