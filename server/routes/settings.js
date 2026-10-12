@@ -29,6 +29,16 @@ router.get('/', async (req, res) => {
     let settings = await SiteSettings.findOne();
     if (!settings) {
       settings = defaultSettings;
+    } else {
+      settings = settings.toObject ? settings.toObject() : settings;
+    }
+    if (!settings.stcwData || (Array.isArray(settings.stcwData) && settings.stcwData.length === 0)) {
+      try {
+        const defaultData = SiteSettings.schema.path('stcwData').defaultValue;
+        settings.stcwData = defaultData;
+      } catch (e) {
+        // Fallback
+      }
     }
     res.json({ success: true, data: settings });
   } catch (error) {

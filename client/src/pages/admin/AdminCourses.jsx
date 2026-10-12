@@ -16,7 +16,9 @@ import {
   FiSave,
   FiLayers,
   FiSliders,
+  FiCheckCircle,
 } from 'react-icons/fi'
+import { defaultStcwCourses } from '../../data/defaultStcwCourses'
 
 const defaultOfficerCadetPrograms = [
   {
@@ -207,6 +209,24 @@ export default function AdminCourses() {
   const [formData, setFormData] = useState(initialForm)
   const [msg, setMsg] = useState({ type: '', text: '' })
 
+  // STCW Courses CRUD States
+  const [stcwData, setStcwData] = useState(defaultStcwCourses)
+  const [stcwFilterCat, setStcwFilterCat] = useState('all')
+  const [stcwModalOpen, setStcwModalOpen] = useState(false)
+  const [stcwEditMode, setStcwEditMode] = useState(false)
+  const [stcwFormData, setStcwFormData] = useState({
+    original_category_id: '',
+    original_id: '',
+    category_id: 'basic-short-courses',
+    id: '',
+    code: '',
+    name: '',
+    slug: '',
+  })
+  const [savingStcw, setSavingStcw] = useState(false)
+  const [subCatModalOpen, setSubCatModalOpen] = useState(false)
+  const [newSubCatForm, setNewSubCatForm] = useState({ title: '', category_id: '', slug: '' })
+
   useEffect(() => {
     fetchInitialData()
   }, [])
@@ -225,6 +245,9 @@ export default function AdminCourses() {
 
       if (setRes.data?.data) {
         const s = setRes.data.data
+        if (s.stcwData && Array.isArray(s.stcwData) && s.stcwData.length > 0) {
+          setStcwData(s.stcwData)
+        }
         if (s.officerCadetPrograms && s.officerCadetPrograms.length > 0) {
           setOfficerPrograms(s.officerCadetPrograms)
         }
@@ -447,6 +470,152 @@ export default function AdminCourses() {
     }))
   }
 
+  // --- STCW COURSES CRUD HANDLERS ---
+  const handleSaveStcw = async (overrideData) => {
+    const dataToSave = overrideData || stcwData
+    try {
+      setSavingStcw(true)
+      const token = localStorage.getItem('msti_admin_token')
+      const res = await axios.put(
+        '/api/settings',
+        { stcwData: dataToSave },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (res.data.success) {
+        setMsg({ type: 'success', text: 'STCW Courses updated & saved live! 🚢' })
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to save STCW Courses' })
+    } finally {
+      setSavingStcw(false)
+    }
+  }
+
+  const handleOpenAddStcw = (catId = 'basic-short-courses') => {
+    setStcwEditMode(false)
+    setStcwFormData({
+      original_category_id: '',
+      original_id: '',
+      category_id: catId,
+      id: '',
+      code: '',
+      name: '',
+      slug: '',
+    })
+    setStcwModalOpen(true)
+  }
+
+  const handleOpenEditStcw = (catId, item) => {
+    setStcwEditMode(true)
+    setStcwFormData({
+      original_category_id: catId,
+      original_id: item.id || item.code,
+      category_id: catId,
+      id: item.id || '',
+      code: item.code || '',
+      name: item.name || '',
+      slug: item.slug || '',
+    })
+    setStcwModalOpen(true)
+  }
+
+  const handleSubmitStcwCourse = (e) => {
+    e.preventDefault()
+    if (!stcwFormData.code.trim() || !stcwFormData.name.trim()) {
+      alert('Please fill in both Course Code and Course Name')
+      return
+    }
+
+    const updated = JSON.parse(JSON.stringify(stcwData))
+    if (!updated[0]) {
+      updated[0] = { category_id: 'stcw-courses', title: 'STCW Courses', slug: '/stcw-courses', children: [] }
+    }
+    if (!updated[0].children) updated[0].children = []
+
+    const autoSlug =
+      stcwFormData.slug.trim() ||
+      `/stcw-courses/${stcwFormData.category_id}/${stcwFormData.code.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+
+    if (stcwEditMode) {
+      // Remove from old category
+      const oldCat = updated[0].children.find((c) => c.category_id === stcwFormData.original_category_id)
+      if (oldCat && oldCat.items) {
+        oldCat.items = oldCat.items.filter(
+          (it) => it.id !== stcwFormData.original_id && it.code !== stcwFormData.original_id
+        )
+      }
+    }
+
+    // Add to target category
+    const targetCat = updated[0].children.find((c) => c.category_id === stcwFormData.category_id)
+    if (targetCat) {
+      if (!targetCat.items) targetCat.items = []
+      targetCat.items.push({
+        id: stcwFormData.id.trim() || (stcwEditMode ? stcwFormData.original_id : `${targetCat.items.length + 1}.1`),
+        code: stcwFormData.code.trim().toUpperCase(),
+        name: stcwFormData.name.trim(),
+        slug: autoSlug,
+      })
+    }
+
+    setStcwData(updated)
+    setStcwModalOpen(false)
+    handleSaveStcw(updated)
+  }
+
+  const handleDeleteStcwCourse = (catId, item) => {
+    if (!window.confirm(`Are you sure you want to delete "${item.code} — ${item.name}"?`)) return
+    const updated = JSON.parse(JSON.stringify(stcwData))
+    const root = updated[0]
+    if (root && root.children) {
+      const targetCat = root.children.find((c) => c.category_id === catId)
+      if (targetCat && targetCat.items) {
+        targetCat.items = targetCat.items.filter((it) => it.code !== item.code && it.id !== item.id)
+      }
+    }
+    setStcwData(updated)
+    handleSaveStcw(updated)
+  }
+
+  const handleAddSubCatSubmit = (e) => {
+    e.preventDefault()
+    if (!newSubCatForm.title.trim()) return
+
+    const catId =
+      newSubCatForm.category_id.trim() ||
+      newSubCatForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    const slug = newSubCatForm.slug.trim() || `/stcw-courses/${catId}`
+
+    const updated = JSON.parse(JSON.stringify(stcwData))
+    if (!updated[0]) {
+      updated[0] = { category_id: 'stcw-courses', title: 'STCW Courses', slug: '/stcw-courses', children: [] }
+    }
+    if (!updated[0].children) updated[0].children = []
+
+    updated[0].children.push({
+      category_id: catId,
+      title: newSubCatForm.title.trim(),
+      slug: slug,
+      items: [],
+    })
+
+    setStcwData(updated)
+    setSubCatModalOpen(false)
+    setNewSubCatForm({ title: '', category_id: '', slug: '' })
+    handleSaveStcw(updated)
+  }
+
+  const handleDeleteSubCat = (catId, title) => {
+    if (!window.confirm(`Are you sure you want to delete category "${title}" and all its courses?`)) return
+    const updated = JSON.parse(JSON.stringify(stcwData))
+    const root = updated[0]
+    if (root && root.children) {
+      root.children = root.children.filter((c) => c.category_id !== catId)
+    }
+    setStcwData(updated)
+    handleSaveStcw(updated)
+  }
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
@@ -460,7 +629,30 @@ export default function AdminCourses() {
           </p>
         </div>
 
-        {activeTab !== 'courses' ? (
+        {activeTab === 'stcw' ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setSubCatModalOpen(true)}
+              className="bg-navy-800 hover:bg-navy-700 text-white font-bold text-xs px-4 py-3 rounded-xl flex items-center justify-center gap-2 border border-navy-700 transition-all shrink-0 cursor-pointer"
+            >
+              <FiPlus size={16} /> Add Sub-Category
+            </button>
+            <button
+              onClick={() => handleOpenAddStcw(stcwFilterCat !== 'all' ? stcwFilterCat : 'basic-short-courses')}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all shrink-0 cursor-pointer"
+            >
+              <FiPlus size={16} /> Add STCW Course
+            </button>
+            <button
+              onClick={() => handleSaveStcw()}
+              disabled={savingStcw}
+              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs px-4 py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all shrink-0 cursor-pointer"
+            >
+              {savingStcw ? <FiRefreshCw className="animate-spin" /> : <FiSave />}
+              {savingStcw ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        ) : activeTab !== 'courses' ? (
           <button
             onClick={handleSaveProgrammes}
             disabled={savingSettings}
@@ -499,9 +691,10 @@ export default function AdminCourses() {
       <div className="flex flex-wrap gap-2 border-b border-navy-800 pb-3">
         {[
           { id: 'courses', label: '1. Structured Disciplines (Cards)', icon: FiLayers },
-          { id: 'officer', label: '2. Officer Cadet Programmes', icon: FiAnchor },
-          { id: 'rating', label: '3. Rating Training Programmes', icon: FiAward },
-          { id: 'short', label: '4. Short Courses Catalogue', icon: FiSliders },
+          { id: 'stcw', label: '2. STCW Courses (Hierarchical CRUD)', icon: FiCheckCircle },
+          { id: 'officer', label: '3. Officer Cadet Programmes', icon: FiAnchor },
+          { id: 'rating', label: '4. Rating Training Programmes', icon: FiAward },
+          { id: 'short', label: '5. Short Courses Catalogue', icon: FiSliders },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -608,9 +801,156 @@ export default function AdminCourses() {
             </div>
           )}
         </div>
+      {/* TAB 2: STCW COURSES (HIERARCHICAL CRUD) */}
+      {activeTab === 'stcw' && (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-navy-900/60 border border-navy-800 p-5 rounded-2xl">
+            <div>
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <FiCheckCircle className="text-blue-500" /> STCW Hierarchical Courses Management
+              </h2>
+              <p className="text-xs text-navy-400 mt-1">
+                Add, edit, or delete STCW course modules, course codes (e.g. FPFF, PST), sub-categories, and links.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setSubCatModalOpen(true)}
+                className="bg-navy-800 hover:bg-navy-750 text-navy-200 border border-navy-700 text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 font-semibold cursor-pointer transition-colors"
+              >
+                <FiPlus size={14} /> Add Sub-Category
+              </button>
+              <button
+                onClick={() => handleOpenAddStcw(stcwFilterCat !== 'all' ? stcwFilterCat : 'basic-short-courses')}
+                className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 font-semibold shadow-lg shadow-blue-600/20 cursor-pointer transition-colors"
+              >
+                <FiPlus size={14} /> Add STCW Course
+              </button>
+            </div>
+          </div>
+
+          {/* Sub-Category Filter Pills */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setStcwFilterCat('all')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                stcwFilterCat === 'all'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                  : 'bg-navy-900 text-navy-400 hover:text-white border border-navy-800'
+              }`}
+            >
+              All Categories ({stcwData[0]?.children?.reduce((acc, c) => acc + (c.items?.length || 0), 0) || 0})
+            </button>
+            {stcwData[0]?.children?.map((subCat) => (
+              <button
+                key={subCat.category_id}
+                onClick={() => setStcwFilterCat(subCat.category_id)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  stcwFilterCat === subCat.category_id
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'bg-navy-900 text-navy-400 hover:text-white border border-navy-800'
+                }`}
+              >
+                <span>{subCat.title}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-navy-800 text-navy-300">
+                  {subCat.items?.length || 0}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Sub Categories and their Courses */}
+          <div className="space-y-6">
+            {stcwData[0]?.children
+              ?.filter((subCat) => stcwFilterCat === 'all' || stcwFilterCat === subCat.category_id)
+              .map((subCat) => (
+                <div key={subCat.category_id} className="bg-navy-900 border border-navy-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                  {/* Category Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-navy-800 pb-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                        <h3 className="text-base font-bold text-white">{subCat.title}</h3>
+                        <span className="text-[10px] font-mono bg-navy-800 text-blue-400 px-2 py-0.5 rounded border border-navy-700">
+                          {subCat.category_id}
+                        </span>
+                      </div>
+                      <p className="text-xs text-navy-400 mt-1 font-mono">Slug: {subCat.slug}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => handleOpenAddStcw(subCat.category_id)}
+                        className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold cursor-pointer transition-colors"
+                      >
+                        <FiPlus size={14} /> Add Course Here
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSubCat(subCat.category_id, subCat.title)}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-2 rounded-lg transition-colors cursor-pointer"
+                        title="Delete Entire Category"
+                      >
+                        <FiTrash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Courses List */}
+                  {subCat.items && subCat.items.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {subCat.items.map((item, idx) => (
+                        <div
+                          key={item.id || item.code || idx}
+                          className="bg-navy-950 border border-navy-800 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-navy-700 transition-colors"
+                        >
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-mono font-bold">
+                                {item.code}
+                              </span>
+                              {item.id && (
+                                <span className="text-[10px] font-mono text-navy-500">
+                                  #{item.id}
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-sm font-bold text-white leading-snug">
+                              {item.name}
+                            </h4>
+                            <p className="text-[11px] font-mono text-navy-500 truncate" title={item.slug}>
+                              {item.slug}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-navy-850">
+                            <button
+                              onClick={() => handleOpenEditStcw(subCat.category_id, item)}
+                              className="text-xs text-blue-400 hover:text-blue-300 bg-navy-900 hover:bg-navy-800 px-2.5 py-1 rounded-md flex items-center gap-1 cursor-pointer font-medium border border-navy-800 transition-colors"
+                            >
+                              <FiEdit2 size={12} /> Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteStcwCourse(subCat.category_id, item)}
+                              className="text-xs text-red-400 hover:text-red-300 bg-navy-900 hover:bg-red-500/10 px-2.5 py-1 rounded-md flex items-center gap-1 cursor-pointer font-medium border border-navy-800 transition-colors"
+                            >
+                              <FiTrash2 size={12} /> Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 bg-navy-950/40 rounded-xl border border-dashed border-navy-800 text-xs text-navy-400">
+                      No courses in this sub-category yet. Click "Add Course Here" to add one.
+                    </div>
+                  )}
+                </div>
+              ))}
+          </div>
+        </div>
       )}
 
-      {/* TAB 2: OFFICER CADET PROGRAMMES */}
+      {/* TAB 3: OFFICER CADET PROGRAMMES */}
       {activeTab === 'officer' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -1091,6 +1431,199 @@ export default function AdminCourses() {
                   className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/30 cursor-pointer"
                 >
                   {editMode ? 'Save Course Updates' : 'Add Course Program'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADD / EDIT STCW COURSE MODAL */}
+      {stcwModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-navy-900 border border-navy-800 rounded-2xl max-w-lg w-full p-6 space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-navy-800 pb-4">
+              <h2 className="text-lg font-bold text-white">
+                {stcwEditMode ? 'Edit STCW Course' : 'Add New STCW Course'}
+              </h2>
+              <button
+                onClick={() => setStcwModalOpen(false)}
+                className="text-navy-400 hover:text-white p-1 rounded-lg cursor-pointer"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitStcwCourse} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                  Target Sub-Category *
+                </label>
+                <select
+                  value={stcwFormData.category_id}
+                  onChange={(e) => setStcwFormData({ ...stcwFormData, category_id: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  {stcwData[0]?.children?.map((subCat) => (
+                    <option key={subCat.category_id} value={subCat.category_id}>
+                      {subCat.title} ({subCat.category_id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                    Course Code *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. FPFF, PST, MFA"
+                    value={stcwFormData.code}
+                    onChange={(e) => setStcwFormData({ ...stcwFormData, code: e.target.value.toUpperCase() })}
+                    className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono font-bold focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                    Course Number / ID (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 1.1, 2.3"
+                    value={stcwFormData.id}
+                    onChange={(e) => setStcwFormData({ ...stcwFormData, id: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                  Course Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Fire Prevention and Fire Fighting"
+                  value={stcwFormData.name}
+                  onChange={(e) => setStcwFormData({ ...stcwFormData, name: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                  Custom Slug / URL (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Auto-generated if left empty"
+                  value={stcwFormData.slug}
+                  onChange={(e) => setStcwFormData({ ...stcwFormData, slug: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-navy-800">
+                <button
+                  type="button"
+                  onClick={() => setStcwModalOpen(false)}
+                  className="px-5 py-2.5 bg-navy-800 hover:bg-navy-700 text-white font-semibold text-xs rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingStcw}
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/30 cursor-pointer disabled:opacity-50"
+                >
+                  {savingStcw ? 'Saving...' : stcwEditMode ? 'Update Course' : 'Add Course'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADD SUB-CATEGORY MODAL */}
+      {subCatModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-navy-900 border border-navy-800 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-navy-800 pb-4">
+              <h2 className="text-lg font-bold text-white">Add New STCW Sub-Category</h2>
+              <button
+                onClick={() => setSubCatModalOpen(false)}
+                className="text-navy-400 hover:text-white p-1 rounded-lg cursor-pointer"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddSubCatSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                  Category Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Specialised Tanker Courses"
+                  value={newSubCatForm.title}
+                  onChange={(e) =>
+                    setNewSubCatForm({
+                      ...newSubCatForm,
+                      title: e.target.value,
+                      category_id: newSubCatForm.category_id || e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                      slug: newSubCatForm.slug || `/stcw-courses/${e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+                    })
+                  }
+                  className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                  Category ID (Slug Key)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. specialised-tanker-courses"
+                  value={newSubCatForm.category_id}
+                  onChange={(e) => setNewSubCatForm({ ...newSubCatForm, category_id: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-navy-200 uppercase tracking-wider mb-1">
+                  Slug / URL Path
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. /stcw-courses/specialised-tanker-courses"
+                  value={newSubCatForm.slug}
+                  onChange={(e) => setNewSubCatForm({ ...newSubCatForm, slug: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-navy-800">
+                <button
+                  type="button"
+                  onClick={() => setSubCatModalOpen(false)}
+                  className="px-5 py-2.5 bg-navy-800 hover:bg-navy-700 text-white font-semibold text-xs rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingStcw}
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/30 cursor-pointer disabled:opacity-50"
+                >
+                  {savingStcw ? 'Saving...' : 'Add Category'}
                 </button>
               </div>
             </form>

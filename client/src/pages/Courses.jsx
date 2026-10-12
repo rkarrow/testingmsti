@@ -4,6 +4,7 @@ import { FiClock, FiArrowRight, FiCheckCircle, FiStar, FiGlobe, FiShield, FiBook
 import { Link } from 'react-router-dom'
 import CourseCard from '../components/CourseCard'
 import CTASection from '../components/CTASection'
+import { defaultStcwCourses } from '../data/defaultStcwCourses'
 
 
 const disciplines = [
@@ -213,6 +214,10 @@ export default function Courses() {
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('Main Courses')
   
+  // STCW Courses from settings or default
+  const [stcwData, setStcwData] = useState(defaultStcwCourses)
+  const [selectedStcwSubCat, setSelectedStcwSubCat] = useState('all')
+
   // Dynamic programmes from settings
   const [officerList, setOfficerList] = useState(officerCadetPrograms)
   const [ratingList, setRatingList] = useState(ratingPrograms)
@@ -221,7 +226,7 @@ export default function Courses() {
   const [activeTab, setActiveTab] = useState('officer')
   const [activeShortCourseTab, setActiveShortCourseTab] = useState('stcw')
 
-  const categories = ['Main Courses']
+  const categories = ['Main Courses', 'STCW Courses']
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -235,6 +240,9 @@ export default function Courses() {
         }
         if (setRes.data?.data) {
           const s = setRes.data.data
+          if (s.stcwData && Array.isArray(s.stcwData) && s.stcwData.length > 0) {
+            setStcwData(s.stcwData)
+          }
           if (s.officerCadetPrograms && s.officerCadetPrograms.length > 0) {
             setOfficerList(s.officerCadetPrograms)
           }
@@ -321,23 +329,138 @@ export default function Courses() {
             ))}
           </div>
 
-          {loading ? (
-            <div className="grid md:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="card animate-pulse">
-                  <div className="h-48 bg-navy-800" />
-                  <div className="p-5 space-y-3">
-                     <div className="h-4 bg-navy-800 rounded w-3/4" />
-                    <div className="h-3 bg-navy-800 rounded w-full" />
+          {activeCategory === 'Main Courses' && (
+            loading ? (
+              <div className="grid md:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="card animate-pulse">
+                    <div className="h-48 bg-navy-800" />
+                    <div className="p-5 space-y-3">
+                       <div className="h-4 bg-navy-800 rounded w-3/4" />
+                      <div className="h-3 bg-navy-800 rounded w-full" />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-6">
-              {displayCourses.map((course) => (
-                <CourseCard key={course._id} course={course} />
-              ))}
+                ))}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {displayCourses.map((course) => (
+                  <CourseCard key={course._id} course={course} />
+                ))}
+              </div>
+            )
+          )}
+
+          {activeCategory === 'STCW Courses' && (
+            <div className="space-y-10">
+              {/* Sub-Category Filter Pills */}
+              <div className="flex flex-wrap gap-2 justify-center border-b border-navy-800 pb-6">
+                <button
+                  onClick={() => setSelectedStcwSubCat('all')}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    selectedStcwSubCat === 'all'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                      : 'bg-navy-900 text-navy-400 hover:text-white hover:bg-navy-800 border border-navy-800'
+                  }`}
+                >
+                  All Categories ({stcwData[0]?.children?.reduce((acc, c) => acc + (c.items?.length || 0), 0) || 0})
+                </button>
+                {stcwData[0]?.children?.map((subCat) => (
+                  <button
+                    key={subCat.category_id}
+                    onClick={() => setSelectedStcwSubCat(subCat.category_id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                      selectedStcwSubCat === subCat.category_id
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                        : 'bg-navy-900 text-navy-400 hover:text-white hover:bg-navy-800 border border-navy-800'
+                    }`}
+                  >
+                    <span>{subCat.title}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-navy-800/80 text-navy-300">
+                      {subCat.items?.length || 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Sub-Category Groups */}
+              <div className="space-y-10">
+                {stcwData[0]?.children
+                  ?.filter((subCat) => selectedStcwSubCat === 'all' || selectedStcwSubCat === subCat.category_id)
+                  .map((subCat) => (
+                    <div key={subCat.category_id} className="bg-navy-900/60 border border-navy-800 rounded-2xl p-6 md:p-8 space-y-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-navy-800 pb-4">
+                        <div>
+                          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                            {subCat.title}
+                          </h3>
+                          <p className="text-xs text-navy-400 mt-1">
+                            Approved maritime competencies under international IMO STCW standards.
+                          </p>
+                        </div>
+                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-navy-800 text-blue-400 border border-navy-700 w-fit">
+                          {subCat.items?.length || 0} Course{subCat.items?.length === 1 ? '' : 's'} Available
+                        </span>
+                      </div>
+
+                      {subCat.items && subCat.items.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {subCat.items.map((item, itemIdx) => (
+                            <div
+                              key={item.id || itemIdx}
+                              className="bg-navy-950 border border-navy-800 hover:border-blue-500/50 rounded-xl p-5 flex flex-col justify-between group transition-all hover:shadow-xl hover:shadow-blue-500/5 relative"
+                            >
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                    {item.code}
+                                  </span>
+                                  {item.id && (
+                                    <span className="text-[11px] font-mono text-navy-500">
+                                      #{item.id}
+                                    </span>
+                                  )}
+                                </div>
+                                <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">
+                                  {item.name}
+                                </h4>
+                                <span className="text-[11px] text-navy-400 block">
+                                  {subCat.title}
+                                </span>
+                              </div>
+
+                              <div className="pt-4 mt-4 border-t border-navy-850 flex items-center justify-between">
+                                <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> STCW Certified
+                                </span>
+                                <Link
+                                  to={`/contact?course=${encodeURIComponent(item.name + ' (' + item.code + ')')}`}
+                                  className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 group/btn"
+                                >
+                                  Inquire <FiArrowRight className="group-hover/btn:translate-x-0.5 transition-transform" />
+                                </Link>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="py-8 text-center bg-navy-950/60 rounded-xl border border-navy-800/80 space-y-3">
+                          <FiAnchor className="mx-auto text-navy-600 text-3xl" />
+                          <p className="text-sm text-navy-400 font-medium">
+                            No active batches currently scheduled for {subCat.title}.
+                          </p>
+                          <Link
+                            to="/contact"
+                            className="inline-block text-xs font-semibold bg-navy-800 hover:bg-navy-750 text-blue-400 border border-navy-700 px-4 py-2 rounded-lg transition-colors"
+                          >
+                            Inquire for Upcoming Intakes →
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
         </div>
