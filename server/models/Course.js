@@ -16,6 +16,11 @@ const courseSchema = new mongoose.Schema(
     intake: { type: String },
     requirements: [{ type: String }],
     outcomes: [{ type: String }],
+    careerGrowth: { type: String, default: '' },
+    careerSea: { type: String, default: '' },
+    careerAshore: { type: String, default: '' },
+    careerPath: { type: String, default: '' },
+    outcome: { type: String, default: '' },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

@@ -211,6 +211,9 @@ export default function AdminCourses() {
     image: '',
     requirements: '',
     outcomes: '',
+    careerGrowth: '',
+    careerSea: '',
+    careerAshore: '',
   }
 
   const [formData, setFormData] = useState(initialForm)
@@ -343,6 +346,9 @@ export default function AdminCourses() {
       image: course.image || '',
       requirements: Array.isArray(course.requirements) ? course.requirements.join('\n') : '',
       outcomes: Array.isArray(course.outcomes) ? course.outcomes.join('\n') : '',
+      careerGrowth: course.careerGrowth || '',
+      careerSea: course.careerSea || '',
+      careerAshore: course.careerAshore || '',
     })
     setModalOpen(true)
   }
@@ -1777,6 +1783,53 @@ export default function AdminCourses() {
                     className="w-full px-3 py-2 bg-navy-950 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-blue-500 font-mono"
                     placeholder="Certificate of Competency&#10;International employment"
                   />
+                </div>
+              </div>
+
+              {/* CAREER GROWTH & PROGRESSION */}
+              <div className="space-y-3 bg-navy-950/70 p-4 border border-navy-800 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <FiAnchor className="text-amber-400" size={16} />
+                  <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                    Career Growth & Progression Description
+                  </label>
+                </div>
+                <textarea
+                  rows={4}
+                  value={formData.careerGrowth}
+                  onChange={(e) => setFormData({ ...formData, careerGrowth: e.target.value })}
+                  className="w-full px-3 py-2.5 bg-navy-900 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500 leading-relaxed"
+                  placeholder="Enter detailed career growth and progression description for this course (e.g. seafaring career ladder, salary growth, global opportunities)..."
+                />
+                <p className="text-[11px] text-navy-400">
+                  This description will appear directly inside the "⚓ Career Growth & Progression" card on the course details page.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-navy-300 uppercase tracking-wider mb-1">
+                      Career Progression at Sea (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.careerSea}
+                      onChange={(e) => setFormData({ ...formData, careerSea: e.target.value })}
+                      className="w-full px-3 py-2 bg-navy-900 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                      placeholder="e.g. Third Officer → Second Officer → Chief Officer → Captain"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-navy-300 uppercase tracking-wider mb-1">
+                      Career Opportunities Ashore (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.careerAshore}
+                      onChange={(e) => setFormData({ ...formData, careerAshore: e.target.value })}
+                      className="w-full px-3 py-2 bg-navy-900 border border-navy-800 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                      placeholder="e.g. Harbour Pilot, Marine Superintendent, Educator"
+                    />
+                  </div>
                 </div>
               </div>
 

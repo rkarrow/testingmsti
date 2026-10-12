@@ -457,6 +457,12 @@ export default function CourseDetail() {
                 <FiAnchor className="text-amber-400" /> Career Growth & Progression
               </h2>
 
+              {course.careerGrowth && (
+                <div className="text-navy-300 text-sm md:text-base bg-navy-950 p-4 md:p-5 rounded-xl border border-navy-800 leading-relaxed whitespace-pre-line">
+                  {course.careerGrowth}
+                </div>
+              )}
+
               {course.outcome && (
                 <div>
                   <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">
@@ -465,6 +471,22 @@ export default function CourseDetail() {
                   <p className="text-navy-300 text-sm md:text-base bg-navy-950 p-4 rounded-xl border border-navy-800">
                     {course.outcome}
                   </p>
+                </div>
+              )}
+
+              {Array.isArray(course.outcomes) && course.outcomes.length > 0 && !course.outcome && (
+                <div>
+                  <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">
+                    Career & Qualification Outcomes
+                  </h3>
+                  <ul className="space-y-2 bg-navy-950 p-4 rounded-xl border border-navy-800">
+                    {course.outcomes.map((out, i) => (
+                      <li key={i} className="text-navy-300 text-sm md:text-base flex items-start gap-2.5">
+                        <FiCheckCircle className="text-emerald-400 shrink-0 mt-1" size={16} />
+                        <span>{out}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
@@ -499,6 +521,12 @@ export default function CourseDetail() {
                     {course.careerPath}
                   </p>
                 </div>
+              )}
+
+              {!course.careerGrowth && !course.outcome && (!Array.isArray(course.outcomes) || course.outcomes.length === 0) && !course.careerSea && !course.careerAshore && !course.careerPath && (
+                <p className="text-navy-400 text-sm italic bg-navy-950/60 p-4 rounded-xl border border-navy-800/80">
+                  Detailed career pathway information and placement guidance will be provided during admission counseling.
+                </p>
               )}
             </div>
           </div>
