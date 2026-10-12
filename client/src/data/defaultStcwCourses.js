@@ -153,7 +153,7 @@ export const defaultStcwCourses = [
       },
       {
         category_id: "other-courses",
-        title: "Other Courses",
+        title: "NON-STCW Courses",
         slug: "/stcw-courses/other-courses",
         items: [
           {

@@ -334,7 +334,14 @@ export default function Courses() {
         if (setRes.data?.data) {
           const s = setRes.data.data
           if (s.stcwData && Array.isArray(s.stcwData) && s.stcwData.length > 0) {
-            setStcwData(s.stcwData)
+            const normalizedStcw = s.stcwData.map((root) => ({
+              ...root,
+              children: root.children?.map((child) => ({
+                ...child,
+                title: (child.title === 'Other Courses' || child.category_id === 'other-courses') ? 'NON-STCW Courses' : child.title,
+              })),
+            }))
+            setStcwData(normalizedStcw)
           }
           if (s.cadetStandards) {
             setCadetStandards(s.cadetStandards)
@@ -507,10 +514,12 @@ export default function Courses() {
                         <div>
                           <h3 className="text-xl font-bold text-white flex items-center gap-2">
                             <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                            {subCat.title}
+                            {subCat.title === 'Other Courses' ? 'NON-STCW Courses' : subCat.title}
                           </h3>
                           <p className="text-xs text-navy-400 mt-1">
-                            Approved maritime competencies under international IMO STCW standards.
+                            {(subCat.title === 'NON-STCW Courses' || subCat.title === 'Other Courses' || subCat.category_id === 'other-courses')
+                              ? 'Specialized maritime professional training and certification courses.'
+                              : 'Approved maritime competencies under international IMO STCW standards.'}
                           </p>
                         </div>
                         <span className="text-xs font-semibold px-3 py-1 rounded-full bg-navy-800 text-blue-400 border border-navy-700 w-fit">
@@ -523,7 +532,11 @@ export default function Courses() {
                           {subCat.items.map((item, itemIdx) => (
                             <div
                               key={item.id || itemIdx}
-                              onClick={() => setSelectedStcwModal({ ...item, categoryTitle: subCat.title })}
+                              onClick={() => setSelectedStcwModal({
+                                ...item,
+                                categoryTitle: (subCat.title === 'Other Courses' ? 'NON-STCW Courses' : subCat.title),
+                                isNonStcw: subCat.title === 'NON-STCW Courses' || subCat.title === 'Other Courses' || subCat.category_id === 'other-courses'
+                              })}
                               className="bg-navy-950 border border-navy-800 hover:border-blue-500/50 rounded-2xl overflow-hidden flex flex-col justify-between group transition-all hover:shadow-2xl hover:shadow-blue-500/10 relative cursor-pointer"
                             >
                               {/* Course Photo */}
@@ -537,7 +550,11 @@ export default function Courses() {
                                 ) : (
                                   <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-navy-900 to-navy-950 text-navy-500 p-4 text-center">
                                     <FiAnchor className="text-3xl text-blue-500/40 mb-1" />
-                                    <span className="text-xs font-semibold text-navy-400">STCW Maritime Training</span>
+                                    <span className="text-xs font-semibold text-navy-400">
+                                      {(subCat.title === 'NON-STCW Courses' || subCat.title === 'Other Courses' || subCat.category_id === 'other-courses')
+                                        ? 'Maritime Training'
+                                        : 'STCW Maritime Training'}
+                                    </span>
                                   </div>
                                 )}
                                 <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/20 to-black/30" />
@@ -566,7 +583,7 @@ export default function Courses() {
                               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                                 <div className="space-y-2">
                                   <span className="text-[11px] font-semibold text-blue-400 uppercase tracking-wider block">
-                                    {subCat.title}
+                                    {subCat.title === 'Other Courses' ? 'NON-STCW Courses' : subCat.title}
                                   </span>
                                   <h4 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">
                                     {item.name}
@@ -582,7 +599,11 @@ export default function Courses() {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      setSelectedStcwModal({ ...item, categoryTitle: subCat.title })
+                                      setSelectedStcwModal({
+                                        ...item,
+                                        categoryTitle: (subCat.title === 'Other Courses' ? 'NON-STCW Courses' : subCat.title),
+                                        isNonStcw: subCat.title === 'NON-STCW Courses' || subCat.title === 'Other Courses' || subCat.category_id === 'other-courses'
+                                      })
                                     }}
                                     className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1.5 group/btn cursor-pointer"
                                   >
@@ -662,7 +683,9 @@ export default function Courses() {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-navy-900 to-navy-950 text-navy-400">
                   <FiAnchor className="text-5xl text-blue-500/50 mb-2" />
-                  <span className="text-sm font-semibold">STCW Maritime Training Programme</span>
+                  <span className="text-sm font-semibold">
+                    {selectedStcwModal.isNonStcw ? 'Maritime Training Programme' : 'STCW Maritime Training Programme'}
+                  </span>
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/40 to-black/60" />
@@ -687,8 +710,12 @@ export default function Courses() {
                       #{selectedStcwModal.id}
                     </span>
                   )}
-                  <span className="px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 backdrop-blur-sm">
-                    STCW Approved
+                  <span className={`px-3 py-1 rounded-xl text-xs font-semibold backdrop-blur-sm ${
+                    selectedStcwModal.isNonStcw
+                      ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  }`}>
+                    {selectedStcwModal.isNonStcw ? 'NON-STCW Certified' : 'STCW Approved'}
                   </span>
                 </div>
 

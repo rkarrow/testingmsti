@@ -206,7 +206,7 @@ const siteSettingsSchema = new mongoose.Schema({
           },
           {
             category_id: "other-courses",
-            title: "Other Courses",
+            title: "NON-STCW Courses",
             slug: "/stcw-courses/other-courses",
             items: [
               { id: "5.1", code: "CRISIS", name: "Crisis Management", slug: "/stcw-courses/other-courses/crisis-management" },

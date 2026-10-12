@@ -50,6 +50,17 @@ router.get('/', async (req, res) => {
         settings.ratingStandards = SiteSettings.schema.path('ratingStandards').defaultValue;
       } catch (e) {}
     }
+    if (settings.stcwData && Array.isArray(settings.stcwData)) {
+      settings.stcwData.forEach((root) => {
+        if (root.children && Array.isArray(root.children)) {
+          root.children.forEach((child) => {
+            if (child.title === 'Other Courses' || child.category_id === 'other-courses') {
+              child.title = 'NON-STCW Courses';
+            }
+          });
+        }
+      });
+    }
     res.json({ success: true, data: settings });
   } catch (error) {
     res.json({ success: true, data: defaultSettings });
